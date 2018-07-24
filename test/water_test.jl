@@ -101,7 +101,7 @@
     
         thermostat = BerendsenThermostat(T0, 200τ)
         simulation = NBodySimulation(water, (t1, t2), pbc)
-        (ms_ber, kb_ber, n_ber, nc_ber, p_ber) = DiffEqPhysics.obtain_data_for_berendsen_thermostating(simulation)
+        (ms_ber, kb_ber, n_ber, nc_ber, p_ber) = NBodySimulator.obtain_data_for_berendsen_thermostating(simulation)
         @test length(ms_ber) == n_ber
         @test kb_ber == kb
         @test n_ber == 6
@@ -109,7 +109,7 @@
     
         thermostat = NoseHooverThermostat(T0, 200τ)
         simulation = NBodySimulation(water, (t1, t2), pbc)
-        (ms_nh, kb_nh, n_nh, nc_nh, γind, p_nh) = DiffEqPhysics.obtain_data_for_nosehoover_thermostating(simulation)
+        (ms_nh, kb_nh, n_nh, nc_nh, γind, p_nh) = NBodySimulator.obtain_data_for_nosehoover_thermostating(simulation)
         @test length(ms_nh) == n_nh
         @test kb_nh == kb
         @test n_nh == 6
@@ -138,7 +138,7 @@
         result = run_simulation(simulation, VelocityVerlet(), dt=τ)
 
         io = IOBuffer()
-        pdb_data = sprint(io -> DiffEqPhysics.write_pdb_data(io, result))
+        pdb_data = sprint(io -> NBodySimulator.write_pdb_data(io, result))
         splitted_data = split(pdb_data, '\n')
 
         hetatm_count = 0

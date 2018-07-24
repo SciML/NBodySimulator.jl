@@ -2,7 +2,7 @@ struct CustomPotentialParameters <: PotentialParameters
     a::AbstractFloat
 end
 
-import DiffEqPhysics.get_accelerating_function
+import NBodySimulator.get_accelerating_function
 function get_accelerating_function(p::CustomPotentialParameters, simulation::NBodySimulation)
     (dv, u, v, t, i) -> begin custom_accel = SVector(p.a, 0.0, 0.0); dv .= custom_accel end 
 end

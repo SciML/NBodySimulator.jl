@@ -1,9 +1,9 @@
 using StaticArrays, DiffEqBase, OrdinaryDiffEq, RecipesBase, DiffEqCallbacks
 
-include("./nbody_bodies.jl")
-include("./nbody_boundary_conditions.jl")
-include("./nbody_thermostat.jl")
-include("./nbody_basic_potentials.jl")
+include("./bodies.jl")
+include("./boundary_conditions.jl")
+include("./thermostats.jl")
+include("./basic_potentials.jl")
 include("./nbody_system.jl")
 
 const kb_SI = 1.38e-23 # J/K

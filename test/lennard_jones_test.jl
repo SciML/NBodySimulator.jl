@@ -96,7 +96,7 @@
         @test (rs[ind] / σ) ≈ 1.0 atol = 1.0
 
         io = IOBuffer()
-        pdb_data = sprint(io -> DiffEqPhysics.write_pdb_data(io, result))
+        pdb_data = sprint(io -> NBodySimulator.write_pdb_data(io, result))
         splitted_data = split(pdb_data, '\n')
 
         hetatm_count = 0
