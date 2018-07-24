@@ -1,5 +1,10 @@
-using NbodySimulator, Test
+using NBodySimulator, StaticArrays, LinearAlgebra
+using Test
 
-@testset "Initial test" begin
-	@test sqrt(36) == 6
-end
+include("lennard_jones_test.jl")
+include("electrostatics_test.jl")
+include("gravitational_test.jl")
+include("custom_potential_test.jl")
+include("magnetostaic_test.jl")
+include("thermostat_test.jl")
+include("water_test.jl")
