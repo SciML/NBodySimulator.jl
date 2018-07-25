@@ -1,4 +1,6 @@
-module NbodySimulator
+__precompile__()
+
+module NBodySimulator
 
 using Reexport
 @reexport using DiffEqBase, OrdinaryDiffEq, RecursiveArrayTools
