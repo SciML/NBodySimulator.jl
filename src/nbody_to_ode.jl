@@ -28,6 +28,16 @@ function gather_bodies_initial_coordinates(simulation::NBodySimulation{<:WaterSP
         len = 3*n+1
     end
 
+    (u0,v0) = gather_atom_coordinates(simulation.system, len)
+
+    (u0, v0, n)
+end
+
+
+
+function gather_atom_coordinates(system::WaterSPCFw{<:MassBody}, len)
+    molecules = system.bodies;
+    n = length(molecules)
     u0 = zeros(3, len)
     v0 = zeros(3, len)
 
@@ -40,6 +50,51 @@ function gather_bodies_initial_coordinates(simulation::NBodySimulation{<:WaterSP
         v0[:, indO] = molecules[i].v
         v0[:, indH1] = molecules[i].v
         v0[:, indH2] = molecules[i].v
+    end 
+    (u0, v0)
+end
+
+function gather_atom_coordinates(system::WaterSPCFw{<:WaterMolecule}, len)
+    molecules = system.bodies;
+    n = length(molecules)
+    u0 = zeros(3, len)
+    v0 = zeros(3, len)
+
+    for i = 1:n
+        p = system.scpfw_parameters
+        indO, indH1, indH2 = 3 * (i - 1) + 1, 3 * (i - 1) + 2, 3 * (i - 1) + 3
+        u0[:, indO] = molecules[i].O.r 
+        u0[:, indH1]  = molecules[i].H1.r
+        u0[:, indH2] = molecules[i].H2.r
+        v0[:, indO] = molecules[i].O.v
+        v0[:, indH1] = molecules[i].H1.v
+        v0[:, indH2] = molecules[i].H2.v
+    end
+    (u0, v0)
+end
+
+function gather_bodies_initial_coordinates_in_vectors(simulation::NBodySimulation{<:WaterSPCFw})
+    system = simulation.system
+    molecules = system.bodies;
+    n = length(molecules)
+    len = 3*n
+    
+    if simulation.thermostat isa NoseHooverThermostat
+        len = 3*n+1
+    end
+
+    u0 = zeros(3*len)
+    v0 = zeros(3*len)
+
+    for i = 1:n
+        p = system.scpfw_parameters
+        indO, indH1, indH2 = 9 * (i - 1) + 1, 9 * (i - 1) + 4, 9 * (i - 1) + 7
+        u0[indO:indO+2] = molecules[i].r 
+        u0[indH1:indH1+2] = molecules[i].r .+ [p.rOH, 0.0, 0.0]
+        u0[indH2:indH2+2] = molecules[i].r .+ [cos(p.aHOH) * p.rOH, 0.0, sin(p.aHOH) * p.rOH]
+        v0[indO:indO+2] = molecules[i].v
+        v0[indH1:indH1+2] = molecules[i].v
+        v0[indH2:indH2+2] = molecules[i].v
     end 
 
     (u0, v0, n)
@@ -388,15 +443,17 @@ end
 
 function DiffEqBase.SDEProblem(simulation::NBodySimulation{<:WaterSPCFw})
     (u0, v0, n) = gather_bodies_initial_coordinates(simulation)
-    
-   
+       
     (o_acelerations, h_acelerations) = gather_accelerations_for_potentials(simulation)
     group_accelerations = gather_group_accelerations(simulation)   
     simultaneous_acceleration = gather_simultaneous_acceleration(simulation)
 
     therm = simulation.thermostat
 
-    function deterministic_acceleration!(du, u, p, t)
+    function deterministic_acceleration!(du2, u2, p, t)
+        du = reshape(du2,3,2*3*n)
+        u = reshape(u2,3,2*3*n)
+        
         du[:, 1:3*n] = @view u[:, 3*n+1 : 2*3*n];
 
         @inbounds for i = 1:n
@@ -422,17 +479,35 @@ function DiffEqBase.SDEProblem(simulation::NBodySimulation{<:WaterSPCFw})
             acceleration!((@view du[:, 3*n+1 : 2*3*n]), (@view u[:, 1:3*n]), (@view u[:, 3*n+1 : 2*3*n]), t);    
         end
         @. du[:, 3*n+1 : 2*3*n] -= therm.γ*u[:, 3*n+1 : 2*3*n]
+
+        du2 = reshape(du, 3*3*2*n)
+        u2 = reshape(u, 3*3*2*n)
     end
 
     σO = sqrt(2*therm.γ*simulation.kb*therm.T/simulation.system.mO)
     σH = sqrt(2*therm.γ*simulation.kb*therm.T/simulation.system.mH)
     function noise!(du, u, p, t)
         @inbounds for i = 1:n
-            @. du[:, 3*n+3 * (i - 1) + 1] += σO
-            @. du[:, 3*n+3 * (i - 1) + 2] += σH
-            @. du[:, 3*n+3 * (i - 1) + 3] += σH
+            n_ind = 3 * (i - 1)
+            p_ind = 9 * (i - 1)
+            for j = 1:3
+                du[p_ind+j, n_ind+j] = σO
+                du[p_ind+j+3, n_ind+j] = σH
+                du[p_ind+j+6, n_ind+j] = σH
+            end
+        end
+    end
+
+    A = zeros(3*3*2*n,3*n)
+    for i = 1:n
+        n_ind = 3 * (i - 1)
+        p_ind = 9 * (i - 1)
+        for j = 1:3
+            A[3*3*n+p_ind+j, n_ind+j] = 1
+            A[3*3*n+p_ind+j+3, n_ind+j] = 1
+            A[3*3*n+p_ind+j+6, n_ind+j] = 1
         end
     end
     
-    return SDEProblem(deterministic_acceleration!, noise!, hcat(u0, v0), simulation.tspan)
+    return SDEProblem(deterministic_acceleration!, noise!, reshape(hcat(u0, v0), 3*3*2*n), simulation.tspan, noise_rate_prototype=A)
 end

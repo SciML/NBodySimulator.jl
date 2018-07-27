@@ -42,6 +42,10 @@ function get_velocity(sr::SimulationResult, time::Real, i::Integer=0)
         end
     else
         velocities = sr(time)
+        if sr.simulation.thermostat isa LangevinThermostat
+            velocities = reshape(velocities, 3, 2*n)
+        end
+
         if i <= 0
             return @view velocities[:, n + 1:2*n]
         else
@@ -585,4 +589,93 @@ function write_pdb_data(f::IO, sr::SimulationResult)
         end
         println(f,"ENDMDL")
     end
+end
+
+function save_to_pdb(sr::SimulationResult, f)
+    open(f, "w") do s
+        write_pdb_data(s,sr)
+    end
+end
+
+function load(f::File{format"ProteinDataBank"})
+    open(f) do s
+        skipmagic(s)  # skip over the magic bytes
+        extract_from_pdb(s)
+    end
+end
+
+function load_water_molecules_from_pdb(path_str)
+    open(path_str) do file
+        extract_from_pdb(file)
+    end
+end
+
+function extract_from_pdb(file)
+    cc = SVector[]
+    wms = WaterMolecule[]
+    t_count = 0
+    while !eof(file)
+        ln = readline(file)
+        if ln[1:5] == "MODEL"
+            break
+        end
+    end
+
+    ln_time = readline(file)
+    parts = split(ln_time)
+    t1 = parse(Float64, parts[3][6:end])
+        
+    while !eof(file)
+        ln_cc = readline(file)
+        if ln_cc[1:6]=="ENDMDL"
+            break
+        elseif ln_cc[14]=='O'
+            ps_o = split(ln_cc)
+            cc_o = SVector(parse(Float64, ps_o[6]), parse(Float64, ps_o[7]), parse(Float64, ps_o[8]))/10
+            ps_h1 = split(readline(file))
+            cc_h1 = SVector(parse(Float64, ps_h1[6]), parse(Float64, ps_h1[7]), parse(Float64, ps_h1[8]))/10
+            ps_h2 = split(readline(file))
+            cc_h2 = SVector(parse(Float64, ps_h2[6]), parse(Float64, ps_h2[7]), parse(Float64, ps_h2[8]))/10
+            push!(cc, cc_o)
+            push!(cc, cc_h1)
+            push!(cc, cc_h2)
+        end
+    end
+
+    while !eof(file)
+        ln = readline(file)
+        if ln[1:5] == "MODEL"
+            break
+        end
+    end
+    
+
+    ln_time = readline(file)
+    parts = split(ln_time)
+    t2 = parse(Float64, parts[3][6:end])
+    τ = t2-t1
+
+    mc = 0
+    while !eof(file)
+        ln_cc = readline(file)
+        if ln_cc[1:6]=="ENDMDL"
+            break
+        elseif  ln_cc[14]=='O'
+            mc+=1
+            ps_o = split(ln_cc)
+            cc_o = SVector(parse(Float64, ps_o[6]), parse(Float64, ps_o[7]), parse(Float64, ps_o[8]))/10
+            ps_h1 = split(readline(file))
+            cc_h1 = SVector(parse(Float64, ps_h1[6]), parse(Float64, ps_h1[7]), parse(Float64, ps_h1[8]))/10
+            ps_h2 = split(readline(file))
+            cc_h2 = SVector(parse(Float64, ps_h2[6]), parse(Float64, ps_h2[7]), parse(Float64, ps_h2[8]))/10
+
+            o = MassBody(cc[3*(mc-1)+1], (cc_o-cc[3*(mc-1)+1])/τ, 15.999)
+            h1 = MassBody(cc[3*(mc-1)+2], (cc_h1-cc[3*(mc-1)+2])/τ, 1.00794)
+            h2 = MassBody(cc[3*(mc-1)+3], (cc_h2-cc[3*(mc-1)+3])/τ, 1.00794)
+
+            push!(wms, WaterMolecule(o,h1,h2))
+        end
+    end       
+
+    wms
 end

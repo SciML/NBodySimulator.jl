@@ -23,6 +23,12 @@ struct MagneticParticle{cType <: Real,mType <: Real,mmType <: Real} <: Body
     mm::SVector{3,mmType}   
 end
 
+struct WaterMolecule <: Body
+    O::MassBody
+    H1::MassBody
+    H2::MassBody
+end
+
 function generate_bodies_in_cell_nodes(n::Int, m::Real, v_dev::Real, L::Real)
    
     rng = MersenneTwister(n);

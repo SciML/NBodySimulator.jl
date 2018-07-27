@@ -41,11 +41,11 @@
 
     @testset "Three particles of liquid argon and their \"temperature\"" begin 
         T = 120.0 # °K
-        kb = 1.38e-23 # J/K
+        kb = 8.3144598e-3 # kJ/(K*mol)
         ϵ = T * kb
-        σ = 3.4e-10 # m
-        ρ = 1374 # kg/m^3
-        m = 39.95 * 1.6747 * 1e-27 # kg
+        σ = 0.34 # nm
+        ρ = 1374/1.6747# Da/nm^3
+        m = 39.95# Da
         L = 5σ # 10.229σ
         N = 3 # floor(Int, ρ * L^3 / m)
         R = 2.25σ   
@@ -60,7 +60,7 @@
         p2 = MassBody(r2, v2, m)
         p3 = MassBody(r3, v3, m)
 
-        τ = 1e-14
+        τ = 0.5e-3 # ps or 1e-12 s
         t1 = 0.0
         t2 = 100τ
 
@@ -88,13 +88,6 @@
         e_tot_2 = total_energy(result, t2)
         @test e_tot_1 ≈ e_tot_2 atol = ε
 
-        (ts, mean_square_displacement) = msd(result)
-        @test mean_square_displacement[1] < mean_square_displacement[end]
-
-        (rs, grs) = rdf(result)
-        (val, ind) = findmax(grs)
-        @test (rs[ind] / σ) ≈ 1.0 atol = 1.0
-
         io = IOBuffer()
         pdb_data = sprint(io -> NBodySimulator.write_pdb_data(io, result))
         splitted_data = split(pdb_data, '\n')
@@ -115,6 +108,35 @@
         @test length(result.solution.t) == timestep_count
         @test molecule_number == length(lj_system.bodies)
 
+    end
+
+    @testset "Testing RDF and MSD calculation" begin 
+        T = 120.0 # °K
+        kb = 8.3144598e-3 # kJ/(K*mol)
+        ϵ = T * kb
+        σ = 0.34 # nm
+        ρ = 1374/1.6747# Da/nm^3
+        m = 39.95# Da
+        L = 5σ # 10.229σ
+        N = 125 # floor(Int, ρ * L^3 / m)
+        R = 0.5L   
+        τ = 0.5e-3 # ps or 1e-12 s
+        t1 = 0.0
+        t2 = 400τ
+        v_dev = sqrt(kb * T / m)
+        bodies = generate_bodies_in_cell_nodes(N, m, v_dev, L)
+
+        parameters = LennardJonesParameters(ϵ, σ, R)
+        lj_system = PotentialNBodySystem(bodies, Dict(:lennard_jones => parameters));
+        simulation = NBodySimulation(lj_system, (t1, t2), CubicPeriodicBoundaryConditions(L), kb);
+        result = run_simulation(simulation, VelocityVerlet(), dt=τ)
+
+        (ts, mean_square_displacement) = msd(result)
+        @test mean_square_displacement[1] < mean_square_displacement[end]
+
+        (rs, grs) = rdf(result)
+        (val, ind) = findmax(grs)
+        @test (rs[ind] / σ) ≈ 1.0 atol = 1.0
     end
 
     @testset "Constructing electorstatic potential parameters entity" begin
