@@ -449,11 +449,10 @@ function DiffEqBase.SDEProblem(simulation::NBodySimulation{<:WaterSPCFw})
     simultaneous_acceleration = gather_simultaneous_acceleration(simulation)
 
     therm = simulation.thermostat
+    mH = simulation.system.mH
+    mO = simulation.system.mO
 
-    function deterministic_acceleration!(du2, u2, p, t)
-        du = reshape(du2,3,2*3*n)
-        u = reshape(u2,3,2*3*n)
-        
+    function deterministic_acceleration!(du, u, p, t)
         du[:, 1:3*n] = @view u[:, 3*n+1 : 2*3*n];
 
         @inbounds for i = 1:n
@@ -462,6 +461,10 @@ function DiffEqBase.SDEProblem(simulation::NBodySimulation{<:WaterSPCFw})
                 acceleration!(a, (@view u[:, 1:3*n]), (@view u[:, 3*n+1 : 2*3*n]), t, 3 * (i - 1) + 1);    
             end
             du[:, 3*n+3 * (i - 1) + 1]  .= a
+
+            @. du[:, 3*n+3 * (i - 1) + 1] -= therm.γ*u[:, 3*n+3 * (i - 1) + 1]/mO
+            @. du[:, 3*n+3 * (i - 1) + 2] -= therm.γ*u[:, 3*n+3 * (i - 1) + 2]/mH
+            @. du[:, 3*n+3 * (i - 1) + 3] -= therm.γ*u[:, 3*n+3 * (i - 1) + 3]/mH
         end
         @inbounds for i in 1:n, j in (2, 3)
             a = MVector(0.0, 0.0, 0.0)
@@ -472,42 +475,27 @@ function DiffEqBase.SDEProblem(simulation::NBodySimulation{<:WaterSPCFw})
         end 
         @inbounds for i = 1:n
             for acceleration! in group_accelerations
-                acceleration!((@view du[:, 3*n+1 : 2*3*n]), (@view u[:, 1:3*n]), (@view u[:, 3*n+1 : 2*3*n]), t, i);    
+                acceleration!((@view du[ :, 3*n+1 : 2*3*n]), (@view u[:, 1:3*n]), (@view u[:, 3*n+1 : 2*3*n]), t, i);    
             end
         end
         for acceleration! in simultaneous_acceleration
             acceleration!((@view du[:, 3*n+1 : 2*3*n]), (@view u[:, 1:3*n]), (@view u[:, 3*n+1 : 2*3*n]), t);    
         end
         @. du[:, 3*n+1 : 2*3*n] -= therm.γ*u[:, 3*n+1 : 2*3*n]
-
-        du2 = reshape(du, 3*3*2*n)
-        u2 = reshape(u, 3*3*2*n)
     end
 
-    σO = sqrt(2*therm.γ*simulation.kb*therm.T/simulation.system.mO)
-    σH = sqrt(2*therm.γ*simulation.kb*therm.T/simulation.system.mH)
+    #σO = sqrt(2*therm.γ*simulation.kb*therm.T/simulation.system.mO)
+    #σH = sqrt(2*therm.γ*simulation.kb*therm.T/simulation.system.mH)
+    σO = sqrt(2*therm.γ*simulation.kb*therm.T)/mO
+    σH = sqrt(2*therm.γ*simulation.kb*therm.T)/mH
+    
     function noise!(du, u, p, t)
         @inbounds for i = 1:n
-            n_ind = 3 * (i - 1)
-            p_ind = 9 * (i - 1)
-            for j = 1:3
-                du[p_ind+j, n_ind+j] = σO
-                du[p_ind+j+3, n_ind+j] = σH
-                du[p_ind+j+6, n_ind+j] = σH
-            end
-        end
-    end
-
-    A = zeros(3*3*2*n,3*n)
-    for i = 1:n
-        n_ind = 3 * (i - 1)
-        p_ind = 9 * (i - 1)
-        for j = 1:3
-            A[3*3*n+p_ind+j, n_ind+j] = 1
-            A[3*3*n+p_ind+j+3, n_ind+j] = 1
-            A[3*3*n+p_ind+j+6, n_ind+j] = 1
+            @. du[:, 3*n+3 * (i - 1) + 1] += σO
+            @. du[:, 3*n+3 * (i - 1) + 2] += σH
+            @. du[:, 3*n+3 * (i - 1) + 3] += σH
         end
     end
     
-    return SDEProblem(deterministic_acceleration!, noise!, reshape(hcat(u0, v0), 3*3*2*n), simulation.tspan, noise_rate_prototype=A)
+    return SDEProblem(deterministic_acceleration!, noise!, hcat(u0, v0), simulation.tspan)
 end
