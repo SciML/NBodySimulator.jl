@@ -17,7 +17,7 @@ const Rel = 0.49*L
 const v_dev = sqrt(kb * T /mH2O)# sqrt(3.0/7)*sqrt(kb * T /mH2O)
 const τ = 0.5e-3 # ps
 const t1 = 0τ
-const t2 = 800τ # ps
+const t2 = 100τ # ps
 const k_bond = 1059.162*4.184*1e2 # kJ/(mol*nm^2)
 const k_angle = 75.90*4.184 # kJ/(mol*rad^2)
 const rOH = 0.1012 # nm
@@ -31,9 +31,9 @@ e_parameters = ElectrostaticParameters(k, Rel)
 spc_paramters = SPCFwParameters(rOH, ∠HOH, k_bond, k_angle)
 pbc = CubicPeriodicBoundaryConditions(L)
 water = WaterSPCFw(bodies, mH, mO, qH, qO,  jl_parameters, e_parameters, spc_paramters);
-thermostat = LangevinThermostat(T0, 1)
+thermostat = LangevinThermostat(T0, 0)
 simulation = NBodySimulation(water, (t1, t2), pbc, thermostat, kb);
-result = @time run_simulation(simulation, SOSRA(),  dt=τ)
+result = @time run_simulation(simulation, EM(),  dt=τ)
 
 time_now = Dates.format(now(), "yyyy_mm_dd_HH_MM_SS")
 Nactual = length(bodies)
@@ -80,3 +80,19 @@ close(file)
 #plot!(pl, title="Berendsen thermostat at tau=$(thermostat.τ) ps")
 #plot!(pl, title="Andersen thermostat at dt*v=$(thermostat.ν*τ) ")
 #plot!(pl, title="Nose-Hoover thermostat at tau=$(thermostat.τ) ps")
+
+#=
+t = t1:τ:result.solution.t[end-1]
+temper = temperature.(result, t)
+
+time_now = Dates.format(now(), "yyyy_mm_dd_HH_MM_SS")
+Nactual = length(bodies)
+timesteps = round(length(result.solution.t))
+
+using MAT
+file = matopen("d:/water sde $timesteps timesteps $T0 _$time_now.mat", "w")
+write(file, "t", collect(t))
+write(file, "temper", temper)
+write(file, "T0", T0)
+close(file)
+=#

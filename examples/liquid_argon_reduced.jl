@@ -1,26 +1,5 @@
 using NBodySimulator
 
-function generate_bodies_in_cell_nodes(n::Int, m::Real, v_dev::Real, L::Real)
-   
-    rng = MersenneTwister(n);
-    velocities = v_dev * randn(rng, Float64, (3, n))
-    bodies = MassBody[]
-
-    count = 1
-    dL = L / (ceil(n^(1 / 3)))
-    for x = dL / 2:dL:L, y = dL / 2:dL:L, z = dL / 2:dL:L        
-        if count > n
-            break
-        end
-        r = SVector(x, y, z)
-        v = SVector{3}(velocities[:,count])
-        body = MassBody(r, v, m)
-        push!(bodies, body)
-        count += 1           
-    end
-    return bodies
-end
-
 const T = 120.0 # °K
 const kb = 1.38e-23 # J/K
 const ϵ = T * kb

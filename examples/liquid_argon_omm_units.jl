@@ -1,36 +1,40 @@
 using NBodySimulator
 using StochasticDiffEq
 
-T = 120.0 # °K
-T0 = 90.0 # °K
-kb = 8.3144598e-3 # kJ/(K*mol)
-ϵ = T * kb
-σ = 0.34 # nm
-ρ = 1374/1.6747# Da/nm^3
-m = 39.95# Da
-N = 216
-L = (m*N/ρ)^(1/3)#10.229σ
-R = 0.5*L   
-v_dev = sqrt(kb * T / m)
-bodies = generate_bodies_in_cell_nodes(N, m, v_dev, L)
+const T = 120.0 # °K
+const T0 = 90.0 # °K
+const kb = 8.3144598e-3 # kJ/(K*mol)
+const ϵ = T * kb
+const σ = 0.34 # nm
+const ρ = 1374/1.6747# Da/nm^3
+const m = 39.95# Da
+const N = 8
+const L = (m*N/ρ)^(1/3)#10.229σ
+const R = 0.5*L   
+const v_dev = sqrt(kb * T / m)
+const bodies = generate_bodies_in_cell_nodes(N, m, v_dev, L)
 
-τ = 0.5e-3 # ps or 1e-12 s
-t1 = 0.0
-t2 = 2000τ
+const τ = 0.5e-4 # ps or 1e-12 s
+const t1 = 0.0
+const t2 = 3τ
 
-parameters = LennardJonesParameters(ϵ, σ, R)
-lj_system = PotentialNBodySystem(bodies, Dict(:lennard_jones => parameters));
-thermostat = AndersenThermostat(90, 0.01/τ)
+const parameters = LennardJonesParameters(ϵ, σ, R)
+const lj_system = PotentialNBodySystem(bodies, Dict(:lennard_jones => parameters));
+#const thermostat = AndersenThermostat(90, 0.01/τ)
 #thermostat = BerendsenThermostat(90, 2000τ)
-#thermostat = LangevinThermostat(90, 0.00)
+const thermostat = LangevinThermostat(70, 10.0)
 #thermostat = NoseHooverThermostat(T0, 200τ)
-pbc = CubicPeriodicBoundaryConditions(L)
-simulation = NBodySimulation(lj_system, (t1, t2), pbc, thermostat, kb);
-result = @time run_simulation(simulation, VelocityVerlet(), dt=τ)
+const pbc = CubicPeriodicBoundaryConditions(L)
+const simulation = NBodySimulation(lj_system, (t1, t2), pbc, thermostat, kb);
+#result = @time run_simulation(simulation, VelocityVerlet(), dt=τ)
 #result = @time run_simulation_sde(simulation, ISSEM(symplectic=true,theta=0.5))
+result = @time run_simulation(simulation, EM(), dt=τ)
 
-#t = t1:τ:result.solution.t[end-1]
-#temper = temperature.(result, t)
+#(rs, grf) = rdf(result)
+#(ts, dr2) = msd(result)
+
+t = t1:τ:result.solution.t[end-1]
+temper = @time temperature.(result, t)
 
 
 #using Plots
@@ -41,9 +45,9 @@ result = @time run_simulation(simulation, VelocityVerlet(), dt=τ)
 #plot!(pl, title="Nose-Hoover thermostat at tau=$(thermostat.τ) ps")
 
 
-#time_now = Dates.format(now(), "yyyy_mm_dd_HH_MM_SS")
-#Nactual = length(bodies)
-#timesteps = round(length(result.solution.t))
+time_now = Dates.format(now(), "yyyy_mm_dd_HH_MM_SS")
+Nactual = length(bodies)
+timesteps = round(length(result.solution.t))
 
 #@time save_to_pdb(result, "D:/liquid argon simulation $Nactual molecules and $timesteps steps $time_now.pdb" )
 
@@ -51,3 +55,23 @@ result = @time run_simulation(simulation, VelocityVerlet(), dt=τ)
 #save("d:/nosehoover thermostat for water liquid argon $T0 and $(thermostat.τ) _$time_now.jld", "t",t, "temper", temper, "T0", T0, "τ", thermostat.τ)
 
 
+#=
+using MAT
+
+time_now = Dates.format(now(), "yyyy_mm_dd_HH_MM_SS")
+Nactual = length(bodies)
+timesteps = round(length(result.solution.t))
+
+file = matopen("d:/liquid argon $(length(bodies)) omm units at temperature $T0 andgamma $(thermostat.γ)  $timesteps timesteps $T0 _$time_now.mat", "w")
+write(file, "t", collect(t))
+write(file, "temper", temper)
+write(file, "T0", T0)
+if thermostat isa LangevinThermostat
+    write(file, "gamma", thermostat.γ)
+end
+#write(file, "rs", rs)
+#write(file, "ts", ts)
+#write(file, "grf", grf)
+#write(file, "dr2", dr2)
+close(file)
+=#
