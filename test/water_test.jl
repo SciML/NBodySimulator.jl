@@ -197,7 +197,7 @@ ENDMDL")
         @test bodies[3].H2.r[2] - 1.7715 ≈ 0.0 atol = ε
         @test bodies[3].H2.r[3] - 0.6214 ≈ 0.0 atol = ε
 
-        @test bodies[3].H2.v[1] - -0.2 ≈ 0.0 atol = ε
+        @test bodies[3].H2.v[1] - 0.0 ≈ 0.0 atol = ε
         @test bodies[3].H2.v[2] - 0.0 ≈ 0.0 atol = ε
         @test bodies[3].H2.v[3] - 0.0 ≈ 0.0 atol = ε
     end    
