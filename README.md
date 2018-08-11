@@ -47,7 +47,48 @@ simulation = NBodySimulation(system, tspan)
 There are different types of bodies but they are just containers of particle parameters. The interaction and acceleration of particles are defined by the potentials or force fields.
 
 ## Potentials
-`PotentialNBodySystem` structure represents such entities. One can pass the bodies and paramaters of inetaction potentials into that system. In case the potential parameters are not set, during the simulation particles will move with a constant initial velocity without acceelration. But as an example let us create an entity of the gravitational potential parameters set and then creat a new `PotentialNBodySystem`:
+The potentials or force field defines the interaction of particles ant, therefore, their acceleration.
+
+There are several structures for basic physical interactions:
+
+```julia
+jl_parameters = LennardJonesParameters(ϵ, σ, cutoff_radius)
+g_parameters = GravitationalParameters(G)
+m_parameters = MagnetostaticParameters(μ_4π)
+el_potential = ElectrostaticParameters(k, cutoff_radius)
+spc_water_paramters = SPCFwParameters(rOH, ∠HOH, k_bond, k_angle)
+```
+
+`PotentialNBodySystem` structure represents systems with a custom set of potentials. In other words, a user defines the ways in which the particles are allowed to interact. One can pass the bodies and paramaters of inetaction potentials into that system. In case the potential parameters are not set, during the simulation particles will move with constant velocities without acceelration. But as an example let us create an entity of the gravitational potential parameters set and then creat a new `PotentialNBodySystem`:
+
+### Custom Potential
+There exists an [example](http://docs.juliadiffeq.org/latest/models/physical.html) of simulation n-body system at absolutely custom potential. 
+
+Here is shown how to create custom acceleration functions using tools of NBodySimulator.
+
+First of all it is necessary to create a structure for parameters for the custom potential.
+
+```julia
+struct CustomPotentialParameters <: PotentialParameters
+    a::AbstractFloat
+end
+```
+
+Next, the acceleration function for the potential is required. The custom potential defined here creates a force acting on all the particles proportionate to their masses. The first argument of the function defines the potential for which the acceleration should be calculated in this method. 
+
+```julia
+import NBodySimulator.get_accelerating_function
+function get_accelerating_function(p::CustomPotentialParameters, simulation::NBodySimulation)
+    ms = get_masses(simulation.system)
+    (dv, u, v, t, i) -> begin custom_accel = SVector(p.a, 0.0, 0.0); dv .= custom_accel end 
+end
+```
+
+After the parameters and acceleration function are created, one can instantiate a system of particles interacting with a set of potentials which includes the just created custom potential:
+
+```julia
+system = PotentialNBodySystem(bodies, Dict(:custom_potential_params => parameters))
+```
 
 ## Gravitational interaction
 
