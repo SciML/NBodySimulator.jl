@@ -4,8 +4,50 @@
 [![Build status](https://ci.appveyor.com/api/projects/status/1ofg9ianvcciq26v?svg=true)](https://ci.appveyor.com/project/Mikhail-Vaganov/nbodysimulator-jl)
 
 This project is under development at the moment. The implementation of potential calculations is fairly experimental and has not been extensively verified yet.
-
 You can test simulation of different systems now but be aware of possible changes in future. 
+
+## Add Package
+
+In order to start simulating systems of n interacting bodies, it is necessary to add `NBodySimulator` package to Julia and then begin to use it:
+
+```julia
+]add NBodySimulator
+using NBodySimulator
+```
+
+If you cannot wait to start codding, try to run some scripts from `examples`. Number of particles `N` and the final timestep of simulations `t2` are the two parameters which will define the time of script execution.
+
+## Basic components
+There are three basic components required for any simulation of systems of n-bodies: `bodies`, `system` and `simulation`.
+
+**Bodies** or **Particles** are the objects which will interact with each other and for wich the equations of Newton's 2nd law are solved during the simulation process. Three parametes of a body is necessary, they are initial location, initial velocity and its mass. For the sake of simulation speed it is advised to use static arrays from the corresponding package.  `MassBody` structure represents particles such particles:
+
+```julia
+using StaticArrays
+r = SVector(.0,.0,.0)
+v = SVector(.1,.2,.5)
+mass = 1.25
+body = MassBody(r,v,mass)
+```
+
+A **System** covers bodies and necessary parameters for correct simulation of interaction between particles. For example, to create an entity for a system of gravitationally interacting particles, one needs to use `GravitationalSystem` constructor:
+
+```julia
+const G = 6.67e-11 # m^3/kg/s^2
+system = GravitationalSystem(bodies, G)
+```
+
+**Simulation** is an entity defining parameters of the experiment: time span of simulation, global physical constants, borders of the simulation cell, external magnetic or electric fields, etc. The required arguments for `NBodySImulation` constructor are the system to be tested and the time span of simulation.
+
+```julia
+tspan = (.0, 10.0)
+simulation = NBodySimulation(system, tspan)
+```
+
+There are different types of bodies but they are just containers of particle parameters. The interaction and acceleration of particles are defined by the potentials or force fields.
+
+## Potentials
+`PotentialNBodySystem` structure represents such entities. One can pass the bodies and paramaters of inetaction potentials into that system. In case the potential parameters are not set, during the simulation particles will move with a constant initial velocity without acceelration. But as an example let us create an entity of the gravitational potential parameters set and then creat a new `PotentialNBodySystem`:
 
 ## Gravitational interaction
 
