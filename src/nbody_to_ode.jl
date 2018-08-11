@@ -33,8 +33,6 @@ function gather_bodies_initial_coordinates(simulation::NBodySimulation{<:WaterSP
     (u0, v0, n)
 end
 
-
-
 function gather_atom_coordinates(system::WaterSPCFw{<:MassBody}, len)
     molecules = system.bodies;
     n = length(molecules)
@@ -71,33 +69,6 @@ function gather_atom_coordinates(system::WaterSPCFw{<:WaterMolecule}, len)
         v0[:, indH2] = molecules[i].H2.v
     end
     (u0, v0)
-end
-
-function gather_bodies_initial_coordinates_in_vectors(simulation::NBodySimulation{<:WaterSPCFw})
-    system = simulation.system
-    molecules = system.bodies;
-    n = length(molecules)
-    len = 3*n
-    
-    if simulation.thermostat isa NoseHooverThermostat
-        len = 3*n+1
-    end
-
-    u0 = zeros(3*len)
-    v0 = zeros(3*len)
-
-    for i = 1:n
-        p = system.scpfw_parameters
-        indO, indH1, indH2 = 9 * (i - 1) + 1, 9 * (i - 1) + 4, 9 * (i - 1) + 7
-        u0[indO:indO+2] = molecules[i].r 
-        u0[indH1:indH1+2] = molecules[i].r .+ [p.rOH, 0.0, 0.0]
-        u0[indH2:indH2+2] = molecules[i].r .+ [cos(p.aHOH) * p.rOH, 0.0, sin(p.aHOH) * p.rOH]
-        v0[indO:indO+2] = molecules[i].v
-        v0[indH1:indH1+2] = molecules[i].v
-        v0[indH2:indH2+2] = molecules[i].v
-    end 
-
-    (u0, v0, n)
 end
 
 function gather_accelerations_for_potentials(simulation::NBodySimulation{CustomAccelerationSystem})
@@ -483,9 +454,7 @@ function DiffEqBase.SDEProblem(simulation::NBodySimulation{<:WaterSPCFw})
         end
         @. du[:, 3*n+1 : 2*3*n] -= therm.γ*u[:, 3*n+1 : 2*3*n]
     end
-
-    #σO = sqrt(2*therm.γ*simulation.kb*therm.T/simulation.system.mO)
-    #σH = sqrt(2*therm.γ*simulation.kb*therm.T/simulation.system.mH)
+    
     σO = sqrt(2*therm.γ*simulation.kb*therm.T)/mO
     σH = sqrt(2*therm.γ*simulation.kb*therm.T)/mH
     
