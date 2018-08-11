@@ -34,7 +34,7 @@ For the second particle we will use a shorter form:
 p2 = MagneticParticle(SVector(0.005, 0.0, 0.0), SVector(0.0, 0.0, 0.0), 5e-6, SVector(0.0,0.0,0.00077))
 ```
 
-To calculate magnetic interactions properly one should also specify the value for the vacuum permeability μ<sub>0</sub>/10<sup>7</sup>. or its substitute:
+To calculate magnetic interactions properly one should also specify the value for the constant μ<sub>0</sub>/4π or its substitute. Having created parameters for the magnetostatic potential, one now can instantiate a system of particles which should interact magnetically. For that pupose we use `PotentialNBodySystem` and pass particles and potential parameters as arguments.
 
 ```julia
 parameters = MagnetostaticParameters(μ_4π)
@@ -42,3 +42,30 @@ system = PotentialNBodySystem([p1, p2], Dict(:magnetic => parameters))
 simulation = NBodySimulation(system, (t1, t2))
 sim_result = run_simulation(simulation, VelocityVerlet(), dt=τ)
 ```
+
+## Anylizing the Result of Simulation
+Once the simulation is completed, one can analyze its result and obtain some useful characteristics of the system. 
+
+Function `run_simulation` returns a structure containig the initial parameters of simulation and the solution of differential equation required for description of the corresponding system of particles. There are different functions which help to intepret solution of DEs into physical quantities.
+
+One of the main charachterestics of a system during molecular dynamics simulations is its thermodynamic temperature. The value of the temperature at a particular time `t` can be obtained via calling this function:
+
+```julia
+T = temperature(result, t) 
+```
+
+[Radial distribution functions](https://en.wikipedia.org/wiki/Radial_distribution_function) is another popular and essential characteristic of molecules or similar system of particles. It shows the reciprocal location of particles averaged by the time of simulation.
+
+```julia
+(rs, grf) = @time rdf(result)
+```
+
+The dependence of `grf` on `rs` shows radial distribution of particles at different distances from an average particle in a system.
+Here is the radial distribution function for the classic system of liquid argon:
+![rdf for liquid argon][https://user-images.githubusercontent.com/16945627/43990348-843b164c-9d74-11e8-8d9e-daaff142c0b7.png]
+
+
+```julia
+(ts, dr2) = @time msd(result)
+```
+![rdf for liquid argon][https://user-images.githubusercontent.com/16945627/43990362-9a67c0aa-9d74-11e8-9512-08840294d411.png]
