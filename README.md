@@ -54,7 +54,8 @@ One of the main charachterestics of a system during molecular dynamics simulatio
 T = temperature(result, t) 
 ```
 
-[Radial distribution functions](https://en.wikipedia.org/wiki/Radial_distribution_function) is another popular and essential characteristic of molecules or similar system of particles. It shows the reciprocal location of particles averaged by the time of simulation.
+###[Radial distribution functions](https://en.wikipedia.org/wiki/Radial_distribution_function) 
+The RDF is another popular and essential characteristic of molecules or similar system of particles. It shows the reciprocal location of particles averaged by the time of simulation.
 
 ```julia
 (rs, grf) = @time rdf(result)
@@ -62,10 +63,26 @@ T = temperature(result, t)
 
 The dependence of `grf` on `rs` shows radial distribution of particles at different distances from an average particle in a system.
 Here is the radial distribution function for the classic system of liquid argon:
-![rdf for liquid argon][https://user-images.githubusercontent.com/16945627/43990348-843b164c-9d74-11e8-8d9e-daaff142c0b7.png]
+![rdf for liquid argon](https://user-images.githubusercontent.com/16945627/43990348-843b164c-9d74-11e8-8d9e-daaff142c0b7.png)
 
 
+### Mean squared displacement
+The MSD characteristic can be used to estimate the shift of particles from their initial positions.
 ```julia
 (ts, dr2) = @time msd(result)
 ```
-![rdf for liquid argon][https://user-images.githubusercontent.com/16945627/43990362-9a67c0aa-9d74-11e8-9512-08840294d411.png]
+For a standrad liquid argon system the displacement grows with time:
+![rdf for liquid argon](https://user-images.githubusercontent.com/16945627/43990362-9a67c0aa-9d74-11e8-9512-08840294d411.png)
+
+### Energy functions
+
+Energy is higlhy important physical characteristic of the system. The module provides three functions to obain it, though the `total_energy` function just sums potential and kinetic energy:
+
+```julia
+e_init = initial_energy(simualtion)
+e_kin = kinetic_energy(result, t)
+e_pot = potential_energy(result, t)
+e_tot = total_energy(result, t)
+```
+
+## Ploting images
