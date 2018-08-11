@@ -28,7 +28,7 @@ using StochasticDiffEq
 
         T1 = temperature(result, t1) 
         T2 = temperature(result, t2)
-        ε = 0.1
+        ε = 0.5
         @test abs(T2 - T0) / T0 ≈ 0.0 atol = ε
     end
 
