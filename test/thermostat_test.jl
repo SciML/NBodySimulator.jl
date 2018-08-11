@@ -8,11 +8,11 @@ using StochasticDiffEq
     σ = 0.34 # nm
     ρ = 1374/1.6747# Da/nm^3
     m = 39.95# Da
+    N = 125
+    L = (m * N / ρ)^(1 / 3)#10.229σ
+    R = 0.5 * L   
+    v_dev = sqrt(kb * T / m)
     @testset "Andersen thermostat" begin 
-        N = 216
-        L = (m * N / ρ)^(1 / 3)#10.229σ
-        R = 0.5 * L   
-        v_dev = sqrt(kb * T / m)
         bodies = generate_bodies_in_cell_nodes(N, m, v_dev, L)
 
         τ = 0.5e-3 # ps or 1e-12 s
@@ -33,10 +33,6 @@ using StochasticDiffEq
     end
 
     @testset "Berendsen thermostat" begin 
-        N = 216
-        L = (m * N / ρ)^(1 / 3)#10.229σ
-        R = 0.5 * L   
-        v_dev = sqrt(kb * T / m)
         bodies = generate_bodies_in_cell_nodes(N, m, v_dev, L)
 
         τ = 0.5e-3
@@ -56,10 +52,6 @@ using StochasticDiffEq
     end
 
     @testset "Nose-Hoover thermostat" begin 
-        N = 216
-        L = (m * N / ρ)^(1 / 3)#10.229σ
-        R = 0.5 * L   
-        v_dev = sqrt(kb * T / m)
         bodies = generate_bodies_in_cell_nodes(N, m, v_dev, L)
 
         τ = 0.5e-3
@@ -79,10 +71,6 @@ using StochasticDiffEq
     end
 
     @testset "Langevin thermostat" begin 
-        N = 216
-        L = (m * N / ρ)^(1 / 3)#10.229σ
-        R = 0.5 * L   
-        v_dev = sqrt(kb * T / m)
         bodies = generate_bodies_in_cell_nodes(N, m, v_dev, L)
 
         τ = 0.5e-3
