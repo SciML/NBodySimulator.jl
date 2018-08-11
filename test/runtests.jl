@@ -1,4 +1,4 @@
-using NBodySimulator, StaticArrays, LinearAlgebra
+using NBodySimulator, StaticArrays, LinearAlgebra, StochasticDiffEq
 using Test
 
 include("lennard_jones_test.jl")

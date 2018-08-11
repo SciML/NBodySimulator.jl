@@ -111,6 +111,22 @@
         @test γind == 19
     end
 
+    @testset "Water thermostating" begin
+        ττ = 0.5e-4 # ps
+        t1 = 0ττ
+        t2 = 200ττ
+        T0 = 275
+        bodies = generate_bodies_in_cell_nodes(N, mH2O, v_dev, L)
+        water = WaterSPCFw(bodies, mH, mO, qH, qO,  jl_parameters, e_parameters, spc_paramters);
+        thermostat = LangevinThermostat(T0, 100)
+        simulation = NBodySimulation(water, (t1, t2), pbc, thermostat, kb)
+        result = run_simulation(simulation, EM(),  dt=τ)
+        
+        T2 = temperature(result, t2)
+        ε = 1.0
+        @test abs(T2 - T0) / T0 ≈ 0.0 atol = ε
+    end
+
     @testset "Protein Data Bank file compilation" begin
         t1 = 0τ
         t2 = 2τ 

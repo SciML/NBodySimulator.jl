@@ -1,5 +1,3 @@
-using StochasticDiffEq
-
 @testset "Testing thermostats on liquid argon " begin 
     T = 120.0 # °K
     T0 = 90 # °K
