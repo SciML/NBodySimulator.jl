@@ -1,7 +1,7 @@
-using NBodySimulator
+using NBodySimulator,StochasticDiffEq
 
 const T = 370 # °K
-const T0 = 275 # °K
+const T0 = 300 # °K
 const kb = 8.3144598e-3 # kJ/(K*mol)
 const ϵOO = 0.1554253*4.184 # kJ 
 const σOO = 0.3165492 # nm
@@ -14,9 +14,9 @@ const L = (mH2O*N/ρ)^(1/3)
 const R = 0.9 # ~3*σOO  
 const Rel = 0.49*L
 const v_dev = sqrt(kb * T /mH2O)
-const τ = 0.5e-3 # ps
+const τ = 0.5e-4 # ps
 const t1 = 0τ
-const t2 = 1000τ # ps
+const t2 = 40000τ # ps
 const k_bond = 1059.162*4.184*1e2 # kJ/(mol*nm^2)
 const k_angle = 75.90*4.184 # kJ/(mol*rad^2)
 const rOH = 0.1012 # nm
@@ -24,6 +24,7 @@ const ∠HOH = 113.24*pi/180 # rad
 const qH = 0.41
 const qO = -0.82
 const k = 138.935458 #
+#bodies = load_water_molecules_from_pdb("C:/Users/Michael/Desktop/GSoC/pdbs/output_4.pdb")
 bodies = generate_bodies_in_cell_nodes(N, mH2O, v_dev, L)
 jl_parameters = LennardJonesParameters(ϵOO, σOO, R)
 e_parameters = ElectrostaticParameters(k, Rel)
@@ -32,10 +33,11 @@ pbc = CubicPeriodicBoundaryConditions(L)
 water = WaterSPCFw(bodies, mH, mO, qH, qO,  jl_parameters, e_parameters, spc_paramters);
 #thermostat = BerendsenThermostat(T0, 200τ)
 #thermostat = NoseHooverThermostat(T0, 200τ)
-thermostat = AndersenThermostat(90, 0.01/τ)
+#thermostat = AndersenThermostat(90, 0.01/τ)
+thermostat = LangevinThermostat(T0, 75)
 simulation = NBodySimulation(water, (t1, t2), pbc, thermostat, kb);
-#result = run_simulation(simulation, Tsit5())
-result = @time run_simulation(simulation, VelocityVerlet(), dt=τ)
+#result = @time run_simulation(simulation, VelocityVerlet(), dt=τ)
+result = @time run_simulation(simulation, EM(),  dt=τ)
 
 
 #time_now = Dates.format(now(), "yyyy_mm_dd_HH_MM_SS")
@@ -72,4 +74,33 @@ plot!(pl, t, T0*ones(length(t)), label = "$T0 °K", linewidth=2, legend = :botto
 #plot!(pl, title="Berendsen thermostat at tau=$(thermostat.τ) ps")
 plot!(pl, title="Andersen thermostat at dt*v=$(thermostat.ν*τ) ")
 #plot!(pl, title="Nose-Hoover thermostat at tau=$(thermostat.τ) ps")
+=#
+
+
+#(rs, grf) = @time rdf(result)
+#(ts, dr2) = @time msd(result)
+
+#=
+t = t1:τ:result.solution.t[end-1]
+temper = @time temperature.(result, t)
+
+
+time_now = Dates.format(now(), "yyyy_mm_dd_HH_MM_SS")
+Nactual = length(bodies)
+timesteps = round(length(result.solution.t))
+
+using MAT
+file = matopen("d:/water $(length(bodies)) omm units at temperature $T0 and gamma $(thermostat.γ) and $timesteps timesteps with tau $τ _$time_now.mat", "w")
+write(file, "t", collect(t))
+write(file, "temper", temper)
+if thermostat isa LangevinThermostat
+    write(file, "gamma", thermostat.γ)
+end
+#write(file, "rs", rs)
+#write(file, "ts", ts)
+#write(file, "grf", grf)
+#write(file, "dr2", dr2)
+close(file)
+
+@time NBodySimulator.save_to_pdb(result, "d:/water from PDB $timesteps timesteps $time_now.pdb" )
 =#

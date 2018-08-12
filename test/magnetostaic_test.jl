@@ -1,5 +1,5 @@
 @testset "Magnetostatics Functional Tests" begin
-    @testset "Repelling magnets" begin
+    @testset "Repelling magnetic dipoles" begin
         d1 = 0.01 # m
         m1 = 5e-6 # kg
         m2 = 5e-6 # kg

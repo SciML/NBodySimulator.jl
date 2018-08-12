@@ -22,7 +22,11 @@ end
 
 function berendsen_acceleration!(dv, v, ms, kb, N, Nc, p::BerendsenThermostat)
     T = md_temperature(v, ms, kb, N, Nc)
-    @. dv += p.γ * (p.T / T - 1) * v
+    if inv(T) == Inf
+        @. dv += p.γ * v
+    else
+        @. dv += p.γ * (p.T / T - 1) * v
+    end
 end
 
 # N - number of particles

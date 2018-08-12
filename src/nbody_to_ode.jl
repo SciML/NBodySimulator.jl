@@ -28,6 +28,14 @@ function gather_bodies_initial_coordinates(simulation::NBodySimulation{<:WaterSP
         len = 3*n+1
     end
 
+    (u0,v0) = gather_atom_coordinates(simulation.system, len)
+
+    (u0, v0, n)
+end
+
+function gather_atom_coordinates(system::WaterSPCFw{<:MassBody}, len)
+    molecules = system.bodies;
+    n = length(molecules)
     u0 = zeros(3, len)
     v0 = zeros(3, len)
 
@@ -41,8 +49,26 @@ function gather_bodies_initial_coordinates(simulation::NBodySimulation{<:WaterSP
         v0[:, indH1] = molecules[i].v
         v0[:, indH2] = molecules[i].v
     end 
+    (u0, v0)
+end
 
-    (u0, v0, n)
+function gather_atom_coordinates(system::WaterSPCFw{<:WaterMolecule}, len)
+    molecules = system.bodies;
+    n = length(molecules)
+    u0 = zeros(3, len)
+    v0 = zeros(3, len)
+
+    for i = 1:n
+        p = system.scpfw_parameters
+        indO, indH1, indH2 = 3 * (i - 1) + 1, 3 * (i - 1) + 2, 3 * (i - 1) + 3
+        u0[:, indO] = molecules[i].O.r 
+        u0[:, indH1]  = molecules[i].H1.r
+        u0[:, indH2] = molecules[i].H2.r
+        v0[:, indO] = molecules[i].O.v
+        v0[:, indH1] = molecules[i].H1.v
+        v0[:, indH2] = molecules[i].H2.v
+    end
+    (u0, v0)
 end
 
 function gather_accelerations_for_potentials(simulation::NBodySimulation{CustomAccelerationSystem})
@@ -388,13 +414,14 @@ end
 
 function DiffEqBase.SDEProblem(simulation::NBodySimulation{<:WaterSPCFw})
     (u0, v0, n) = gather_bodies_initial_coordinates(simulation)
-    
-   
+       
     (o_acelerations, h_acelerations) = gather_accelerations_for_potentials(simulation)
     group_accelerations = gather_group_accelerations(simulation)   
     simultaneous_acceleration = gather_simultaneous_acceleration(simulation)
 
     therm = simulation.thermostat
+    mH = simulation.system.mH
+    mO = simulation.system.mO
 
     function deterministic_acceleration!(du, u, p, t)
         du[:, 1:3*n] = @view u[:, 3*n+1 : 2*3*n];
@@ -405,6 +432,10 @@ function DiffEqBase.SDEProblem(simulation::NBodySimulation{<:WaterSPCFw})
                 acceleration!(a, (@view u[:, 1:3*n]), (@view u[:, 3*n+1 : 2*3*n]), t, 3 * (i - 1) + 1);    
             end
             du[:, 3*n+3 * (i - 1) + 1]  .= a
+
+            @. du[:, 3*n+3 * (i - 1) + 1] -= therm.γ*u[:, 3*n+3 * (i - 1) + 1]/mO
+            @. du[:, 3*n+3 * (i - 1) + 2] -= therm.γ*u[:, 3*n+3 * (i - 1) + 2]/mH
+            @. du[:, 3*n+3 * (i - 1) + 3] -= therm.γ*u[:, 3*n+3 * (i - 1) + 3]/mH
         end
         @inbounds for i in 1:n, j in (2, 3)
             a = MVector(0.0, 0.0, 0.0)
@@ -415,7 +446,7 @@ function DiffEqBase.SDEProblem(simulation::NBodySimulation{<:WaterSPCFw})
         end 
         @inbounds for i = 1:n
             for acceleration! in group_accelerations
-                acceleration!((@view du[:, 3*n+1 : 2*3*n]), (@view u[:, 1:3*n]), (@view u[:, 3*n+1 : 2*3*n]), t, i);    
+                acceleration!((@view du[ :, 3*n+1 : 2*3*n]), (@view u[:, 1:3*n]), (@view u[:, 3*n+1 : 2*3*n]), t, i);    
             end
         end
         for acceleration! in simultaneous_acceleration
@@ -423,9 +454,10 @@ function DiffEqBase.SDEProblem(simulation::NBodySimulation{<:WaterSPCFw})
         end
         @. du[:, 3*n+1 : 2*3*n] -= therm.γ*u[:, 3*n+1 : 2*3*n]
     end
-
-    σO = sqrt(2*therm.γ*simulation.kb*therm.T/simulation.system.mO)
-    σH = sqrt(2*therm.γ*simulation.kb*therm.T/simulation.system.mH)
+    
+    σO = sqrt(2*therm.γ*simulation.kb*therm.T)/mO
+    σH = sqrt(2*therm.γ*simulation.kb*therm.T)/mH
+    
     function noise!(du, u, p, t)
         @inbounds for i = 1:n
             @. du[:, 3*n+3 * (i - 1) + 1] += σO
