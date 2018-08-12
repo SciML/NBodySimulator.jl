@@ -58,6 +58,11 @@ L = 21.0 # size of the cell side
 bodies = generate_bodies_in_cell_nodes(N, m, v, L)
 ```
 
+Molecules for the SPC/Fw water model can be imported from a PDB file:
+```julia
+molecules = load_water_molecules_from_pdb("path_to_pdb_file.pdb")
+```
+
 ## Potentials
 The potentials or force field defines the interaction of particles ant, therefore, their acceleration.
 
@@ -293,7 +298,7 @@ thermostat = LangevinThermostat(90, γ)
 ![langevin thermostating](https://user-images.githubusercontent.com/16945627/44002505-0683c6b0-9e5d-11e8-8647-5b15b98eb0fa.png)
 
 ## Anylizing the Result of Simulation
-Once the simulation is completed, one can analyze its result and obtain some useful characteristics of the system. 
+Once the simulation is completed, one can analyze the result and obtain some useful characteristics of the system. 
 
 Function `run_simulation` returns a structure containig the initial parameters of simulation and the solution of differential equation required for description of the corresponding system of particles. There are different functions which help to intepret solution of DEs into physical quantities.
 
@@ -325,7 +330,7 @@ For a standrad liquid argon system the displacement grows with time:
 
 ### Energy functions
 
-Energy is higlhy important physical characteristic of the system. The module provides three functions to obain it, though the `total_energy` function just sums potential and kinetic energy:
+Energy is higlhy important physical characteristic of a system. The module provides four functions to obain it, though the `total_energy` function just sums potential and kinetic energy:
 
 ```julia
 e_init = initial_energy(simualtion)
@@ -335,4 +340,20 @@ e_tot = total_energy(result, t)
 ```
 
 ## Ploting images
-Using tools of NBodySimulator one can export results of simulation into a [Protein Database File](https://en.wikipedia.org/wiki/Protein_Data_Bank_(file_format))
+Using tools of NBodySimulator one can export results of simulation into a [Protein Database File](https://en.wikipedia.org/wiki/Protein_Data_Bank_(file_format)). VMD software is the well-known tool for visualizing molecular dynamics, which can read the data from PDB files. 
+
+```julia
+save_to_pdb(result, "path_to_a_new_pdb_file.pdb" )
+```
+
+In future it will be possible to import results via FileIO interface and its `save` function.
+
+Using Plots.jl one can draw positions of particles at any time of simulation or create an animation of moving particles, molecules of water:
+
+```julia
+using Plots
+plot(result)
+animate(result, "path_to_file.gif")
+```
+
+Makie.jl also has a recipe for plotting results of n-body simulations. The [example](http://makie.juliaplots.org/stable/examples-meshscatter.html#Type-recipe-for-molecule-simulation-1) is presenten in the documentation.
