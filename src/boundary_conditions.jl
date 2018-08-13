@@ -51,21 +51,17 @@ function apply_boundary_conditions!(ri, rj, pbc::PeriodicBoundaryConditions, R2)
 end
 
 function apply_boundary_conditions!(ri, rj, pbc::CubicPeriodicBoundaryConditions, R2)
-    rij = SVector{3,typeof(R2)}(Inf, Inf, Inf)
-    success = false
-    rij2 = zero(typeof(R2))
-    shifts = SVector{3,typeof(R2)}(0, -pbc.L, pbc.L)
-    for dx ∈ shifts, dy ∈ shifts, dz ∈ shifts
-        dr = SVector{3,typeof(R2)}(dx, dy, dz)
-        rij = ri - rj + dr
-        rij = rij - pbc.L * sign.(rij) .* sign(pbc.L) .* floor.(abs.(rij) / abs(pbc.L))
-        rij2 = dot(rij, rij)
-        if rij2 < R2
-            success = true
-            break
-        end
-    end
-    return (rij, rij2, success)
+    rij = ri - rj
+    x, y, z = rij[1], rij[2], rij[3]
+    while x >= pbc.L    x -= pbc.L end
+    while x < -pbc.L    x += pbc.L end
+    while y >= pbc.L    y -= pbc.L end
+    while y < -pbc.L    y += pbc.L end
+    while z >= pbc.L    z -= pbc.L end
+    while z < -pbc.L    z += pbc.L end
+    rij = SVector{3,eltype(R2)}(x, y, z)
+    rij2 = dot(rij, rij)
+    return (rij, rij2, rij2 < R2)
 end
 
 function apply_boundary_conditions!(ri, rj, pbc::BoundaryConditions, R2)
