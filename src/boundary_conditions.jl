@@ -11,7 +11,7 @@ Base.start(::PeriodicBoundaryConditions) = 1
 
 Base.done(pbc::PeriodicBoundaryConditions, state) = state > length(pbc.boundary)
 
-function Base.next(pbc::PeriodicBoundaryConditions, state) 
+function Base.next(pbc::PeriodicBoundaryConditions, state)
     pbc.boundary[state], state + 1
 end
 
@@ -38,7 +38,7 @@ function apply_boundary_conditions!(ri, rj, pbc::PeriodicBoundaryConditions, R2)
 
     for dx in [0,-pbc[2],pbc[2]], dy in [0,-pbc[4],pbc[4]], dz in [0,-pbc[6],pbc[6]]
         rij = @MVector [ri[1] - rj[1] + dx, ri[2] - rj[2] + dy, ri[3] - rj[3] + dz]
-        for x in (1, 2, 3) 
+        for x in (1, 2, 3)
             rij[x] -= (pbc[2x] - pbc[2x - 1]) * div(rij[x], (pbc[2x] - pbc[2x - 1]))
         end
         rij2 = dot(rij, rij)
@@ -51,18 +51,16 @@ function apply_boundary_conditions!(ri, rj, pbc::PeriodicBoundaryConditions, R2)
 end
 
 function apply_boundary_conditions!(ri, rj, pbc::CubicPeriodicBoundaryConditions, R2)
-    rij = @MVector [Inf, Inf, Inf]
+    rij = SVector{3,typeof(R2)}(Inf, Inf, Inf)
     success = false
-    rij2 = 0
-
-    shifts = @SVector [0,-pbc.L,pbc.L]
-    for dx in shifts, dy in shifts, dz in shifts
-        rij = @MVector [ri[1] - rj[1] + dx, ri[2] - rj[2] + dy, ri[3] - rj[3] + dz]
-        for x in (1, 2, 3) 
-            rij[x] -= pbc.L * div(rij[x], pbc.L)
-        end
+    rij2 = zero(typeof(R2))
+    shifts = SVector{3,typeof(R2)}(0, -pbc.L, pbc.L)
+    for dx ∈ shifts, dy ∈ shifts, dz ∈ shifts
+        dr = SVector{3,typeof(R2)}(dx, dy, dz)
+        rij = ri - rj + dr
+        rij = rij - pbc.L * sign.(rij) .* sign(pbc.L) .* floor.(abs.(rij) / abs(pbc.L))
         rij2 = dot(rij, rij)
-        if  rij2 < R2
+        if rij2 < R2
             success = true
             break
         end
