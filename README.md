@@ -266,8 +266,8 @@ simulation = NBodySimulation(lj_system, (t1, t2), pbc, thermostat, kb);
 
 The default boundary conditions are `InfiniteBox` without any limits, default thermostat is `NullThermostat` which does no thermostating and default Boltzmann constant `kb` equals its value in SI, i.e. 1.38e-23 J/K.
 
-## [Water simulation](http://www.sklogwiki.org/SklogWiki/index.php/SPC/Fw_model_of_water)
-In NBodySImulator the SPC/Fw water model is implemented. For using this model, one has to specify parameters of the Lennard-Jones potential between the oxygen atoms of water molecules, parameters of the electrostatic potential for the corresponding interactions between atoms of different molecules and parameters for harmonic potentials representing bonds between atoms and the valence angle made from bonds between hydrogen atoms and the oxygen one.
+## Water Simulations
+In NBodySImulator the [SPC/Fw water model](http://www.sklogwiki.org/SklogWiki/index.php/SPC/Fw_model_of_water) is implemented. For using this model, one has to specify parameters of the Lennard-Jones potential between the oxygen atoms of water molecules, parameters of the electrostatic potential for the corresponding interactions between atoms of different molecules and parameters for harmonic potentials representing bonds between atoms and the valence angle made from bonds between hydrogen atoms and the oxygen one.
 
 ```julia
 bodies = generate_bodies_in_cell_nodes(N, mH2O, v, L)
@@ -285,7 +285,7 @@ Further, one pass the water system into `NBodySimulation` constructor as a usual
 simulation = NBodySimulation(water, (t1, t2), pbc, kb);
 ```
 
-## Thermostats`
+## Thermostats
 Usually during simulation of a system is required to be at a particular temperature. NBodySimulator contains several thermostats for that purpose. Here the thermostating of liquid argon is presented, for thermostating of water one can refer to [this post](https://mikhail-vaganov.github.io/gsoc-2018-blog/2018/08/06/thermostating.html)
 
 ### [Andersen Thermostat](http://www.sklogwiki.org/SklogWiki/index.php/Andersen_thermostat)
