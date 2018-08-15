@@ -199,24 +199,25 @@ function lennard_jones_potential(p::LennardJonesParameters, indxs::Vector{<:Inte
 end
 
 function electrostatic_potential(p::ElectrostaticParameters, indxs::Vector{<:Integer}, exclude::Dict{Int,Vector{Int}}, qs, rs, pbc::BoundaryConditions)
-    e_el = 0
+    e_el = 0.0
 
     n = length(indxs)
     for ind_i = 1:n
         i = indxs[ind_i]
         ri = @SVector [rs[1, i], rs[2, i], rs[3, i]]
-        e_el_i = 0
+        e_el_i = 0.0
         for ind_j = ind_i + 1:n
             j = indxs[ind_j]
             if !in(j, exclude[i])
                 rj = @SVector [rs[1, j], rs[2, j], rs[3, j]]
 
                 (rij, r, r2) = get_interparticle_distance(ri, rj, pbc)
-                if !(r2 < p.R2)
-                    rij = p.R # NOTE: hmm?
-                end
 
-                e_el_i += qs[j] / norm(rij)
+                if r2 < p.R2
+                    e_el_i += qs[j] / r
+                else
+                    e_el_i += qs[j] / p.R
+                end
             end
         end
         e_el += e_el_i * qs[i]
