@@ -179,11 +179,11 @@ function obtain_data_for_electrostatic_interaction(system::PotentialNBodySystem)
     qs = zeros(typeof(first(bodies).q), n)
     ms = zeros(typeof(first(bodies).m), n)
     indxs = collect(1:n)
-    exclude = Dict{Int, Set{Int}}()
+    exclude = Dict{Int, Vector{Int}}()
     for i = 1:n
         qs[i] = bodies[i].q
         ms[i] = bodies[i].m
-        exclude[i] = Set{Int}(i)
+        exclude[i] = [i]
     end
     return (qs, ms, indxs, exclude)
 end
@@ -194,7 +194,7 @@ function obtain_data_for_electrostatic_interaction(system::WaterSPCFw)
     qs = zeros(3 * n)
     ms = zeros(3 * n)
     indxs = collect(1:3*n)
-    exclude = Dict{Int, Set{Int}}()
+    exclude = Dict{Int, Vector{Int}}()
     for i = 1:n
         Oind = 3 * (i - 1) + 1
         qs[Oind] = system.qO
@@ -203,9 +203,9 @@ function obtain_data_for_electrostatic_interaction(system::WaterSPCFw)
         ms[Oind] = system.mO
         ms[Oind + 1] = system.mH
         ms[Oind + 2] = system.mH
-        exclude[Oind] = Set{Int}((Oind, Oind+1, Oind+2,3*n+1))
-        exclude[Oind+1] = Set{Int}((Oind, Oind+1, Oind+2,3*n+1))
-        exclude[Oind+2] = Set{Int}((Oind, Oind+1, Oind+2,3*n+1))
+        exclude[Oind] = [Oind, Oind+1, Oind+2,3*n+1]
+        exclude[Oind+1] = [Oind, Oind+1, Oind+2,3*n+1]
+        exclude[Oind+2] = [Oind, Oind+1, Oind+2,3*n+1]
     end
     return (qs, ms, indxs, exclude)
 end

@@ -115,7 +115,7 @@ function pairwise_electrostatic_acceleration!(dv,
     n::Integer,
     qs::Vector{<:Real},
     ms::Vector{<:Real},
-    exclude::Dict{Int, Set{Int}},
+    exclude::Dict{Int, Vector{Int}},
     p::ElectrostaticParameters,
     pbc::BoundaryConditions)
 
