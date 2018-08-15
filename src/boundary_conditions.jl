@@ -33,7 +33,6 @@ end
 
 function get_interparticle_distance(ri, rj, pbc::PeriodicBoundaryConditions)
     rij = ri - rj
-    r, r2 = zero(eltype(ri)), zero(eltype(ri))
     x, y, z = rij
     while x  < pbc[1]   x += pbc[2]-pbc[1] end
     while x >= pbc[2]   x -= pbc[2]-pbc[1] end
@@ -42,7 +41,7 @@ function get_interparticle_distance(ri, rj, pbc::PeriodicBoundaryConditions)
     while z  < pbc[5]   z += pbc[6]-pbc[5] end
     while z >= pbc[6]   z -= pbc[6]-pbc[5] end
     rij = @SVector [x, y, z]
-    r2 = dot(rij, rij)
+    r2 = rij[1]^2 + rij[2]^2 + rij[3]^2
     r = sqrt(r2)
     return (rij, r, r2)
 end
@@ -59,14 +58,14 @@ function get_interparticle_distance(ri, rj, bc::CubicPeriodicBoundaryConditions)
     while z >= radius    z -= size end
     while z < -radius    z += size end
     rij = @SVector [x, y, z]
-    r2 = dot(rij, rij)
+    r2 = rij[1]^2 + rij[2]^2 + rij[3]^2
     r = sqrt(r2)
     return (rij, r, r2)
 end
 
 function get_interparticle_distance(ri, rj, ::BoundaryConditions)
     rij = ri - rj
-    r2 = dot(rij, rij)
+    r2 = rij[1]^2 + rij[2]^2 + rij[3]^2
     r = sqrt(r2)
     (rij, r, r2)
 end
