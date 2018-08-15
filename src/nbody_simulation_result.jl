@@ -198,7 +198,7 @@ function lennard_jones_potential(p::LennardJonesParameters, indxs::Vector{<:Inte
     return 4 * p.ϵ * e_lj
 end
 
-function electrostatic_potential(p::ElectrostaticParameters, indxs::Vector{<:Integer}, exclude::Dict{Int,Vector{Int}}, qs, rs, pbc::BoundaryConditions)
+function electrostatic_potential(p::ElectrostaticParameters, indxs::Vector{<:Integer}, exclude::Dict{Int,Set{Int}}, qs, rs, pbc::BoundaryConditions)
     e_el = 0.0
 
     n = length(indxs)
