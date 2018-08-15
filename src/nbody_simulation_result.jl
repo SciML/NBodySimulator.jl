@@ -32,7 +32,7 @@ end
 
 function get_velocity(sr::SimulationResult, time::Real, i::Integer=0)
     n = get_coordinate_vector_count(sr.simulation.system)
-    
+
     if typeof(sr.solution[1]) <: RecursiveArrayTools.ArrayPartition
         velocities = sr(time).x[1]
         if i <= 0
@@ -183,13 +183,13 @@ function lennard_jones_potential(p::LennardJonesParameters, indxs::Vector{<:Inte
             j = indxs[ind_j]
             rj = @SVector [coordinates[1, j], coordinates[2, j], coordinates[3, j]]
 
-            (rij, rij_2, success) = apply_boundary_conditions!(ri, rj, pbc, p.R2)
+            (rij, r, r2) = get_interparticle_distance(ri, rj, pbc)
 
-            if !success
-                rij_2 = p.R2
+            if !(r2 < p.R2)
+                r2 = p.R2
             end
 
-            σ_rij_6 = (p.σ2 / rij_2)^3
+            σ_rij_6 = (p.σ2 / r2)^3
             σ_rij_12 = σ_rij_6^2
             e_lj += (σ_rij_12 - σ_rij_6 )
         end
@@ -199,24 +199,25 @@ function lennard_jones_potential(p::LennardJonesParameters, indxs::Vector{<:Inte
 end
 
 function electrostatic_potential(p::ElectrostaticParameters, indxs::Vector{<:Integer}, exclude::Dict{Int,Vector{Int}}, qs, rs, pbc::BoundaryConditions)
-    e_el = 0
+    e_el = 0.0
 
     n = length(indxs)
     for ind_i = 1:n
         i = indxs[ind_i]
         ri = @SVector [rs[1, i], rs[2, i], rs[3, i]]
-        e_el_i = 0
+        e_el_i = 0.0
         for ind_j = ind_i + 1:n
             j = indxs[ind_j]
             if !in(j, exclude[i])
                 rj = @SVector [rs[1, j], rs[2, j], rs[3, j]]
 
-                (rij, rij_2, success) = apply_boundary_conditions!(ri, rj, pbc, p.R2)
-                if !success
-                    rij = p.R
-                end
+                (rij, r, r2) = get_interparticle_distance(ri, rj, pbc)
 
-                e_el_i += qs[j] / norm(rij)
+                if r2 < p.R2
+                    e_el_i += qs[j] / r
+                else
+                    e_el_i += qs[j] / p.R
+                end
             end
         end
         e_el += e_el_i * qs[i]
@@ -461,11 +462,10 @@ function rdf(sr::SimulationResult)
                 j = indxs[ind_j]
                 rj = @SVector [cc[1, j], cc[2, j], cc[3, j]]
 
-                (rij, rij_2, success) = apply_boundary_conditions!(ri, rj, pbc, (0.5 * pbc.L)^2)
+                (rij, r, r2) = get_interparticle_distance(ri, rj, pbc)
 
-                if success
-                    rij_1 = sqrt(rij_2)
-                    bin = ceil(Int, rij_1 / dr)
+                if r2 < (0.5 * pbc.L)^2
+                    bin = ceil(Int, r / dr)
                     if bin > 1 && bin <= maxbin
                         hist[bin] += 2
                     end
@@ -567,12 +567,12 @@ function write_pdb_data(f::IO, sr::SimulationResult{<:WaterSPCFw})
             @. cc[:, indH2] = cc[:,indO] + cc0[:, indH2] - cc0[:, indO]
         end
 
-        count+=1      
+        count+=1
         println(f,rpad("MODEL",10), count)
         println(f,"REMARK 250 time=$t picoseconds")
         for i ∈ 1:n
             indO, indH1, indH2 = 3 * (i - 1) + 1, 3 * (i - 1) + 2, 3 * (i - 1) + 3
-            
+
             println(f,"HETATM",lpad(indO,5),"  ",rpad("O",4),"HOH",lpad(i,6),"    ", lpad(@sprintf("%8.3f",cc[1,indO]),8), lpad(@sprintf("%8.3f",cc[2,indO]),8), lpad(@sprintf("%8.3f",cc[3,indO]),8),lpad("1.00",6),lpad("0.00",6), lpad("",10), lpad("O",2))
             println(f,"HETATM",lpad(indH1,5),"  ",rpad("H1",4),"HOH",lpad(i,6),"    ", lpad(@sprintf("%8.3f",cc[1,indH1]),8), lpad(@sprintf("%8.3f",cc[2,indH1]),8), lpad(@sprintf("%8.3f",cc[3,indH1]),8),lpad("1.00",6),lpad("0.00",6), lpad("",10), lpad("H",2))
             println(f,"HETATM",lpad(indH2,5),"  ",rpad("H2",4),"HOH",lpad(i,6),"    ", lpad(@sprintf("%8.3f",cc[1,indH2]),8), lpad(@sprintf("%8.3f",cc[2,indH2]),8), lpad(@sprintf("%8.3f",cc[3,indH2]),8),lpad("1.00",6),lpad("0.00",6), lpad("",10), lpad("H",2))
@@ -588,11 +588,11 @@ function write_pdb_data(f::IO, sr::SimulationResult)
     for t in sr.solution.t
         cc = 10*get_position(sr, t)
         map!(x ->  x -= L * floor(x / L), cc, cc)
-        count+=1      
+        count+=1
         println(f,rpad("MODEL",10), count)
         println(f,"REMARK 250 time=$t steps")
         for i ∈ 1:n
-            
+
             println(f,"HETATM",lpad(i,5),"  ",rpad("Ar",4),"Ar",lpad(i,6),"    ", lpad(@sprintf("%8.3f",cc[1,i]),8), lpad(@sprintf("%8.3f",cc[2,i]),8), lpad(@sprintf("%8.3f",cc[3,i]),8),lpad("1.00",6),lpad("0.00",6), lpad("",10), lpad("Ar",2))
         end
         println(f,"ENDMDL")
@@ -656,7 +656,7 @@ function extract_from_pdb(file)
             break
         end
     end
-    
+
 
     ln_time = readline(file)
     parts = split(ln_time)
@@ -687,7 +687,7 @@ function extract_from_pdb(file)
 
             push!(wms, WaterMolecule(o,h1,h2))
         end
-    end       
+    end
 
     wms
 end
