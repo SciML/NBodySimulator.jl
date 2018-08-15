@@ -124,7 +124,7 @@ end
 function obtain_data_for_harmonic_bond_interaction(system::WaterSPCFw, p::SPCFwParameters)
     neighbouhoods = Dict{Int, Vector{Tuple{Int,Float64}}}()
     n = length(system.bodies)
-    ms = zeros(typeof(first(system.bodies).m), 3 * n)
+    ms = zeros(3 * n)
     for i in 1:n
         indO, indH1, indH2 = 3 * (i - 1) + 1, 3 * (i - 1) + 2, 3 * (i - 1) + 3
         ms[indO] = system.mO
@@ -162,7 +162,7 @@ end
 function obtain_data_for_lennard_jones_interaction(system::WaterSPCFw)
     bodies = system.bodies
     n = length(bodies)
-    ms = zeros(typeof(first(bodies).m), 3 * n)
+    ms = zeros(3 * n)
     indxs = zeros(Int, n)
     for i = 1:n
         indxs[i] = 3 * (i - 1) + 1
@@ -191,8 +191,8 @@ end
 function obtain_data_for_electrostatic_interaction(system::WaterSPCFw)
     bodies = system.bodies
     n = length(bodies)
-    qs = zeros(typeof(first(bodies).m), 3 * n)
-    ms = zeros(typeof(first(bodies).m), 3 * n)
+    qs = zeros(3 * n)
+    ms = zeros(3 * n)
     indxs = collect(1:3*n)
     exclude = Dict{Int, Vector{Int}}()
     for i = 1:n
@@ -222,7 +222,7 @@ function obtain_data_for_valence_angle_harmonic_interaction(system::WaterSPCFw)
     p = system.scpfw_parameters
     bonds = Vector{Tuple{Int, Int, Int, Float64, Float64}}()
     n = length(system.bodies)
-    ms = zeros(typeof(first(bodies).m), 3 * n)
+    ms = zeros(3 * n)
     for i = 1:n
         indO, indH1, indH2 = 3 * (i - 1) + 1, 3 * (i - 1) + 2, 3 * (i - 1) + 3
         ms[indO] = system.mO
