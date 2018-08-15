@@ -34,7 +34,7 @@ end
 
 function Base.show(stream::IO, pp::GravitationalParameters)
     println(stream, "Gravitational:")
-    print(stream, "\tG:"); show(stream, pp.G); 
+    print(stream, "\tG:"); show(stream, pp.G);
     println(stream)
 end
 
@@ -58,7 +58,7 @@ end
 
 function Base.show(stream::IO, pp::ElectrostaticParameters)
     println(stream, "Electrostatic:")
-    print(stream, "\tk:"); show(stream, pp.k); 
+    print(stream, "\tk:"); show(stream, pp.k);
     println(stream)
 end
 
@@ -72,7 +72,7 @@ end
 
 function Base.show(stream::IO, pp::MagnetostaticParameters)
     println(stream, "Magnetostatic:")
-    print(stream, "\tμ/4π:"); show(stream, pp.μ_4π); 
+    print(stream, "\tμ/4π:"); show(stream, pp.μ_4π);
     println(stream)
 end
 
@@ -93,19 +93,19 @@ function pairwise_lennard_jones_acceleration!(dv,
 
     force = @SVector [0.0, 0.0, 0.0];
     ri = @SVector [rs[1, i], rs[2, i], rs[3, i]]
-    
+
     for j ∈ indxs
         if j != i
             rj = @SVector [rs[1, j], rs[2, j], rs[3, j]]
-            (rij, rij_2, success) = apply_boundary_conditions!(ri, rj, pbc, p.R2)
-                        
-            if success
+            (rij, r, rij_2) = get_interparticle_distance(ri, rj, pbc)
+
+            if rij_2 < p.R2
                 σ_rij_6 = (p.σ2 / rij_2)^3
                 σ_rij_12 = σ_rij_6^2
-                force += (2 * σ_rij_12 - σ_rij_6 ) * rij / rij_2    
-            end        
+                force += (2 * σ_rij_12 - σ_rij_6 ) * rij / rij_2
+            end
         end
-    end   
+    end
     @. dv +=  24 * p.ϵ * force / ms[i]
 end
 
@@ -119,29 +119,28 @@ function pairwise_electrostatic_acceleration!(dv,
     p::ElectrostaticParameters,
     pbc::BoundaryConditions)
 
-    force = @SVector [0.0, 0.0, 0.0];
+    force = @SVector [0.0, 0.0, 0.0]
     ri = @SVector [rs[1, i], rs[2, i], rs[3, i]]
     @inbounds for j = 1:n
         if !in(j, exclude[i])
             rj = @SVector [rs[1, j], rs[2, j], rs[3, j]]
-
-            (rij, rij_2, success) = apply_boundary_conditions!(ri, rj, pbc, p.R2)
-            if success
-                force += qs[j] * rij / norm(rij)^3
+            rij, r, r2 = get_interparticle_distance(ri, rj, pbc)
+            if r2 < p.R2
+                force += qs[j] * rij / (r*r2)
             end
         end
-    end    
+    end
     @. dv += p.k * qs[i] * force / ms[i]
 end
 
 
-function gravitational_acceleration!(dv, 
+function gravitational_acceleration!(dv,
     rs,
     i::Integer,
     n::Integer,
     bodies::Vector{<:MassBody},
     p::GravitationalParameters)
-    
+
     accel = @SVector [0.0, 0.0, 0.0];
     ri = @SVector [rs[1, i], rs[2, i], rs[3, i]]
     @inbounds for j = 1:n
@@ -151,11 +150,11 @@ function gravitational_acceleration!(dv,
             accel -= p.G * bodies[j].m * rij / norm(rij)^3
         end
     end
-    
+
     @. dv += accel
 end
 
-function magnetostatic_dipdip_acceleration!(dv, 
+function magnetostatic_dipdip_acceleration!(dv,
     rs,
     i::Integer,
     n::Integer,
@@ -177,17 +176,17 @@ function magnetostatic_dipdip_acceleration!(dv,
             force += (mi * mij + mj * mir + r * dot(mi, mj) - 5 * r * mir * mij) / rij4
         end
     end
-    
+
     @. dv += 3 * p.μ_4π * force / bodies[i].m
 end
 
-function harmonic_bond_potential_acceleration!(dv, 
+function harmonic_bond_potential_acceleration!(dv,
     rs,
     i::Integer,
     ms::Vector{<:Real},
     neighbouhoods::Dict{Int,Vector{Tuple{Int,Float64}}},
     p::SPCFwParameters)
-    
+
     force = @SVector [0.0, 0.0, 0.0];
     ri = @SVector [rs[1, i], rs[2, i], rs[3, i]]
     @inbounds for (j, k) in neighbouhoods[i]
@@ -197,7 +196,7 @@ function harmonic_bond_potential_acceleration!(dv,
         d = r - p.rOH
         force -= d * k * rij / r
     end
-    
+
     @. dv += force / ms[i]
 end
 
@@ -221,14 +220,14 @@ function valence_angle_potential_acceleration!(dv,
     pc = normalize(cross(rcb, rbaXbc))
 
     cosine = dot(rba, rbc) / (norm(rba) * norm(rbc))
-   
+
     if cosine>1
         cosine = 1
     elseif cosine<-1
         cosine =-1
     end
     aHOH = acos(cosine)
-    
+
     force = - p.ka * (aHOH - p.aHOH)
     force_a = pa * force / norm(rba)
     force_c = pc * force / norm(rbc)

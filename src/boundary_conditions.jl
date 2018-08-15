@@ -31,40 +31,42 @@ struct CubicPeriodicBoundaryConditions{cType <: Real} <: BoundaryConditions
     L::cType
 end
 
-function apply_boundary_conditions!(ri, rj, pbc::PeriodicBoundaryConditions, R2)
-    rij = @MVector [Inf, Inf, Inf]
-    success = false
-    rij2 = 0
-
-    for dx in [0,-pbc[2],pbc[2]], dy in [0,-pbc[4],pbc[4]], dz in [0,-pbc[6],pbc[6]]
-        rij = @MVector [ri[1] - rj[1] + dx, ri[2] - rj[2] + dy, ri[3] - rj[3] + dz]
-        for x in (1, 2, 3)
-            rij[x] -= (pbc[2x] - pbc[2x - 1]) * div(rij[x], (pbc[2x] - pbc[2x - 1]))
-        end
-        rij2 = dot(rij, rij)
-        if  rij2 < R2
-            success = true
-            break
-        end
-    end
-    return (rij, rij2, success)
+function get_interparticle_distance(ri, rj, pbc::PeriodicBoundaryConditions)
+    rij = ri - rj
+    r, r2 = zero(eltype(ri)), zero(eltype(ri))
+    x, y, z = rij
+    while x  < pbc[1]   x += pbc[2]-pbc[1] end
+    while x >= pbc[2]   x -= pbc[2]-pbc[1] end
+    while y  < pbc[3]   y += pbc[4]-pbc[3] end
+    while y >= pbc[4]   y -= pbc[4]-pbc[3] end
+    while z  < pbc[5]   z += pbc[6]-pbc[5] end
+    while z >= pbc[6]   z -= pbc[6]-pbc[5] end
+    rij = @SVector [x, y, z]
+    r2 = dot(rij, rij)
+    r = sqrt(r2)
+    return (rij, r, r2)
 end
 
-function apply_boundary_conditions!(ri, rj, pbc::CubicPeriodicBoundaryConditions, R2)
+function get_interparticle_distance(ri, rj, bc::CubicPeriodicBoundaryConditions)
     rij = ri - rj
-    x, y, z = rij[1], rij[2], rij[3]
-    while x >= pbc.L    x -= pbc.L end
-    while x < -pbc.L    x += pbc.L end
-    while y >= pbc.L    y -= pbc.L end
-    while y < -pbc.L    y += pbc.L end
-    while z >= pbc.L    z -= pbc.L end
-    while z < -pbc.L    z += pbc.L end
-    rij = SVector{3,eltype(R2)}(x, y, z)
-    rij2 = dot(rij, rij)
-    return (rij, rij2, rij2 < R2)
+    x, y, z = rij
+    size = bc.L
+    radius = 0.5 * size
+    while x >= radius    x -= size end
+    while x < -radius    x += size end
+    while y >= radius    y -= size end
+    while y < -radius    y += size end
+    while z >= radius    z -= size end
+    while z < -radius    z += size end
+    rij = @SVector [x, y, z]
+    r2 = dot(rij, rij)
+    r = sqrt(r2)
+    return (rij, r, r2)
 end
 
-function apply_boundary_conditions!(ri, rj, pbc::BoundaryConditions, R2)
+function get_interparticle_distance(ri, rj, ::BoundaryConditions)
     rij = ri - rj
-    (rij, dot(rij,rij),true)
+    r2 = dot(rij, rij)
+    r = sqrt(r2)
+    (rij, r, r2)
 end
