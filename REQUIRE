@@ -1,4 +1,4 @@
-julia 0.7
+julia 1.0
 DiffEqBase 3.0.0
 OrdinaryDiffEq 3.0.0
 Reexport
