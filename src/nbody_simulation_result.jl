@@ -22,12 +22,10 @@ end
 
 # This iterator interface is implemented specifically for making animation.
 # Probably, there will be a wrapper for this in the future.
-Base.start(::SimulationResult) = 1
 
-Base.done(sr::SimulationResult, state) = state > length(sr.solution.t)
-
-function Base.next(sr::SimulationResult, state)
-    (sr, sr.solution.t[state]), state + 1
+function Base.iterate(sr::SimulationResult,state=1)
+  state > length(sr.solution.t) && return nothing
+  (sr, sr.solution.t[state]), state + 1
 end
 
 function get_velocity(sr::SimulationResult, time::Real, i::Integer=0)
