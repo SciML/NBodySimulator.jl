@@ -1,10 +1,9 @@
-using NBodySimulator
-using StochasticDiffEq
+using NBodySimulator,StochasticDiffEq
 
 const T = 370 # °K
 const T0 = 300 # °K
 const kb = 8.3144598e-3 # kJ/(K*mol)
-const ϵOO = 0.1554253*4.184 # kJ
+const ϵOO = 0.1554253*4.184 # kJ 
 const σOO = 0.3165492 # nm
 const ρ = 997/1.6747# Da/nm^3
 const mO = 15.999 # Da
@@ -12,7 +11,7 @@ const mH = 1.00794 # Da
 const mH2O = mO+2*mH
 const N = 216#floor(Int, ρ * L^3 / m)
 const L = (mH2O*N/ρ)^(1/3)
-const R = 0.9 # ~3*σOO
+const R = 0.9 # ~3*σOO  
 const Rel = 0.49*L
 const v_dev = sqrt(kb * T /mH2O)
 const τ = 0.5e-4 # ps
@@ -33,20 +32,20 @@ spc_paramters = SPCFwParameters(rOH, ∠HOH, k_bond, k_angle)
 pbc = CubicPeriodicBoundaryConditions(L)
 water = WaterSPCFw(bodies, mH, mO, qH, qO,  jl_parameters, e_parameters, spc_paramters);
 #thermostat = BerendsenThermostat(T0, 200τ)
-thermostat = NoseHooverThermostat(T0, 200τ)
+#thermostat = NoseHooverThermostat(T0, 200τ)
 #thermostat = AndersenThermostat(90, 0.01/τ)
-#thermostat = LangevinThermostat(T0, 75)
+thermostat = LangevinThermostat(T0, 75)
 simulation = NBodySimulation(water, (t1, t2), pbc, thermostat, kb);
-result = @time run_simulation(simulation, VelocityVerlet(), dt=τ)
-#result = @time run_simulation(simulation, EM(),  dt=τ)
+#result = @time run_simulation(simulation, VelocityVerlet(), dt=τ)
+result = @time run_simulation(simulation, EM(),  dt=τ)
 
 
 #time_now = Dates.format(now(), "yyyy_mm_dd_HH_MM_SS")
 #Nactual = length(bodies)
 #timesteps = round(length(result.solution.t))
 
-(rs, grf) = @time rdf(result)
-(ts, dr2) = @time msd(result)
+#(rs, grf) = @time rdf(result)
+#(ts, dr2) = @time msd(result)
 
 #using JLD
 #save("D:/water $Nactual molecules $timesteps steps $time_now.jld", "rs", rs, "grf", grf, "ts", ts, "dr2", dr2)

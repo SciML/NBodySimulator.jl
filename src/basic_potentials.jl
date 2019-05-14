@@ -1,4 +1,5 @@
-abstract type PotentialParameters end
+abstract type PotentialParameters
+end
 
 struct LennardJonesParameters{pType <: Real} <: PotentialParameters
     ϵ::pType
@@ -108,21 +109,6 @@ function pairwise_lennard_jones_acceleration!(dv,
     @. dv +=  24 * p.ϵ * force / ms[i]
 end
 
-function compute_pair_force(ri::SVector{3,T}, rj::SVector{3,T}, pbc::BoundaryConditions, p::PotentialParameters, data...) where T
-    error("Force computation for potential $p not implemented yet.")
-end
-
-function compute_pair_force(ri::SVector{3,T}, rj::SVector{3,T}, pbc::BoundaryConditions, p::LennardJonesParameters, data...) where T
-    # NOTE: ensuring that i!=j is the responsibility of the caller
-    (rij, r, rij_2) = get_interparticle_distance(ri, rj, pbc)
-    if rij_2 < p.R2
-        σ_rij_6 = (p.σ2 / rij_2)^3
-        σ_rij_12 = σ_rij_6^2
-        force = (2*σ_rij_12 - σ_rij_6) * rij / rij_2 # NOTE: optimize this?
-    end
-    24 * p.ϵ * force
-end
-
 function pairwise_electrostatic_acceleration!(dv,
     rs,
     i::Integer,
@@ -147,14 +133,6 @@ function pairwise_electrostatic_acceleration!(dv,
     @. dv += p.k * qs[i] * force / ms[i]
 end
 
-function compute_pair_force(ri::SVector{3,T}, rj::SVector{3,T}, pbc::BoundaryConditions, p::ElectrostaticParameters, qi::T, qj::T) where T
-    # NOTE: ensuring that i!=j and !in(j, exclude[i]) is the responsibility of the caller
-    (rij, r, r2) = get_interparticle_distance(ri, rj, pbc)
-    if r2 < p.R2
-        force += qj * rij / (r*r2)
-    end
-    p.k * qi * force
-end
 
 function gravitational_acceleration!(dv,
     rs,
