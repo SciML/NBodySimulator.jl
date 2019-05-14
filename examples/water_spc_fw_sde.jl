@@ -1,10 +1,10 @@
-using NBodySimulator
-using StochasticDiffEq
+using Dates
+using NBodySimulator, StochasticDiffEq
 
 const T = 370 # °K
 const T0 = 275 # °K
 const kb = 8.3144598e-3 # kJ/(K*mol)
-const ϵOO = 0.1554253*4.184 # kJ 
+const ϵOO = 0.1554253*4.184 # kJ
 const σOO = 0.3165492 # nm
 const ρ = 997/1.6747# Da/nm^3
 const mO = 15.999 # Da
@@ -12,7 +12,7 @@ const mH = 1.00794 # Da
 const mH2O = mO+2*mH
 const N = 216#floor(Int, ρ * L^3 / m)
 const L = (mH2O*N/ρ)^(1/3)
-const R = 0.9 # ~3*σOO  
+const R = 0.9 # ~3*σOO
 const Rel = 0.49*L
 const v_dev = sqrt(kb * T /mH2O)# sqrt(3.0/7)*sqrt(kb * T /mH2O)
 const τ = 0.5e-3 # ps

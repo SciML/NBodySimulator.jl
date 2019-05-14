@@ -19,11 +19,9 @@ end
 
 (sr::SimulationResult)(args...; kwargs...) = return sr.solution(args...; kwargs...)
 
-
 # This iterator interface is implemented specifically for making animation.
 # Probably, there will be a wrapper for this in the future.
-
-function Base.iterate(sr::SimulationResult,state=1)
+function Base.iterate(sr::SimulationResult, state=1)
   state > length(sr.solution.t) && return nothing
   (sr, sr.solution.t[state]), state + 1
 end
@@ -244,19 +242,17 @@ function harmonic_bonds_potential(p::SPCFwParameters,
     return e_harmonic / 4
 end
 
-function valence_angle_harmonic_potential(rs,
-    bonds::Vector{Tuple{Int,Int,Int,Float64,Float64}})
-
-    e_valence = 0
-
+function valence_angle_harmonic_potential(
+        rs::AbstractArray{T},
+        bonds::Vector{Tuple{Int,Int,Int,T,T}}
+        ) where T
+    e_valence = zero(T)
     for (a, b, c, valence_angle, k) ∈ bonds
-        ra = @SVector [rs[1, a], rs[2, a], rs[3, a]]
-        rb = @SVector [rs[1, b], rs[2, b], rs[3, b]]
-        rc = @SVector [rs[1, c], rs[2, c], rs[3, c]]
-
+        ra = SVector{3,T}(rs[1,a],rs[2,a],rs[3,a])
+        rb = SVector{3,T}(rs[1,b],rs[2,b],rs[3,b])
+        rc = SVector{3,T}(rs[1,c],rs[2,c],rs[3,c])
         rba = ra - rb
         rbc = rc - rb
-
         currenct_angle = acos(dot(rba, rbc) / (norm(rba) * norm(rbc)))
         e_valence += k * (currenct_angle - valence_angle)^2
     end
@@ -350,12 +346,9 @@ end
 @recipe function generate_data_for_scatter(sr::SimulationResult{<:PotentialNBodySystem}, time::Real=0.0)
     solution = sr.solution
     n = length(sr.simulation.system.bodies)
-
     if :gravitational ∈ keys(sr.simulation.system.potentials)
-
         xlim --> 1.1 * [minimum(solution[1,1:n,:]), maximum(solution[1,1:n,:])]
         ylim --> 1.1 * [minimum(solution[2,1:n,:]), maximum(solution[2,1:n,:])]
-
         for i in 1:n
             @series begin
                 label --> "Orbit $i"
@@ -376,20 +369,15 @@ end
             zlim --> 1.1 * [0, borders.L]
             map!(x ->  x -= borders.L * floor(x / borders.L), positions, positions)
         end
-
-
         seriestype --> :scatter
         markersize --> 5
-
         (positions[1,:], positions[2,:], positions[3,:])
-        #(positions[1,:], positions[2,:])
     end
 end
 
 function distancies(result::SimulationResult, time::Real)
     n = length(result.simulation.system.bodies)
     cc = get_position(result, time)
-
     d = Float64[]
     for i = 1:n
         for j = 1:n
@@ -402,13 +390,9 @@ function distancies(result::SimulationResult, time::Real)
 end
 
 @recipe function initial_distribution(sr::SimulationResult{<:WaterSPCFw}, time::Real=0.0)
-
     n = length(sr.simulation.system.bodies)
-
     borders = sr.simulation.boundary_conditions
-
     cc = get_position(sr, time)
-
     if borders isa PeriodicBoundaryConditions
         xlim --> 1.1 * [borders[1], borders[2]]
         ylim --> 1.1 * [borders[3], borders[4]]
@@ -417,19 +401,15 @@ end
         xlim --> 1.1 * [0, borders.L]
         ylim --> 1.1 * [0, borders.L]
         zlim --> 1.1 * [0, borders.L]
-
-
         map!(x ->  x -= borders.L * floor(x / borders.L), cc, cc)
     end
     seriestype --> :scatter
-
     @series begin
         label --> "O"
         markersize --> 8
         markercolor --> :red
         (cc[1,1:3:3 * n - 2], cc[2,1:3:3 * n - 2], cc[3,1:3:3 * n - 2])
     end
-
     @series begin
         label --> "H"
         markersize --> 4
@@ -444,10 +424,8 @@ end
 function rdf(sr::SimulationResult)
     n = length(sr.simulation.system.bodies)
     pbc = sr.simulation.boundary_conditions
-
     (ms, indxs) = obtain_data_for_lennard_jones_interaction(sr.simulation.system)
     indlen = length(indxs)
-
     maxbin = 1000
     dr = pbc.L / maxbin
     hist = zeros(maxbin)
@@ -459,9 +437,7 @@ function rdf(sr::SimulationResult)
             for ind_j = ind_i + 1:indlen
                 j = indxs[ind_j]
                 rj = @SVector [cc[1, j], cc[2, j], cc[3, j]]
-
                 (rij, r, r2) = get_interparticle_distance(ri, rj, pbc)
-
                 if r2 < (0.5 * pbc.L)^2
                     bin = ceil(Int, r / dr)
                     if bin > 1 && bin <= maxbin
@@ -471,9 +447,7 @@ function rdf(sr::SimulationResult)
             end
         end
     end
-
     c = 4 / 3 * π * indlen / pbc.L^3
-
     gr = zeros(maxbin)
     rs = zeros(maxbin)
     tlen = length(sr.solution.t)
@@ -484,59 +458,46 @@ function rdf(sr::SimulationResult)
         gr[bin] = (hist[bin] / (tlen * indlen)) / nideal
         rs[bin] = rlower + dr / 2
     end
-
     return (rs, gr)
 end
 
 function msd(sr::SimulationResult{<:PotentialNBodySystem})
     n = length(sr.simulation.system.bodies)
-
     (ms, indxs) = obtain_data_for_lennard_jones_interaction(sr.simulation.system)
     indlen = length(indxs)
-
     ts = sr.solution.t
     tlen = length(ts)
     dr2 = zeros(length(ts))
-
     cc0 = get_position(sr, ts[1])
-
     for t = 1:tlen
         cc = get_position(sr, ts[t])
         for ind_i = 1:indlen
             i = indxs[ind_i]
             dr = @SVector [cc[1, i] - cc0[1,i], cc[2, i] - cc0[2,i], cc[3, i] - cc0[3,i]]
-
             dr2[t] += dot(dr, dr)
         end
         dr2[t] /= indlen
     end
-
     (ts, dr2)
 end
 
 function msd(sr::SimulationResult{<:WaterSPCFw})
     n = length(sr.simulation.system.bodies)
-
     mO = sr.simulation.system.mO
     mH = sr.simulation.system.mH
-
     ts = sr.solution.t
     tlen = length(ts)
     dr2 = zeros(tlen)
-
     cc0 = get_position(sr, ts[1])
-
     for t = 1:tlen
         cc = get_position(sr, ts[t])
         for i = 1:n
             indO, indH1, indH2 = 3 * (i - 1) + 1, 3 * (i - 1) + 2, 3 * (i - 1) + 3
             dr = ((cc[:,indO] - cc0[:,indO]) * mO + (cc[:,indH1] - cc0[:,indH1]) * mH + (cc[:,indH2] - cc0[:,indH2]) * mH) / (2 * mH + mO)
-
             dr2[t] += dot(dr, dr)
         end
         dr2[t] /= n
     end
-
     (ts, dr2)
 end
 
@@ -558,13 +519,11 @@ function write_pdb_data(f::IO, sr::SimulationResult{<:WaterSPCFw})
     for t in sr.solution.t
         cc0 = 10*get_position(sr, t)
         map!(x ->  x -= L * floor(x / L), cc, cc0)
-
         for i ∈ 1:n
             indO, indH1, indH2 = 3 * (i - 1) + 1, 3 * (i - 1) + 2, 3 * (i - 1) + 3
             @. cc[:, indH1] = cc[:,indO] + cc0[:, indH1] - cc0[:, indO]
             @. cc[:, indH2] = cc[:,indO] + cc0[:, indH2] - cc0[:, indO]
         end
-
         count+=1
         println(f,rpad("MODEL",10), count)
         println(f,"REMARK 250 time=$t picoseconds")
