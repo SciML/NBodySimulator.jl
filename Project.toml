@@ -15,9 +15,9 @@ Reexport = "189a3867-3050-52da-a836-e630ba90ab69"
 StaticArrays = "90137ffa-7385-5640-81b9-e52037218182"
 
 [compat]
-DiffEqBase = "≥ 3.0.0"
-OrdinaryDiffEq = "≥ 3.0.0"
-julia = "≥ 1.0.0"
+DiffEqBase = "6"
+OrdinaryDiffEq = "5"
+julia = "1"
 
 [extras]
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
