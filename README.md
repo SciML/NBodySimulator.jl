@@ -86,7 +86,7 @@ system = PotentialNBodySystem(bodies, Dict(:gravitational => g_parameters, elect
 ```
 
 ### Custom Potential
-There exists an [example](http://docs.juliadiffeq.org/latest/models/physical.html) of simulation of an N-body system at absolutely custom potential. 
+There exists an [example](http://docs.juliadiffeq.org/dev/models/physical.html) of simulation of an N-body system at absolutely custom potential. 
 
 Here is shown how to create custom acceleration functions using tools of NBodySimulator.
 
