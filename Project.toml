@@ -16,6 +16,7 @@ StaticArrays = "90137ffa-7385-5640-81b9-e52037218182"
 
 [compat]
 DiffEqBase = "6"
+DiffEqCallbacks = "2.9"
 OrdinaryDiffEq = "5"
 julia = "1"
 
