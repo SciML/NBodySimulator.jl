@@ -18,6 +18,7 @@ StaticArrays = "90137ffa-7385-5640-81b9-e52037218182"
 DiffEqBase = "6"
 FileIO = "1.0"
 OrdinaryDiffEq = "5"
+RecipesBase = "0.7"
 Reexport = "0.2"
 julia = "1"
 
