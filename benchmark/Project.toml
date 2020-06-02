@@ -1,0 +1,4 @@
+[deps]
+BenchmarkTools = "6e4b80f9-dd63-53aa-95a3-0cdb28fa8baf"
+NBodySimulator = "0e6f8da7-a7fc-5c8b-a220-74e902c310f9"
+StaticArrays = "90137ffa-7385-5640-81b9-e52037218182"
