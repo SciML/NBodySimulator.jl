@@ -28,18 +28,18 @@
         @test v_expected ≈ v_actual atol = ε
 
         io = IOBuffer()
-    
-        @test sprint(io -> show(io, system)) == 
+
+        @test sprint(io -> show(io, system)) ==
     "Potentials: \nLennard-Jones:\n\tϵ:1.0\n\tσ:1.0\n\tR:Inf\n"
 
-        @test sprint(io -> show(io, simulation)) == 
+        @test sprint(io -> show(io, simulation)) ==
     "Timespan: (0.0, 1.0)\nBoundary conditions: InfiniteBox{Float64}([-Inf, Inf, -Inf, Inf, -Inf, Inf])\nPotentials: \nLennard-Jones:\n\tϵ:1.0\n\tσ:1.0\n\tR:Inf\n"
 
-        @test sprint(io -> show(io, sim_result)) == 
+        @test sprint(io -> show(io, sim_result)) ==
     "N: 2\nTimespan: (0.0, 1.0)\nBoundary conditions: InfiniteBox{Float64}([-Inf, Inf, -Inf, Inf, -Inf, Inf])\nPotentials: \nLennard-Jones:\n\tϵ:1.0\n\tσ:1.0\n\tR:Inf\nTime steps: 1000\nt: 0.0, 1.0\n"
     end
 
-    @testset "Three particles of liquid argon and their \"temperature\"" begin 
+    @testset "Three particles of liquid argon and their \"temperature\"" begin
         T = 120.0 # °K
         kb = 8.3144598e-3 # kJ/(K*mol)
         ϵ = T * kb
@@ -48,7 +48,7 @@
         m = 39.95# Da
         L = 5σ # 10.229σ
         N = 3 # floor(Int, ρ * L^3 / m)
-        R = 2.25σ   
+        R = 2.25σ
         v_dev = sqrt(3 * kb * T / m)
         r1 = SVector(L / 3, L / 3, 2 * L / 3)
         r2 = SVector(L / 3, 2 * L / 3, L / 3)
@@ -69,7 +69,7 @@
         simulation = NBodySimulation(lj_system, (t1, t2), PeriodicBoundaryConditions(L), kb);
         result = run_simulation(simulation, VelocityVerlet(), dt=τ)
 
-        T1 = temperature(result, t1) 
+        T1 = temperature(result, t1)
         ε = 1e-6
         @test T1 ≈ 120.0 atol = ε
 
@@ -110,7 +110,7 @@
 
     end
 
-    @testset "Testing RDF and MSD calculation" begin 
+    @testset "Testing RDF and MSD calculation" begin
         T = 120.0 # °K
         kb = 8.3144598e-3 # kJ/(K*mol)
         ϵ = T * kb
@@ -119,7 +119,7 @@
         m = 39.95# Da
         L = 5σ # 10.229σ
         N = 125 # floor(Int, ρ * L^3 / m)
-        R = 0.5L   
+        R = 0.5L
         τ = 0.5e-3 # ps or 1e-12 s
         t1 = 0.0
         t2 = 400τ
@@ -146,7 +146,7 @@
         @test 2.5 == default_potential.R
         @test 1.0 == default_potential.σ2
         @test 6.25 == default_potential.R2
-    
+
         io = IOBuffer()
         potential1 = LennardJonesParameters()
         potential2 = LennardJonesParameters(2, 5, 10)
