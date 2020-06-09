@@ -36,7 +36,7 @@
     "Timespan: (0.0, 1.0)\nBoundary conditions: InfiniteBox{Float64}([-Inf, Inf, -Inf, Inf, -Inf, Inf])\nPotentials: \nLennard-Jones:\n\tϵ:1.0\n\tσ:1.0\n\tR:Inf\n"
 
         @test sprint(io -> show(io, sim_result)) == 
-    "N: 2\nTimespan: (0.0, 1.0)\nBoundary conditions: InfiniteBox{Float64}([-Inf, Inf, -Inf, Inf, -Inf, Inf])\nPotentials: \nLennard-Jones:\n\tϵ:1.0\n\tσ:1.0\n\tR:Inf\nTime steps: 1001\nt: 0.0, 1.0\n"
+    "N: 2\nTimespan: (0.0, 1.0)\nBoundary conditions: InfiniteBox{Float64}([-Inf, Inf, -Inf, Inf, -Inf, Inf])\nPotentials: \nLennard-Jones:\n\tϵ:1.0\n\tσ:1.0\n\tR:Inf\nTime steps: 1000\nt: 0.0, 1.0\n"
     end
 
     @testset "Three particles of liquid argon and their \"temperature\"" begin 
