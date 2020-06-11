@@ -291,26 +291,6 @@ function obtain_data_for_nosehoover_thermostating(simulation::NBodySimulation{<:
     (ms, kb, n, nc, γind, p)
 end
 
-function DiffEqBase.ODEProblem(simulation::NBodySimulation{<:PotentialNBodySystem})
-    (u0, v0, n) = gather_bodies_initial_coordinates(simulation)
-
-    acceleration_functions = gather_accelerations_for_potentials(simulation)
-
-    function ode_system!(du, u, p, t)
-        du[:, 1:n] = @view u[:, n + 1:2n];
-
-        @inbounds for i = 1:n
-            a = MVector(0.0, 0.0, 0.0)
-            for acceleration! in acceleration_functions
-                acceleration!(a, u[:, 1:n], u[:, n + 1:end], t, i);
-            end
-            du[:, n + i] .= a
-        end
-    end
-
-    return ODEProblem(ode_system!, hcat(u0, v0), simulation.tspan)
-end
-
 function DiffEqBase.SecondOrderODEProblem(simulation::NBodySimulation{<:PotentialNBodySystem})
 
     (u0, v0, n) = gather_bodies_initial_coordinates(simulation)
