@@ -289,14 +289,11 @@ function run_simulation(s::NBodySimulation, args...; kwargs...)
     end
 end
 
-function calculate_simulation(s::NBodySimulation, alg_type=Tsit5(), args...; kwargs...)
-    solution = solve(ODEProblem(s), alg_type, args...; kwargs...)
-    return SimulationResult(solution, s)
-end
-
-# this should be a method for integrators designed for the SecondOrderODEProblem (It is worth somehow to sort them from other algorithms)
-function calculate_simulation(s::NBodySimulation, alg_type::Union{VelocityVerlet,DPRKN6,Yoshida6}, args...; kwargs...)
+function calculate_simulation(s::NBodySimulation, alg_type=VelocityVerlet(), args...; kwargs...)
     cb = obtain_callbacks_for_so_ode_problem(s)
+    if !haskey(kwargs, :dt)
+        kwargs = (kwargs..., dt=(s.tspan[2]-s.tspan[1])/10000)
+    end
     solution = solve(SecondOrderODEProblem(s), alg_type, args...; callback=cb, kwargs...)
     return SimulationResult(solution, s)
 end
