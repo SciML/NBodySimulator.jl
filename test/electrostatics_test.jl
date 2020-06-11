@@ -17,11 +17,13 @@
         simulation = NBodySimulation(system, (0.0, t))
         sim_result = run_simulation(simulation)
 
-
+        # we can assume that the massive body does not move and that the second
+        # has a circular trajectory.
+        # test that the bodies return to their initial positions after one period
         solution = sim_result.solution;
         ε = 0.1 * r
-        for j = 1:2, i = 1:3
-            @test solution[1][i,j] ≈ solution[end][i,j] atol = ε
+        for i = 1:3*2
+            @test solution[1][2,i] ≈ solution[end][2,i] atol = ε
         end
 
         (qs_act, ms_act, indxs_act, exclude_act) = NBodySimulator.obtain_data_for_electrostatic_interaction(simulation.system)
@@ -80,7 +82,7 @@
         q = 1.0
         count = 1
         dL = L / (ceil(n^(1 / 3)) + 1)
-        for x = dL / 2:dL:L, y = dL / 2:dL:L, z = dL / 2:dL:L  
+        for x = dL / 2:dL:L, y = dL / 2:dL:L, z = dL / 2:dL:L
             if count > n
                 break
             end
@@ -88,14 +90,14 @@
             v = SVector(.0, .0, .0)
             body = ChargedParticle(r, v, m, q)
             push!(bodies, body)
-            count += 1           
+            count += 1
         end
 
         k = 9e9
         τ = 0.01 * dL / sqrt(2 * k * q * q / (dL * m))
         t1 = 0.0
         t2 = 1000 * τ
-        
+
         potential = ElectrostaticParameters(k, 0.45 * L)
         system = PotentialNBodySystem(bodies, Dict(:electrostatic => potential))
         pbc = CubicPeriodicBoundaryConditions(L)
@@ -106,6 +108,6 @@
         e_tot_2 = total_energy(result, t2)
 
         ε = 0.001
-        @test (e_tot_2 - e_tot_1) / e_tot_1 ≈ 0.0 atol = ε 
+        @test (e_tot_2 - e_tot_1) / e_tot_1 ≈ 0.0 atol = ε
     end
 end
