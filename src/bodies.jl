@@ -29,9 +29,7 @@ struct WaterMolecule <: Body
     H2::MassBody
 end
 
-function generate_bodies_in_cell_nodes(n::Int, m::Real, v_dev::Real, L::Real)
-   
-    rng = MersenneTwister(n);
+function generate_bodies_in_cell_nodes(n::Int, m::Real, v_dev::Real, L::Real; rng=MersenneTwister(n))
     velocities = v_dev * randn(rng, Float64, (3, n))
     bodies = MassBody[]
 
