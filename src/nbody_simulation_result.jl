@@ -353,8 +353,8 @@ end
 
     if :gravitational ∈ keys(sr.simulation.system.potentials)
 
-        xlim --> 1.1 * [minimum(solution[1,1:n,:]), maximum(solution[1,1:n,:])]
-        ylim --> 1.1 * [minimum(solution[2,1:n,:]), maximum(solution[2,1:n,:])]
+        xlims --> 1.1 * [minimum(solution[1,1:n,:]), maximum(solution[1,1:n,:])]
+        ylims --> 1.1 * [minimum(solution[2,1:n,:]), maximum(solution[2,1:n,:])]
 
         for i in 1:n
             @series begin
@@ -367,22 +367,32 @@ end
         positions = get_position(sr, time)
         borders = sr.simulation.boundary_conditions
         if borders isa PeriodicBoundaryConditions
-            xlim --> 1.1 * [borders[1], borders[2]]
-            ylim --> 1.1 * [borders[3], borders[4]]
-            zlim --> 1.1 * [borders[5], borders[6]]
+            xlims --> 1.1 * [borders[1], borders[2]]
+            ylims --> 1.1 * [borders[3], borders[4]]
+            zlims --> 1.1 * [borders[5], borders[6]]
         elseif borders isa CubicPeriodicBoundaryConditions
-            xlim --> 1.1 * [0, borders.L]
-            ylim --> 1.1 * [0, borders.L]
-            zlim --> 1.1 * [0, borders.L]
+            xlims --> 1.1 * [0, borders.L]
+            ylims --> 1.1 * [0, borders.L]
+            zlims --> 1.1 * [0, borders.L]
             map!(x ->  x -= borders.L * floor(x / borders.L), positions, positions)
         end
 
+    end
 
-        seriestype --> :scatter
-        markersize --> 5
-
-        (positions[1,:], positions[2,:], positions[3,:])
-        #(positions[1,:], positions[2,:])
+    positions = get_position(sr, time)
+    seriestype --> :scatter
+    markersize --> 5
+    
+    for i in 1:n
+        @series begin
+            label --> "Body no. $i"
+            
+            if all(positions[3,:] .- positions[3,1] .< 1e-15)
+                ([positions[1,i]], [positions[2,i]])
+            else
+                (positions[1,:], positions[2,:], positions[3,:])
+            end
+        end
     end
 end
 
