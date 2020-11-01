@@ -8,9 +8,9 @@ include("./nbody_system.jl")
 
 const kb_SI = 1.38e-23 # J/K
 
-# This structure defines conditions under wich we test our system of n-bodies
+# This structure defines conditions under which we test our system of N-bodies.
 # With this wrapping we can make such fields as `boundary_conditions` necessary for every simulation
-# while allowing one to describe a particular systme of N interacting particles
+# while allowing one to describe a particular system of N interacting particles.
 struct NBodySimulation{sType <: NBodySystem,bcType <: BoundaryConditions,tType <: Real,thermType <: Thermostat}
     system::sType
     tspan::Tuple{tType,tType}
@@ -30,7 +30,7 @@ function NBodySimulation(system::BasicPotentialSystem,
     external_electric_field,
     external_magnetic_field,
     external_gravitational_field) where {tType <: Real}
-    
+
     potential_system = PotentialNBodySystem(system)
     NBodySimulation(potential_system, tspan, boundary_conditions, thermostat, kb, external_electric_field, external_magnetic_field, external_gravitational_field)
 end
