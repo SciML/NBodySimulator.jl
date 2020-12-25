@@ -23,7 +23,7 @@ FileIO = "1.0"
 OrdinaryDiffEq = "5"
 RecipesBase = "0.7, 0.8, 1.0"
 RecursiveArrayTools = "2"
-Reexport = "0.2"
+Reexport = "0.2, 1.0"
 StaticArrays = "0.10, 0.11, 0.12"
 julia = "1"
 
