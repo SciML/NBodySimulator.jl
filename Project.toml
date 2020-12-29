@@ -1,7 +1,7 @@
 name = "NBodySimulator"
 uuid = "0e6f8da7-a7fc-5c8b-a220-74e902c310f9"
 authors = ["Chris Rackauckas <accounts@chrisrackauckas.com>"]
-version = "1.4.0"
+version = "1.5.0"
 
 [deps]
 DiffEqBase = "2b5f629d-d688-5b77-993f-72d75c75574e"
@@ -23,7 +23,7 @@ FileIO = "1.0"
 OrdinaryDiffEq = "5"
 RecipesBase = "0.7, 0.8, 1.0"
 RecursiveArrayTools = "2"
-Reexport = "0.2"
+Reexport = "0.2, 1.0"
 StaticArrays = "0.10, 0.11, 0.12, 1.0"
 julia = "1"
 
