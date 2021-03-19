@@ -1,7 +1,10 @@
 __precompile__()
-
+"""
+$(DocStringExtensions.README)
+"""
 module NBodySimulator
 
+using DocStringExtensions
 using Reexport
 @reexport using DiffEqBase, OrdinaryDiffEq, RecursiveArrayTools
 using StaticArrays, RecipesBase, FileIO
