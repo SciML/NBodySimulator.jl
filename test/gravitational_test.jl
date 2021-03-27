@@ -1,4 +1,4 @@
-using OrdinaryDiffEq 
+using OrdinaryDiffEq
 
 @testset "Gravitational Functional Test" begin
     G = 1
@@ -14,9 +14,10 @@ using OrdinaryDiffEq
         simulation = NBodySimulation(system, tspan)
         sim_result = run_simulation(simulation)
         solution_simo_3 = sim_result.solution;
+        # test that the bodies return to their initial positions after one period
         ε = 0.1
-        for j = 1:3, i = 1:3
-            @test solution_simo_3[1][i,j] ≈ solution_simo_3[end][i,j] atol = ε
+        for i = 1:3*3
+            @test solution_simo_3[1][2,i] ≈ solution_simo_3[end][2,i] atol = ε
         end
 
         @testset "Analyzing simulation result" begin
@@ -35,7 +36,7 @@ using OrdinaryDiffEq
             e_kin = 1.218
             @test e_kin ≈ kinetic_energy(sim_result, t1) atol = ε
         end
-    
+
 
         @testset "Using convertion into SecondOrderODEProblem" begin
             sim_result = run_simulation(simulation, DPRKN6())
@@ -75,16 +76,17 @@ using OrdinaryDiffEq
         sim_result = run_simulation(simulation, Tsit5(), abstol=1e-10, reltol=1e-10)
         solution_simo_5 = sim_result.solution;
 
+        # test that the bodies return to their initial positions after one period
         ε = 0.01
-        for j = 1:5, i = 1:3
-            @test solution_simo_5[1][i,j] ≈ solution_simo_5[end][i,j] atol = ε
+        for i = 1:3*5
+            @test solution_simo_5[1][2,i] ≈ solution_simo_5[end][2,i] atol = ε
         end
     end
 
     @testset "Constructing electorstatic potential parameters entity" begin
         default_potential = GravitationalParameters()
         @test 6.67408e-11 == default_potential.G
-    
+
         io = IOBuffer()
         potential1 = GravitationalParameters()
         potential2 = GravitationalParameters(35.67)
