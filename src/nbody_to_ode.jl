@@ -296,15 +296,17 @@ function DiffEqBase.ODEProblem(simulation::NBodySimulation{<:PotentialNBodySyste
 
     acceleration_functions = gather_accelerations_for_potentials(simulation)
 
-    function ode_system!(du, u, p, t)
-        du[:, 1:n] = @view u[:, n + 1:2n];
+    ode_system! = let acceleration_functions = tuple(acceleration_functions...)
+        function ode_system!(du, u, p, t)
+            du[:, 1:n] = @view u[:, n + 1:2n];
 
-        @inbounds for i = 1:n
-            a = MVector(0.0, 0.0, 0.0)
-            for acceleration! in acceleration_functions
-                acceleration!(a, u[:, 1:n], u[:, n + 1:end], t, i);
+            @inbounds for i = 1:n
+                a = MVector(0.0, 0.0, 0.0)
+                for acceleration! in acceleration_functions
+                    acceleration!(a, u[:, 1:n], u[:, n + 1:end], t, i);
+                end
+                du[:, n + i] .= a
             end
-            du[:, n + i] .= a
         end
     end
 
@@ -318,19 +320,20 @@ function DiffEqBase.SecondOrderODEProblem(simulation::NBodySimulation{<:Potentia
     acceleration_functions = gather_accelerations_for_potentials(simulation)
     simultaneous_acceleration = gather_simultaneous_acceleration(simulation)
 
-    function soode_system!(dv, v, u, p, t)
-        @inbounds for i = 1:n
-            a = MVector(0.0, 0.0, 0.0)
-            for acceleration! in acceleration_functions
-                acceleration!(a, u, v, t, i);
+    soode_system! = let acceleration_functions = tuple(acceleration_functions...), simultaneous_acceleration = tuple(simultaneous_acceleration...)
+        function soode_system!(dv, v, u, p, t)
+            @inbounds for i = 1:n
+                a = MVector(0.0, 0.0, 0.0)
+                for acceleration! in acceleration_functions
+                    acceleration!(a, u, v, t, i);
+                end
+                dv[:, i] .= a
             end
-            dv[:, i] .= a
-        end
-        for acceleration! in simultaneous_acceleration
-            acceleration!(dv, u, v, t);
+            for acceleration! in simultaneous_acceleration
+                acceleration!(dv, u, v, t);
+            end
         end
     end
-
     SecondOrderODEProblem(soode_system!, v0, u0, simulation.tspan)
 end
 
@@ -391,17 +394,19 @@ function DiffEqBase.SDEProblem(simulation::NBodySimulation{<:PotentialNBodySyste
 
     therm = simulation.thermostat
 
-    function deterministic_acceleration!(du, u, p, t)
-        du[:, 1:n] = @view u[:, n + 1:2n];
+    deterministic_acceleration! = let acceleration_functions = tuple(acceleration_functions...)
+        function deterministic_acceleration!(du, u, p, t)
+            du[:, 1:n] = @view u[:, n + 1:2n];
 
-        @inbounds for i = 1:n
-            a = MVector(0.0, 0.0, 0.0)
-            for acceleration! in acceleration_functions
-                acceleration!(a, (@view u[:, 1:n]), (@view u[:, n + 1:end]), t, i);
+            @inbounds for i = 1:n
+                a = MVector(0.0, 0.0, 0.0)
+                for acceleration! in acceleration_functions
+                    acceleration!(a, (@view u[:, 1:n]), (@view u[:, n + 1:end]), t, i);
+                end
+                du[:, n + i] .= a
             end
-            du[:, n + i] .= a
+            @. du[:, n + 1:end] -= therm.γ*u[:, n + 1:end]
         end
-        @. du[:, n + 1:end] -= therm.γ*u[:, n + 1:end]
     end
 
     σ = sqrt(2*therm.γ*simulation.kb*therm.T/simulation.system.bodies[1].m)
