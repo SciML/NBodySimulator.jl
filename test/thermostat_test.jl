@@ -1,4 +1,4 @@
-@testset "Testing thermostats on liquid argon " begin 
+@testset "Testing thermostats on liquid argon " begin
     T = 120.0 # °K
     T0 = 90 # °K
     kb = 8.3144598e-3 # kJ/(K*mol)
@@ -8,9 +8,9 @@
     m = 39.95# Da
     N = 125
     L = (m * N / ρ)^(1 / 3)#10.229σ
-    R = 0.5 * L   
+    R = 0.5 * L
     v_dev = sqrt(kb * T / m)
-    @testset "Andersen thermostat" begin 
+    @testset "Andersen thermostat" begin
         bodies = generate_bodies_in_cell_nodes(N, m, v_dev, L)
 
         τ = 0.5e-3 # ps or 1e-12 s
@@ -22,15 +22,16 @@
         thermostat = AndersenThermostat(T0, 0.1/τ)
         simulation = NBodySimulation(lj_system, (t1, t2), PeriodicBoundaryConditions(L), thermostat, kb);
         result = run_simulation(simulation, VelocityVerlet(), dt=τ)
-    
 
-        T1 = temperature(result, t1) 
+
+        T1 = temperature(result, t1)
         T2 = temperature(result, t2)
         ε = 0.5
         @test abs(T2 - T0) / T0 ≈ 0.0 atol = ε
+        @test result.solution.t == unique(result.solution.t)
     end
 
-    @testset "Berendsen thermostat" begin 
+    @testset "Berendsen thermostat" begin
         bodies = generate_bodies_in_cell_nodes(N, m, v_dev, L)
 
         τ = 0.5e-3
@@ -43,13 +44,13 @@
         pbc = CubicPeriodicBoundaryConditions(L)
         simulation = NBodySimulation(lj_system, (t1, t2), pbc, thermostat, kb);
         result = run_simulation(simulation, VelocityVerlet(), dt=τ)
-     
+
         T2 = temperature(result, t2)
         ε = 0.1
         @test abs(T2 - T0) / T ≈ 0.0 atol = ε
     end
 
-    @testset "Nose-Hoover thermostat" begin 
+    @testset "Nose-Hoover thermostat" begin
         bodies = generate_bodies_in_cell_nodes(N, m, v_dev, L)
 
         τ = 0.5e-3
@@ -62,13 +63,13 @@
         pbc = CubicPeriodicBoundaryConditions(L)
         simulation = NBodySimulation(lj_system, (t1, t2), pbc, thermostat, kb);
         result = run_simulation(simulation, VelocityVerlet(), dt=τ)
-     
+
         T2 = temperature(result, t2)
         ε = 0.5
         @test abs(T2 - T0) / T0 ≈ 0.0 atol = ε
     end
 
-    @testset "Langevin thermostat" begin 
+    @testset "Langevin thermostat" begin
         bodies = generate_bodies_in_cell_nodes(N, m, v_dev, L)
 
         τ = 0.5e-3
@@ -81,7 +82,7 @@
         pbc = CubicPeriodicBoundaryConditions(L)
         simulation = NBodySimulation(lj_system, (t1, t2), pbc, thermostat, kb);
         result = run_simulation(simulation, EM(),  dt=τ)
-     
+
         T2 = temperature(result, t2)
         ε = 0.5
         @test abs(T2 - T0) / T0 ≈ 0.0 atol = ε
