@@ -297,7 +297,7 @@ end
 # this should be a method for integrators designed for the SecondOrderODEProblem (It is worth somehow to sort them from other algorithms)
 function calculate_simulation(s::NBodySimulation, alg_type::Union{VelocityVerlet,DPRKN6,Yoshida6}, args...; kwargs...)
     cb = obtain_callbacks_for_so_ode_problem(s)
-    solution = solve(SecondOrderODEProblem(s), alg_type, args...; callback=cb, kwargs...)
+    solution = solve(SecondOrderODEProblem(s), alg_type, args...; callback=cb, save_everystep = isempty(cb), kwargs...)
     return SimulationResult(solution, s)
 end
 
@@ -331,7 +331,7 @@ function get_andersen_thermostating_callback(s::NBodySimulation)
             end
         end
     end
-    cb = DiscreteCallback(condition, affect!)
+    cb = DiscreteCallback(condition, affect!, save_positions = (false,true))
 end
 
 function apply_andersen_rescaling_velocity(integrator, i, kb, system::PotentialNBodySystem, p::AndersenThermostat)
@@ -382,11 +382,11 @@ end
     positions = get_position(sr, time)
     seriestype --> :scatter
     markersize --> 5
-    
+
     for i in 1:n
         @series begin
             label --> "Body no. $i"
-            
+
             if all(positions[3,:] .- positions[3,1] .< 1e-15)
                 ([positions[1,i]], [positions[2,i]])
             else
