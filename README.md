@@ -81,7 +81,7 @@ The Lennard-Jones potential is used in molecular dynamics simulations for approx
 `PotentialNBodySystem` structure represents systems with a custom set of potentials. In other words, the user determines the ways in which the particles are allowed to interact. One can pass the bodies and parameters of interaction potentials into that system. In the case the potential parameters are not set, the particles will move at constant velocities without acceleration during the simulation.
 
 ```julia
-system = PotentialNBodySystem(bodies, Dict(:gravitational => g_parameters, electrostatic: => el_potential))
+system = PotentialNBodySystem(bodies, Dict(:gravitational => g_parameters, :electrostatic => el_potential))
 ```
 
 ### Custom Potential
