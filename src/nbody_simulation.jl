@@ -8,9 +8,11 @@ include("./nbody_system.jl")
 
 const kb_SI = 1.38e-23 # J/K
 
-# This structure defines conditions under which we test our system of N-bodies.
-# With this wrapping we can make such fields as `boundary_conditions` necessary for every simulation
-# while allowing one to describe a particular system of N interacting particles.
+"""
+Simulation is an entity determining parameters of the experiment:
+time span of simulation, global physical constants, borders of the simulation cell, external magnetic or electric fields, etc.
+The required arguments for NBodySImulation constructor are the system to be tested and the time span of the simulation.
+"""
 struct NBodySimulation{sType <: NBodySystem,bcType <: BoundaryConditions,tType <: Real,thermType <: Thermostat}
     system::sType
     tspan::Tuple{tType,tType}

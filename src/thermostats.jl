@@ -1,6 +1,11 @@
+"""
+Usually, during the simulation, a system is required to be at a particular temperature. NBodySimulator contains several thermostats for that purpose.
+"""
 abstract type Thermostat
 end
-
+"""
+No thermostat.
+"""
 struct NullThermostat <: Thermostat
 end
 

@@ -5,7 +5,9 @@ DiffEqBase.@def position_velocity_mass begin
     v::SVector{3,cType}
     m::mType
 end
-
+"""
+Bodies or Particles are the objects which will interact with each other and for which the equations of Newton's 2nd law are solved during the simulation process.
+"""
 abstract type Body
 end
 
@@ -28,7 +30,9 @@ struct WaterMolecule <: Body
     H1::MassBody
     H2::MassBody
 end
-
+"""
+Places similar particles in the nodes of a cubic cell with their velocities distributed in accordance with the Maxwell–Boltzmann law
+"""
 function generate_bodies_in_cell_nodes(n::Int, m::Real, v_dev::Real, L::Real; rng=MersenneTwister(n))
     velocities = v_dev * randn(rng, Float64, (3, n))
     bodies = MassBody[]
