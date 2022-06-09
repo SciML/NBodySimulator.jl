@@ -1,5 +1,7 @@
-# SimulationResult sould provide an interface for working with properties of a separate particle
-# and with physical properties of the whole system.
+"""
+SimulationResult sould provide an interface for working with properties of a separate particle
+and with physical properties of the whole system.
+"""
 struct SimulationResult{sType <: NBodySystem}
     solution::DiffEqBase.AbstractTimeseriesSolution
     simulation::NBodySimulation{sType}
@@ -281,6 +283,9 @@ function initial_energy(simulation::NBodySimulation)
     return potential_energy(u0, simulation) + kinetic_energy(v0, ms)
 end
 
+"""
+Run the N-body simulation.
+"""
 function run_simulation(s::NBodySimulation, args...; kwargs...)
     if s.thermostat isa LangevinThermostat
         calculate_simulation_sde(s, args...; kwargs...)
@@ -619,7 +624,9 @@ function load(f::File{format"ProteinDataBank"})
         extract_from_pdb(s)
     end
 end
-
+"""
+Molecules for the SPC/Fw water model can be imported from a PDB file.
+"""
 function load_water_molecules_from_pdb(path_str)
     open(path_str) do file
         extract_from_pdb(file)
