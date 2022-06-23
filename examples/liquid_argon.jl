@@ -3,23 +3,27 @@ using NBodySimulator, StaticArrays
 function generate_bodies_in_line(n::Int, m::Real, v_dev::Real, L::Real)
     dL = L / (ceil(n^(1 / 3)))
     n_line = floor(Int, L / dL)
-    rng = MersenneTwister(n);
+    rng = MersenneTwister(n)
     velocities = v_dev * randn(rng, Float64, (3, n_line))
     bodies = MassBody[]
     x = y = L / 2
-    for i = 1:n_line      
+    for i in 1:n_line
         r = SVector(x, y, i * dL)
-        v = SVector{3}(velocities[:,i])
+        v = SVector{3}(velocities[:, i])
         body = MassBody(r, v, m)
-        push!(bodies, body)  
+        push!(bodies, body)
     end
     return bodies
 end
 
 function generate_random_directions(n::Int)
-    theta = acos.(1 - 2 * rand(n));
-    phi = 2 * pi * rand(n);
-    directions = [@SVector [sin(theta[i]) .* cos(phi[i]), sin(theta[i]) .* sin(phi[i]), cos(theta[i])] for i = 1:n]
+    theta = acos.(1 - 2 * rand(n))
+    phi = 2 * pi * rand(n)
+    directions = [@SVector [
+                      sin(theta[i]) .* cos(phi[i]),
+                      sin(theta[i]) .* sin(phi[i]),
+                      cos(theta[i]),
+                  ] for i in 1:n]
 end
 
 units = :real
@@ -33,8 +37,8 @@ const σ = 3.4e-10 # m
 const ρ = 1374 # kg/m^3
 const m = 39.95 * 1.6747 * 1e-27 # kg
 const N = 216#floor(Int, ρ * L^3 / m)
-const L = (m*N/ρ)^(1/3)#10.229σ
-const R = 0.5*L   
+const L = (m * N / ρ)^(1 / 3)#10.229σ
+const R = 0.5 * L
 const v_dev = sqrt(kb * T / m)
 const τ = 0.5e-15 # σ/v
 const t1 = 0τ
@@ -48,7 +52,7 @@ pbc = CubicPeriodicBoundaryConditions(L)
 lj_system = PotentialNBodySystem(bodies, Dict(:lennard_jones => jl_parameters));
 simulation = NBodySimulation(lj_system, (t1, t2), pbc, kb);
 #result = run_simulation(simulation, Tsit5())
-result = @time run_simulation(simulation, VelocityVerlet(), dt=τ)
+result = @time run_simulation(simulation, VelocityVerlet(), dt = τ)
 
 #=
 using Plots
