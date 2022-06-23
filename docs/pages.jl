@@ -1,7 +1,7 @@
 # Put in a separate page so it can be used by SciMLDocs.jl
 
-pages=[
+pages = [
     "Home" => "index.md",
     "examples.md",
-    "nbodysimulator.md"
+    "nbodysimulator.md",
 ]
