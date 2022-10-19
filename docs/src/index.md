@@ -17,7 +17,7 @@ v = SVector(.1,.2,.5)
 mass = 1.25
 body = MassBody(r,v,mass)
 ```
-For the sake of simulation speed, it is advised to use [static arrays](https://github.com/JuliaArrays/StaticArrays.jl).  
+For the sake of simulation speed, it is advised to use [static arrays](https://juliaarrays.github.io/StaticArrays.jl/stable/pages/quickstart/).  
 
 A **System** covers bodies and necessary parameters for correct simulation of interaction between particles. For example, to create an entity for a system of gravitationally interacting particles, one needs to use `GravitationalSystem` constructor:
 
