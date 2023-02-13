@@ -1,21 +1,19 @@
 """
 Usually, during the simulation, a system is required to be at a particular temperature. NBodySimulator contains several thermostats for that purpose.
 """
-abstract type Thermostat
-end
+abstract type Thermostat end
 """
 No thermostat.
 """
 struct NullThermostat <: Thermostat
 end
 
-
 struct AndersenThermostat{tType <: Real, νType <: Real} <: Thermostat
     T::tType
     ν::νType
 end
 
-struct BerendsenThermostat{τType <: Real,tType <: Real} <: Thermostat
+struct BerendsenThermostat{τType <: Real, tType <: Real} <: Thermostat
     T::tType
     τ::τType
     γ::τType
@@ -37,22 +35,22 @@ end
 # N - number of particles
 # Nc - number of constraints
 function md_temperature(vs, ms, kb, N, Nc)
-    e_kin = sum(dot(ms, vec(sum(vs.^2, dims=1))))
+    e_kin = sum(dot(ms, vec(sum(vs .^ 2, dims = 1))))
     temperature = e_kin / (kb * (3 * N - Nc))
     return temperature
 end
 
-struct NoseHooverThermostat{tType <: Real,τType <: Real} <: Thermostat
+struct NoseHooverThermostat{tType <: Real, τType <: Real} <: Thermostat
     T::tType
     τ::τType
 end
 
 function nosehoover_acceleration!(dv, u, v, ms, kb, N, Nc, ζind, p::NoseHooverThermostat)
     @. dv -= u[ζind] * v
-    @. dv[:,end] = 0
+    @. dv[:, end] = 0
     T = md_temperature(v[:, 1:N], ms, kb, N, Nc)
-    ndf = 3 * N - Nc 
-    v[ζind] = inv(p.τ)^2 * (T/p.T - (ndf+1)/ndf)
+    ndf = 3 * N - Nc
+    v[ζind] = inv(p.τ)^2 * (T / p.T - (ndf + 1) / ndf)
     #v[ζind] = inv(p.Q) * ( sum(dot(ms, vec(sum(v[:,1:N].^2, 1)))) - (3 * N - Nc) * kb * p.T)
 end
 

@@ -1,12 +1,14 @@
 # API
 
 ## Simulation
+
 ```@docs
 NBodySimulation
 run_simulation
 ```
 
 ## Bodies
+
 ```@docs
 NBodySimulator.Body
 MassBody
@@ -16,6 +18,7 @@ generate_bodies_in_cell_nodes
 ```
 
 ## Potentials
+
 ```@docs
 PotentialParameters
 NBodySimulator.get_accelerating_function
@@ -27,6 +30,7 @@ SPCFwParameters
 ```
 
 ## Thermostats
+
 ```@docs
 NBodySimulator.Thermostat
 NBodySimulator.NullThermostat
@@ -35,7 +39,9 @@ BerendsenThermostat
 NoseHooverThermostat
 LangevinThermostat
 ```
+
 ### Boundary Conditions
+
 ```@docs
 CubicPeriodicBoundaryConditions
 PeriodicBoundaryConditions
@@ -43,6 +49,7 @@ InfiniteBox
 ```
 
 ## Systems
+
 ```@docs
 PotentialNBodySystem
 GravitationalSystem
@@ -50,6 +57,7 @@ WaterSPCFw
 ```
 
 # Analyze
+
 ```@docs
 NBodySimulator.SimulationResult
 temperature
@@ -62,6 +70,7 @@ total_energy
 ```
 
 # Protein Database File
+
 ```@docs
 load_water_molecules_from_pdb
 save_to_pdb
