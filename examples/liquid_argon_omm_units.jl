@@ -6,11 +6,11 @@ const T0 = 90.0 # °K
 const kb = 8.3144598e-3 # kJ/(K*mol)
 const ϵ = T * kb
 const σ = 0.34 # nm
-const ρ = 1374/1.6747# Da/nm^3
+const ρ = 1374 / 1.6747# Da/nm^3
 const m = 39.95# Da
 const N = 8
-const L = (m*N/ρ)^(1/3)#10.229σ
-const R = 0.5*L   
+const L = (m * N / ρ)^(1 / 3)#10.229σ
+const R = 0.5 * L
 const v_dev = sqrt(kb * T / m)
 const bodies = generate_bodies_in_cell_nodes(N, m, v_dev, L)
 
@@ -28,14 +28,13 @@ const pbc = CubicPeriodicBoundaryConditions(L)
 const simulation = NBodySimulation(lj_system, (t1, t2), pbc, thermostat, kb);
 #result = @time run_simulation(simulation, VelocityVerlet(), dt=τ)
 #result = @time run_simulation_sde(simulation, ISSEM(symplectic=true,theta=0.5))
-result = @time run_simulation(simulation, EM(), dt=τ)
+result = @time run_simulation(simulation, EM(), dt = τ)
 
 #(rs, grf) = rdf(result)
 #(ts, dr2) = msd(result)
 
-t = t1:τ:result.solution.t[end-1]
+t = t1:τ:result.solution.t[end - 1]
 temper = @time temperature.(result, t)
-
 
 #using Plots
 #pl=plot(t, temper, ylim=[0,200], xlabel="t, ps", ylabel = "T, °K", label="Temperature, °K", linewidth=2)
@@ -43,7 +42,6 @@ temper = @time temperature.(result, t)
 #plot!(pl, title="Andersen thermostat at dt*v=$(thermostat.ν*τ) ")
 #plot!(pl, title="Berendsen thermostat at tau=$(thermostat.τ) ps")
 #plot!(pl, title="Nose-Hoover thermostat at tau=$(thermostat.τ) ps")
-
 
 time_now = Dates.format(now(), "yyyy_mm_dd_HH_MM_SS")
 Nactual = length(bodies)
@@ -53,7 +51,6 @@ timesteps = round(length(result.solution.t))
 
 #using JLD
 #save("d:/nosehoover thermostat for water liquid argon $T0 and $(thermostat.τ) _$time_now.jld", "t",t, "temper", temper, "T0", T0, "τ", thermostat.τ)
-
 
 #=
 using MAT

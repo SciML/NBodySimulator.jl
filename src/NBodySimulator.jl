@@ -14,7 +14,7 @@ include("nbody_simulation.jl")
 
 export NBodySimulation
 export MassBody, ChargedParticle, MagneticParticle
-export PotentialParameters, LennardJonesParameters, GravitationalParameters, 
+export PotentialParameters, LennardJonesParameters, GravitationalParameters,
        ElectrostaticParameters, MagnetostaticParameters, SPCFwParameters
 export PotentialNBodySystem, ChargedParticles, GravitationalSystem, WaterSPCFw
 export PeriodicBoundaryConditions, CubicPeriodicBoundaryConditions, InfiniteBox

@@ -2,7 +2,7 @@
     k = 9e9
 
     @testset "One particle rotates around another" begin
-    # small mass with negative charge rotating around more massive object with positive charge
+        # small mass with negative charge rotating around more massive object with positive charge
 
         r = 100.0
         q1 = 1e-3
@@ -17,11 +17,10 @@
         simulation = NBodySimulation(system, (0.0, t))
         sim_result = run_simulation(simulation)
 
-
-        solution = sim_result.solution;
+        solution = sim_result.solution
         ε = 0.1 * r
-        for j = 1:2, i = 1:3
-            @test solution[1][i,j] ≈ solution[end][i,j] atol = ε
+        for j in 1:2, i in 1:3
+            @test solution[1][i, j]≈solution[end][i, j] atol=ε
         end
 
         (qs_act, ms_act, indxs_act, exclude_act) = NBodySimulator.obtain_data_for_electrostatic_interaction(simulation.system)
@@ -31,7 +30,7 @@
     end
 
     @testset "Two positive charges repelling from each other" begin
-    #   ("               <---⊕-----r1-----⊕--->                ")
+        #   ("               <---⊕-----r1-----⊕--->                ")
 
         q1 = 1e-3 # C
         q2 = 1e-3 # C
@@ -48,14 +47,14 @@
         p2 = ChargedParticle(SVector(r1 / 2, 0.0, 0.0), SVector(0.0, 0.0, 0.0), m2, q2)
         system = ChargedParticles([p1, p2], k)
         simulation = NBodySimulation(system, (t1, t2))
-        sim_result = run_simulation(simulation, VelocityVerlet(), dt=τ)
+        sim_result = run_simulation(simulation, VelocityVerlet(), dt = τ)
 
         r2 = get_position(sim_result, t2, 2) - get_position(sim_result, t2, 1)
         v_expected = sqrt(k * q1 * q2 / m1 * (1 / norm(r1) - 1 / norm(r2)))
         v_actual = norm(get_velocity(sim_result, t2, 2))
 
         ε = 0.001 * v_expected
-        @test v_expected ≈ v_actual atol = ε
+        @test v_expected≈v_actual atol=ε
     end
 
     @testset "Constructing electorstatic potential parameters entity" begin
@@ -80,32 +79,32 @@
         q = 1.0
         count = 1
         dL = L / (ceil(n^(1 / 3)) + 1)
-        for x = dL / 2:dL:L, y = dL / 2:dL:L, z = dL / 2:dL:L  
+        for x in (dL / 2):dL:L, y in (dL / 2):dL:L, z in (dL / 2):dL:L
             if count > n
                 break
             end
             r = SVector(x, y, z)
-            v = SVector(.0, .0, .0)
+            v = SVector(0.0, 0.0, 0.0)
             body = ChargedParticle(r, v, m, q)
             push!(bodies, body)
-            count += 1           
+            count += 1
         end
 
         k = 9e9
         τ = 0.01 * dL / sqrt(2 * k * q * q / (dL * m))
         t1 = 0.0
         t2 = 1000 * τ
-        
+
         potential = ElectrostaticParameters(k, 0.45 * L)
         system = PotentialNBodySystem(bodies, Dict(:electrostatic => potential))
         pbc = CubicPeriodicBoundaryConditions(L)
         simulation = NBodySimulation(system, (t1, t2), pbc)
-        result = run_simulation(simulation, VelocityVerlet(), dt=τ)
+        result = run_simulation(simulation, VelocityVerlet(), dt = τ)
 
         e_tot_1 = total_energy(result, t1)
         e_tot_2 = total_energy(result, t2)
 
         ε = 0.001
-        @test (e_tot_2 - e_tot_1) / e_tot_1 ≈ 0.0 atol = ε 
+        @test (e_tot_2 - e_tot_1) / e_tot_1≈0.0 atol=ε
     end
 end

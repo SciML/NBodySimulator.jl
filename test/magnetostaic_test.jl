@@ -18,14 +18,14 @@
         parameters = MagnetostaticParameters(μ_4π)
         system = PotentialNBodySystem([p1, p2], Dict(:magnetic => parameters))
         simulation = NBodySimulation(system, (t1, t2))
-        sim_result = run_simulation(simulation, VelocityVerlet(), dt=τ)
+        sim_result = run_simulation(simulation, VelocityVerlet(), dt = τ)
 
         d2 = norm(get_position(sim_result, t2, 2) - get_position(sim_result, t2, 1))
-        v_expected = sqrt(μ_4π * ( dot(mm1, mm2) * (1 / d1^3 - 1 / d2^3) ) / m1)
+        v_expected = sqrt(μ_4π * (dot(mm1, mm2) * (1 / d1^3 - 1 / d2^3)) / m1)
         v_actual = norm(get_velocity(sim_result, t2, 2))
 
         ε = 0.001
-        @test v_expected ≈ v_actual atol = ε
+        @test v_expected≈v_actual atol=ε
     end
 
     @testset "Constructing magnetostatic potential parameters entity" begin
@@ -36,6 +36,7 @@
         potential1 = MagnetostaticParameters()
         potential2 = MagnetostaticParameters(4π)
         @test sprint(io -> show(io, potential1)) == "Magnetostatic:\n\tμ/4π:1.0e-7\n"
-        @test sprint(io -> show(io, potential2)) == "Magnetostatic:\n\tμ/4π:12.566370614359172\n"
+        @test sprint(io -> show(io, potential2)) ==
+              "Magnetostatic:\n\tμ/4π:12.566370614359172\n"
     end
 end
