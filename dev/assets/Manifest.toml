@@ -486,7 +486,7 @@ version = "0.2.4"
 deps = ["DiffEqBase", "DiffEqCallbacks", "DocStringExtensions", "FileIO", "LinearAlgebra", "OrdinaryDiffEq", "Printf", "Random", "RecipesBase", "RecursiveArrayTools", "Reexport", "StaticArrays"]
 path = "/home/runner/work/NBodySimulator.jl/NBodySimulator.jl"
 uuid = "0e6f8da7-a7fc-5c8b-a220-74e902c310f9"
-version = "1.9.0"
+version = "1.10.0"
 
 [[deps.NLSolversBase]]
 deps = ["DiffResults", "Distributed", "FiniteDiff", "ForwardDiff"]
