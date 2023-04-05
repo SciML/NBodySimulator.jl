@@ -33,25 +33,25 @@ One can pass the bodies and parameters of interaction potentials into that syste
 In the case the potential parameters are not set, the particles will move at constant velocities without acceleration during the simulation.
 """
 function PotentialNBodySystem(bodies::Vector{<:Body}; potentials::Vector{Symbol} = [])
-    paramteres = Dict{Symbol, PotentialParameters}()
+    parameters = Dict{Symbol, PotentialParameters}()
 
     if :lennard_jones ∈ potentials
-        paramteres[:lennard_jones] = LennardJonesParameters()
+        parameters[:lennard_jones] = LennardJonesParameters()
     end
 
     if :electrostatic ∈ potentials
-        paramteres[:electrostatic] = ElectrostaticParameters()
+        parameters[:electrostatic] = ElectrostaticParameters()
     end
 
     if :gravitational ∈ potentials
-        paramteres[:gravitational] = GravitationalParameters()
+        parameters[:gravitational] = GravitationalParameters()
     end
 
     if :magnetostatic ∈ potentials
-        paramteres[:magnetostatic] = MagnetostaticParameters()
+        parameters[:magnetostatic] = MagnetostaticParameters()
     end
 
-    PotentialNBodySystem(bodies, paramteres)
+    PotentialNBodySystem(bodies, parameters)
 end
 
 function Base.show(stream::IO, s::PotentialNBodySystem)
