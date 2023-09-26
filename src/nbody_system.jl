@@ -1,5 +1,5 @@
 """
-Bodies or Particles are the objects which will interact with each other
+Bodies or Particles are the objects that will interact with each other
 and for which the equations of Newton's 2nd law are solved during the simulation process.
 """
 abstract type NBodySystem end
@@ -30,7 +30,7 @@ end
 Structure that represents systems with a custom set of potentials.
 In other words, the user determines the ways in which the particles are allowed to interact.
 One can pass the bodies and parameters of interaction potentials into that system.
-In the case the potential parameters are not set, the particles will move at constant velocities without acceleration during the simulation.
+IF the potential parameters are not set, the particles will move at constant velocities without acceleration during the simulation.
 """
 function PotentialNBodySystem(bodies::Vector{<:Body}; potentials::Vector{Symbol} = [])
     parameters = Dict{Symbol, PotentialParameters}()
