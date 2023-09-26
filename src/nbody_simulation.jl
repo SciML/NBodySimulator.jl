@@ -9,9 +9,9 @@ include("./nbody_system.jl")
 const kb_SI = 1.38e-23 # J/K
 
 """
-Simulation is an entity determining parameters of the experiment:
+Simulation is an entity determining the parameters of the experiment:
 time span of simulation, global physical constants, borders of the simulation cell, external magnetic or electric fields, etc.
-The required arguments for NBodySImulation constructor are the system to be tested and the time span of the simulation.
+The required arguments for the NBodySImulation constructor are the system to be tested and the time span of the simulation.
 """
 struct NBodySimulation{sType <: NBodySystem, bcType <: BoundaryConditions, tType <: Real,
                        thermType <: Thermostat}

@@ -3,7 +3,7 @@
 Simulating systems of N interacting bodies.
 
 This project is under development at the moment. The implementation of potential calculations is fairly experimental and has not been extensively verified yet.
-You can test simulation of different systems now, but be aware of possible changes in the future.
+You can test simulations of different systems now, but be aware of possible changes in the future.
 
 ## Installation
 
@@ -18,7 +18,7 @@ Pkg.add("NBodySimulator")
 
 There are three basic components required for any simulation of systems of N-bodies: `bodies`, `system`, and `simulation`.
 
-**Bodies** or **Particles** are the objects which will interact with each other and for which the equations of Newton's 2nd law are solved during the simulation process. Three parameters of a body are necessary, namely: initial location, initial velocity, and mass. `MassBody` structure represents such particles:
+**Bodies** or **Particles** are the objects that will interact with each other and for which the equations of Newton's 2nd law are solved during the simulation process. Three parameters of a body are necessary, namely: initial location, initial velocity, and mass. `MassBody` structure represents such particles:
 
 ```julia
 using StaticArrays
@@ -30,14 +30,14 @@ body = MassBody(r, v, mass)
 
 For simulation speed, it is advised to use [static arrays](https://juliaarrays.github.io/StaticArrays.jl/stable/pages/quickstart/).
 
-A **System** covers bodies and necessary parameters for correct simulation of interaction between particles. For example, to create an entity for a system of gravitationally interacting particles, one needs to use `GravitationalSystem` constructor:
+A **System** covers the bodies and the necessary parameters for the correct simulation of interaction between particles. For example, to create an entity for a system of gravitationally interacting particles, one needs to use `GravitationalSystem` constructor:
 
 ```julia
 const G = 6.67e-11 # m^3/kg/s^2
 system = GravitationalSystem(bodies, G)
 ```
 
-**Simulation** is an entity determining parameters of the experiment: time span of simulation, global physical constants, borders of the simulation cell, external magnetic or electric fields, etc. The required arguments for `NBodySImulation` constructor are the system to be tested and the time span of the simulation.
+**Simulation** is an entity determining the parameters of the experiment: time span of simulation, global physical constants, borders of the simulation cell, external magnetic or electric fields, etc. The required arguments for `NBodySImulation` constructor are the system to be tested and the time span of the simulation.
 
 ```julia
 tspan = (0.0, 10.0)
@@ -79,9 +79,9 @@ jl_parameters = LennardJonesParameters(ϵ, σ, cutoff_radius)
 spc_water_paramters = SPCFwParameters(rOH, ∠HOH, k_bond, k_angle)
 ```
 
-The Lennard-Jones potential is used in molecular dynamics simulations for approximating interactions between neutral atoms or molecules. The [SPC/Fw water model](http://www.sklogwiki.org/SklogWiki/index.php/SPC/Fw_model_of_water) is used in water simulations. The meaning of arguments for `SPCFwParameters` constructor will be clarified further in this documentation.
+The Lennard-Jones potential is used in molecular dynamics simulations to approximate interactions between neutral atoms or molecules. The [SPC/Fw water model](http://www.sklogwiki.org/SklogWiki/index.php/SPC/Fw_model_of_water) is used in water simulations. The meaning of arguments for `SPCFwParameters` constructor will be clarified further in this documentation.
 
-`PotentialNBodySystem` structure represents systems with a custom set of potentials. In other words, the user determines the ways in which the particles are allowed to interact. One can pass the bodies and parameters of interaction potentials into that system. In the case the potential parameters are not set, the particles will move at constant velocities without acceleration during the simulation.
+`PotentialNBodySystem` structure represents systems with a custom set of potentials. In other words, the user determines the ways in which the particles are allowed to interact. One can pass the bodies and parameters of interaction potentials into that system. If the potential parameters are not set, the particles will move at constant velocities without acceleration during the simulation.
 
 ```julia
 system = PotentialNBodySystem(bodies,
@@ -93,7 +93,7 @@ system = PotentialNBodySystem(bodies,
 
 There exists an [example](https://docs.sciml.ai/DiffEqDocs/stable/examples/outer_solar_system/) of a simulation of an N-body system at absolutely custom potential.
 
-Here is shown how to create custom acceleration functions using tools of NBodySimulator.
+Here it is shown how to create custom acceleration functions using the tools of NBodySimulator.
 
 First, it is necessary to create a structure for parameters for the custom potential.
 
@@ -117,7 +117,7 @@ function get_accelerating_function(p::CustomPotentialParameters,
 end
 ```
 
-After the parameters and acceleration function have been created, one can instantiate a system of particles interacting with a set of potentials which includes the just-created custom potential:
+After the parameters and acceleration function have been created, one can instantiate a system of particles interacting with a set of potentials, which includes the just-created custom potential:
 
 ```julia
 parameters = CustomPotentialParameters(-9.8)
@@ -126,8 +126,8 @@ system = PotentialNBodySystem(bodies, Dict(:custom_potential_params => parameter
 
 ### Gravitational Interaction
 
-Using NBodySimulator, it is possible to simulate gravitational interaction of celestial bodies.
-In fact, any structure for bodies can be used for simulation of gravitational interaction since all those structures are required to have mass as one of their parameters:
+Using NBodySimulator, it is possible to simulate the gravitational interaction of celestial bodies.
+In fact, any structure for bodies can be used for the simulation of gravitational interaction since all those structures are required to have mass as one of their parameters:
 
 ```julia
 body1 = MassBody(SVector(0.0, 1.0, 0.0), SVector(5.775e-6, 0.0, 0.0), 2.0)
@@ -159,17 +159,16 @@ simulation = NBodySimulation(system, tspan)
 sim_result = run_simulation(simulation)
 ```
 
-And, finally, we can animate our solution showing two equal bodies rotating on the same orbit:
+And, finally, we can animate our solution, showing two equal bodies rotating on the same orbit:
 
 ```julia
 using Plots
 animate(sim_result, "path_to_animated_particles.gif")
 ```
-
-<img src="https://user-images.githubusercontent.com/16945627/39958539-d2cf779c-561d-11e8-96a8-ffc3a595be8b.gif" alt="Here should appear a gif of rotating bodies" width="350"/>
+![Chaotic behavior of the Lorenz system](https://user-images.githubusercontent.com/16945627/39958539-d2cf779c-561d-11e8-96a8-ffc3a595be8b.gif)
 ### Electrostatic Interaction
 Interaction between charged particles obeys Coulomb's law. The movement of such bodies can be simulated using `ChargedParticle` and `ChargedParticles` structures.
-The following example shows how to model two oppositely charged particles. If one body is more massive than another, it will be possible to observe rotation of the light body around the heavy one without adjusting their positions in space. The constructor for the `ChargedParticles` system requires bodies and Coulomb's constant `k` to be passed as arguments.
+The following example shows how to model two oppositely charged particles. If one body is more massive than another, it will be possible to observe the rotation of the light body around the heavy one without adjusting their positions in space. The constructor for the `ChargedParticles` system requires bodies and Coulomb's constant `k` to be passed as arguments.
 ```julia
 r = 100.0 # m
 q1 = 1e-3 # C
@@ -185,7 +184,7 @@ simulation = NBodySimulation(system, (0.0, t))
 sim_result = run_simulation(simulation)
 ```
 ### Magnetic Interaction
-An N-body system consisting of `MagneticParticle`s can be used for simulation of interacting magnetic dipoles, though such dipoles cannot rotate in space. Such a model can represent single domain particles interacting under the influence of a strong external magnetic field.
+An N-body system consisting of `MagneticParticle`s can be used for the simulation of interacting magnetic dipoles, though such dipoles cannot rotate in space. Such a model can represent single domain particles interacting under the influence of a strong external magnetic field.
 To create a magnetic particle, one specifies its location in space, velocity, and the vector of its magnetic moment. The following code shows how we can construct an iron particle:
 ```julia
 iron_dencity = 7800 # kg/m^3
@@ -201,7 +200,7 @@ For the second particle, we will use a shorter form:
 p2 = MagneticParticle(SVector(0.005, 0.0, 0.0), SVector(0.0, 0.0, 0.0), 5e-6,
                       SVector(0.0, 0.0, 0.00077))
 ```
-To calculate magnetic interactions properly, one should also specify the value for the constant μ<sub>0</sub>/4π or its substitute. Having created parameters for the magnetostatic potential, one can now instantiate a system of particles which should interact magnetically. For that purpose, we use `PotentialNBodySystem` and pass particles and potential parameters as arguments.
+To calculate magnetic interactions properly, one should also specify the value for the constant μ0/4π or its substitute. Having created parameters for the magnetostatic potential, one can now instantiate a system of particles that should interact magnetically. For that purpose, we use `PotentialNBodySystem` and pass particles and potential parameters as arguments.
 ```julia
 parameters = MagnetostaticParameters(μ_4π)
 system = PotentialNBodySystem([p1, p2], Dict(:magnetic => parameters))
@@ -209,14 +208,14 @@ simulation = NBodySimulation(system, (t1, t2))
 sim_result = run_simulation(simulation, VelocityVerlet(), dt = τ)
 ```
 ## Molecular Dynamics (MD)
-NBodySimulator allows one to conduct molecular dynamic simulations for the Lennard-Jones liquids, SPC/Fw model of water, and other molecular systems thanks to implementations of basic interaction potentials between atoms and molecules:
+NBodySimulator allows one to conduct molecular dynamic simulations for the Lennard-Jones liquids, the SPC/Fw model of water, and other molecular systems thanks to implementations of basic interaction potentials between atoms and molecules:
   - Lennard-Jones
   - electrostatic and magnetostatic
   - harmonic bonds
   - harmonic valence angle generated by pairs of bonds
 The comprehensive examples of liquid argon and water simulations can be found in the `examples` folder.
 Here only the basic principles of the molecular dynamics simulations using NBodySimulator are presented using liquid argon as a classical MD system for beginners.
-First, one needs to define parameters of the simulation:
+First, one needs to define the parameters of the simulation:
 ```julia
 T = 120.0 # °K
 T0 = 90.0 # °K
@@ -255,7 +254,7 @@ simulation = NBodySimulation(lj_system, (t1, t2), pbc, thermostat, kb);
 ```
 The default boundary conditions are `InfiniteBox` without any limits, the default thermostat is `NullThermostat` (which does no thermostating), and the default Boltzmann constant `kb` equals its value in SI, i.e., 1.38e-23 J/K.
 ## Water Simulations
-In NBodySImulator the [SPC/Fw water model](http://www.sklogwiki.org/SklogWiki/index.php/SPC/Fw_model_of_water) is implemented. For using this model, one has to specify parameters of the Lennard-Jones potential between the oxygen atoms of water molecules, parameters of the electrostatic potential for the corresponding interactions between atoms of different molecules and parameters for harmonic potentials representing bonds between atoms and the valence angle made from bonds between hydrogen atoms and the oxygen atom.
+In NBodySImulator the [SPC/Fw water model](http://www.sklogwiki.org/SklogWiki/index.php/SPC/Fw_model_of_water) is implemented. For using this model, one has to specify parameters of the Lennard-Jones potential between the oxygen atoms of water molecules, parameters of the electrostatic potential for the corresponding interactions between atoms of different molecules, and parameters for harmonic potentials representing bonds between atoms and the valence angle made from bonds between hydrogen atoms and the oxygen atom.
 ```julia
 bodies = generate_bodies_in_cell_nodes(N, mH2O, v, L)
 jl_parameters = LennardJonesParameters(ϵOO, σOO, R)
@@ -269,7 +268,7 @@ Further, one can pass the water system into the `NBodySimulation` constructor as
 simulation = NBodySimulation(water, (t1, t2), pbc, kb);
 ```
 ## Thermostats
-Usually, during the simulation, a system is required to be at a particular temperature. NBodySimulator contains several thermostats for that purpose. Here the thermostating of liquid argon is presented, for thermostating of water one can refer to [this post](https://mikhail-vaganov.github.io/gsoc-2018-blog/2018/08/06/thermostating.html).
+Usually, during the simulation, a system is required to be at a particular temperature. NBodySimulator contains several thermostats for that purpose. Here the thermostating of liquid argon is presented, for thermostating of water, one can refer to [this post](https://mikhail-vaganov.github.io/gsoc-2018-blog/2018/08/06/thermostating.html).
 ### [Andersen Thermostat](http://www.sklogwiki.org/SklogWiki/index.php/Andersen_thermostat)
 ```julia
 τ = 0.5e-3 # timestep of integration and simulation
@@ -296,10 +295,10 @@ thermostat = NoseHooverThermostat(T0, 200τ)
 thermostat = LangevinThermostat(90, γ)
 ```
 ![langevin thermostating](https://user-images.githubusercontent.com/16945627/44002505-0683c6b0-9e5d-11e8-8647-5b15b98eb0fa.png)
-## Analyzing the Result of Simulation
+## Analyzing the Results of the Simulation
 Once the simulation is completed, one can analyze the result and obtain some useful characteristics of the system.
-The function `run_simulation` returns a structure containing the initial parameters of the simulation and the solution of the differential equation (DE) required for the description of the corresponding system of particles. There are different functions which help to interpret the solution of DEs into physical quantities.
-One of the main characteristics of a system during molecular dynamics simulations is its thermodynamic temperature. The value of the temperature at a particular time `t` can be obtained via calling this function:
+The function `run_simulation` returns a structure containing the initial parameters of the simulation and the solution of the differential equation (DE) required for the description of the corresponding system of particles. There are different functions that help to interpret the solution of DEs into physical quantities.
+One of the main characteristics of a system during molecular dynamics simulations is its thermodynamic temperature. The value of the temperature at a particular time `t` can be obtained by calling this function:
 ```julia
 T = temperature(result, t)
 ```
@@ -308,7 +307,7 @@ The RDF is another popular and essential characteristic of molecules or similar 
 ```julia
 (rs, grf) = rdf(result)
 ```
-The dependence of `grf` on `rs` shows radial distribution of particles at different distances from an average particle in a system.
+The dependence of `grf` on `rs` shows the radial distribution of particles at different distances from an average particle in a system.
 Here, the radial distribution function for the classic system of liquid argon is presented:
 ![rdf for liquid argon](https://user-images.githubusercontent.com/16945627/43990348-843b164c-9d74-11e8-8d9e-daaff142c0b7.png)
 ### Mean Squared Displacement (MSD)
@@ -327,12 +326,12 @@ e_pot = potential_energy(result, t)
 e_tot = total_energy(result, t)
 ```
 ## Plotting Images
-Using tools of NBodySimulator, one can export the results of a simulation into a [Protein Database File](https://en.wikipedia.org/wiki/Protein_Data_Bank_(file_format)). [VMD](http://www.ks.uiuc.edu/Research/vmd/) is a well-known tool for visualizing molecular dynamics, which can read data from PDB files.
+Using the tools of NBodySimulator, one can export the results of a simulation into a [Protein Database File](https://en.wikipedia.org/wiki/Protein_Data_Bank_(file_format)). [VMD](http://www.ks.uiuc.edu/Research/vmd/) is a well-known tool for visualizing molecular dynamics, which can read data from PDB files.
 ```julia
 save_to_pdb(result, "path_to_a_new_pdb_file.pdb")
 ```
-In the future, it will be possible to export results via FileIO interface and its `save` function.
-Using Plots.jl, one can draw positions of particles at any time of simulation or create an animation of moving particles, molecules of water:
+In the future, it will be possible to export results via the FileIO interface and its `save` function.
+Using Plots.jl, one can draw the positions of particles at any time of simulation or create an animation of moving particles, molecules of water:
 ```julia
 using Plots
 plot(result)

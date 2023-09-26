@@ -1,6 +1,6 @@
 """
-SimulationResult should provide an interface for working with properties of a separate particle
-and with physical properties of the whole system.
+SimulationResult should provide an interface for working with the properties of a separate particle
+and with the physical properties of the whole system.
 """
 struct SimulationResult{sType <: NBodySystem}
     solution::DiffEqBase.AbstractTimeseriesSolution
