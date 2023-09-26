@@ -5,6 +5,15 @@ Simulating systems of N interacting bodies.
 This project is under development at the moment. The implementation of potential calculations is fairly experimental and has not been extensively verified yet.
 You can test simulation of different systems now, but be aware of possible changes in the future.
 
+## Installation
+
+To install NBodySimulator.jl, use the Julia package manager:
+
+```julia
+using Pkg
+Pkg.add("NBodySimulator")
+```
+
 ## Basic Components
 
 There are three basic components required for any simulation of systems of N-bodies: `bodies`, `system`, and `simulation`.
@@ -330,6 +339,23 @@ plot(result)
 animate(result, "path_to_file.gif")
 ```
 Makie.jl also has a recipe for plotting the results of N-body simulations. The [example](https://github.com/MakieOrg/Makie.jl/blob/master/ReferenceTests/src/tests/recipes.jl) is presented in the documentation.
+
+## Contributing
+
+  - Please refer to the
+    [SciML ColPrac: Contributor's Guide on Collaborative Practices for Community Packages](https://github.com/SciML/ColPrac/blob/master/README.md)
+    for guidance on PRs, issues, and other matters relating to contributing to SciML.
+
+  - See the [SciML Style Guide](https://github.com/SciML/SciMLStyle) for common coding practices and other style decisions.
+  - There are a few community forums:
+    
+      + The #diffeq-bridged and #sciml-bridged channels in the
+        [Julia Slack](https://julialang.org/slack/)
+      + The #diffeq-bridged and #sciml-bridged channels in the
+        [Julia Zulip](https://julialang.zulipchat.com/#narrow/stream/279055-sciml-bridged)
+      + On the [Julia Discourse forums](https://discourse.julialang.org)
+      + See also [SciML Community page](https://sciml.ai/community/)
+
 ## Reproducibility
 ```@raw html
 <details><summary>The documentation of this SciML package was built using these direct dependencies,</summary>
@@ -367,22 +393,17 @@ You can also download the
 ```
 ```@eval
 using TOML
+using Markdown
 version = TOML.parse(read("../../Project.toml", String))["version"]
 name = TOML.parse(read("../../Project.toml", String))["name"]
-link = "https://github.com/SciML/" * name * ".jl/tree/gh-pages/v" * version *
-       "/assets/Manifest.toml"
-```
-```@raw html
-">manifest</a> file and the
-<a href="
-```
-```@eval
-using TOML
-version = TOML.parse(read("../../Project.toml", String))["version"]
-name = TOML.parse(read("../../Project.toml", String))["name"]
-link = "https://github.com/SciML/" * name * ".jl/tree/gh-pages/v" * version *
-       "/assets/Project.toml"
-```
-```@raw html
-">project</a> file.
+link_manifest = "https://github.com/SciML/" * name * ".jl/tree/gh-pages/v" * version *
+                "/assets/Manifest.toml"
+link_project = "https://github.com/SciML/" * name * ".jl/tree/gh-pages/v" * version *
+               "/assets/Project.toml"
+Markdown.parse("""You can also download the
+[manifest]($link_manifest)
+file and the
+[project]($link_project)
+file.
+""")
 ```
