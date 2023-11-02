@@ -32,7 +32,7 @@ end
 function get_velocity(sr::SimulationResult, time::Real, i::Integer = 0)
     n = get_coordinate_vector_count(sr.simulation.system)
 
-    if typeof(sr.solution[1]) <: RecursiveArrayTools.ArrayPartition
+    if sr.solution[1] isa RecursiveArrayTools.ArrayPartition
         velocities = sr(time).x[1]
         if i <= 0
             return velocities[:, 1:n]
@@ -54,7 +54,7 @@ function get_velocity(sr::SimulationResult, time::Real, i::Integer = 0)
 end
 
 function get_position(sr::SimulationResult, time::Real, i::Integer = 0)
-    if typeof(sr.solution[1]) <: RecursiveArrayTools.ArrayPartition
+    if sr.solution[1] isa RecursiveArrayTools.ArrayPartition
         positions = sr(time).x[2]
     else
         positions = sr(time)
