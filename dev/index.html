@@ -89,9 +89,9 @@ e_pot = potential_energy(result, t)
 e_tot = total_energy(result, t)</code></pre><h2 id="Plotting-Images"><a class="docs-heading-anchor" href="#Plotting-Images">Plotting Images</a><a id="Plotting-Images-1"></a><a class="docs-heading-anchor-permalink" href="#Plotting-Images" title="Permalink"></a></h2><p>Using the tools of NBodySimulator, one can export the results of a simulation into a <a href="https://en.wikipedia.org/wiki/Protein_Data_Bank_(file_format)">Protein Database File</a>. <a href="http://www.ks.uiuc.edu/Research/vmd/">VMD</a> is a well-known tool for visualizing molecular dynamics, which can read data from PDB files.</p><pre><code class="language-julia hljs">save_to_pdb(result, &quot;path_to_a_new_pdb_file.pdb&quot;)</code></pre><p>In the future, it will be possible to export results via the FileIO interface and its <code>save</code> function. Using Plots.jl, one can draw the positions of particles at any time of simulation or create an animation of moving particles, molecules of water:</p><pre><code class="language-julia hljs">using Plots
 plot(result)
 animate(result, &quot;path_to_file.gif&quot;)</code></pre><p>Makie.jl also has a recipe for plotting the results of N-body simulations. The <a href="https://github.com/MakieOrg/Makie.jl/blob/master/ReferenceTests/src/tests/recipes.jl">example</a> is presented in the documentation.</p><h2 id="Contributing"><a class="docs-heading-anchor" href="#Contributing">Contributing</a><a id="Contributing-1"></a><a class="docs-heading-anchor-permalink" href="#Contributing" title="Permalink"></a></h2><ul><li><p>Please refer to the <a href="https://github.com/SciML/ColPrac/blob/master/README.md">SciML ColPrac: Contributor&#39;s Guide on Collaborative Practices for Community Packages</a> for guidance on PRs, issues, and other matters relating to contributing to SciML.</p></li><li><p>See the <a href="https://github.com/SciML/SciMLStyle">SciML Style Guide</a> for common coding practices and other style decisions.</p></li><li><p>There are a few community forums:</p><ul><li>The #diffeq-bridged and #sciml-bridged channels in the <a href="https://julialang.org/slack/">Julia Slack</a></li><li>The #diffeq-bridged and #sciml-bridged channels in the <a href="https://julialang.zulipchat.com/#narrow/stream/279055-sciml-bridged">Julia Zulip</a></li><li>On the <a href="https://discourse.julialang.org">Julia Discourse forums</a></li><li>See also <a href="https://sciml.ai/community/">SciML Community page</a></li></ul></li></ul><h2 id="Reproducibility"><a class="docs-heading-anchor" href="#Reproducibility">Reproducibility</a><a id="Reproducibility-1"></a><a class="docs-heading-anchor-permalink" href="#Reproducibility" title="Permalink"></a></h2><details><summary>The documentation of this SciML package was built using these direct dependencies,</summary><pre class="documenter-example-output"><code class="nohighlight hljs ansi">Status `~/work/NBodySimulator.jl/NBodySimulator.jl/docs/Project.toml`
-  [e30172f5] Documenter v1.2.1
-  [0e6f8da7] NBodySimulator v1.10.0 `~/work/NBodySimulator.jl/NBodySimulator.jl`</code></pre></details><details><summary>and using this machine and Julia version.</summary><pre class="documenter-example-output"><code class="nohighlight hljs ansi">Julia Version 1.10.1
-Commit 7790d6f0641 (2024-02-13 20:41 UTC)
+  [e30172f5] Documenter v1.3.0
+  [0e6f8da7] NBodySimulator v1.10.0 `~/work/NBodySimulator.jl/NBodySimulator.jl`</code></pre></details><details><summary>and using this machine and Julia version.</summary><pre class="documenter-example-output"><code class="nohighlight hljs ansi">Julia Version 1.10.2
+Commit bd47eca2c8a (2024-03-01 10:14 UTC)
 Build Info:
   Official https://julialang.org/ release
 Platform Info:
@@ -101,26 +101,27 @@ Platform Info:
   LIBM: libopenlibm
   LLVM: libLLVM-15.0.7 (ORCJIT, znver3)
 Threads: 1 default, 0 interactive, 1 GC (on 4 virtual cores)</code></pre></details><details><summary>A more complete overview of all dependencies and their versions is also provided.</summary><pre class="documenter-example-output"><code class="nohighlight hljs ansi">Status `~/work/NBodySimulator.jl/NBodySimulator.jl/docs/Manifest.toml`
-  [47edcb42] ADTypes v0.2.6
+  [47edcb42] ADTypes v0.2.7
   [a4c015fc] ANSIColoredPrinters v0.0.1
   [1520ce14] AbstractTrees v0.4.5
-  [7d9f7c33] Accessors v0.1.35
+  [7d9f7c33] Accessors v0.1.36
 ⌅ [79e6a3ab] Adapt v3.7.2
 ⌅ [ec485272] ArnoldiMethod v0.2.0
-  [4fba245c] ArrayInterface v7.7.1
-  [4c555306] ArrayLayouts v1.6.0
+⌃ [4fba245c] ArrayInterface v7.7.1
+  [4c555306] ArrayLayouts v1.8.0
   [62783981] BitTwiddlingConvenienceFunctions v0.1.5
   [2a0fbf3d] CPUSummary v0.2.4
   [fb6a15b2] CloseOpenIntervals v0.1.12
+  [944b1d66] CodecZlib v0.7.4
   [38540f10] CommonSolve v0.2.4
   [bbf7d656] CommonSubexpressions v0.3.0
   [34da2185] Compat v4.14.0
   [a33af91c] CompositionsBase v0.1.2
   [2569d6c7] ConcreteStructs v0.2.3
-  [187b0558] ConstructionBase v1.5.4
+  [187b0558] ConstructionBase v1.5.5
   [adafc99b] CpuId v0.3.1
   [9a962f9c] DataAPI v1.16.0
-  [864edb3b] DataStructures v0.18.17
+  [864edb3b] DataStructures v0.18.18
   [e2d170a0] DataValueInterfaces v1.0.0
   [8bb1440f] DelimitedFiles v1.9.1
 ⌃ [2b5f629d] DiffEqBase v6.145.2
@@ -129,23 +130,23 @@ Threads: 1 default, 0 interactive, 1 GC (on 4 virtual cores)</code></pre></detai
   [b552c78f] DiffRules v1.15.1
   [b4f34e82] Distances v0.10.11
   [ffbed154] DocStringExtensions v0.9.3
-  [e30172f5] Documenter v1.2.1
+  [e30172f5] Documenter v1.3.0
   [4e289a0a] EnumX v1.0.4
-⌅ [f151be2c] EnzymeCore v0.6.5
+⌅ [f151be2c] EnzymeCore v0.6.6
   [d4d017d3] ExponentialUtilities v1.26.1
   [e2ba6199] ExprTools v0.1.10
   [7034ab61] FastBroadcast v0.2.8
   [9aa1b823] FastClosures v0.3.2
   [29a986be] FastLapackInterface v2.0.2
-  [5789e2e9] FileIO v1.16.2
+  [5789e2e9] FileIO v1.16.3
   [1a297f60] FillArrays v1.9.3
-  [6a86dc24] FiniteDiff v2.22.0
+  [6a86dc24] FiniteDiff v2.23.0
   [f6369f11] ForwardDiff v0.10.36
   [069b7b12] FunctionWrappers v1.1.3
   [77dc65aa] FunctionWrappersWrappers v0.1.3
-  [d9f16b24] Functors v0.4.7
+  [d9f16b24] Functors v0.4.8
 ⌃ [46192b85] GPUArraysCore v0.1.5
-  [c145ed77] GenericSchur v0.5.3
+  [c145ed77] GenericSchur v0.5.4
   [d7ba0133] Git v1.3.1
   [86223c79] Graphs v1.9.0
   [3e5b6fbb] HostCPUFeatures v0.1.16
@@ -153,7 +154,7 @@ Threads: 1 default, 0 interactive, 1 GC (on 4 virtual cores)</code></pre></detai
   [615f187c] IfElse v0.1.1
   [d25df0c9] Inflate v0.1.4
   [18e54dd8] IntegerMathUtils v0.1.2
-  [3587e190] InverseFunctions v0.1.12
+  [3587e190] InverseFunctions v0.1.13
   [92d709cd] IrrationalConstants v0.2.2
   [82899510] IteratorInterfaceExtensions v1.0.0
   [692b3bcd] JLLWrappers v1.5.0
@@ -167,12 +168,12 @@ Threads: 1 default, 0 interactive, 1 GC (on 4 virtual cores)</code></pre></detai
   [d3d80556] LineSearches v7.2.0
 ⌃ [7ed4a6bd] LinearSolve v2.22.1
   [2ab3a3ac] LogExpFunctions v0.3.27
-  [bdcacae8] LoopVectorization v0.12.166
+  [bdcacae8] LoopVectorization v0.12.169
   [1914dd2f] MacroTools v0.5.13
   [d125e4d3] ManualMemory v0.1.8
   [d0879d2d] MarkdownAST v0.1.2
   [a3b82374] MatrixFactorizations v2.1.0
-  [bb5d69b7] MaybeInplace v0.1.1
+  [bb5d69b7] MaybeInplace v0.1.2
   [e1d29d7a] Missings v1.1.0
   [46d2c3a1] MuladdMacro v0.2.4
   [0e6f8da7] NBodySimulator v1.10.0 `~/work/NBodySimulator.jl/NBodySimulator.jl`
@@ -186,11 +187,11 @@ Threads: 1 default, 0 interactive, 1 GC (on 4 virtual cores)</code></pre></detai
   [65ce6f38] PackageExtensionCompat v1.0.2
   [d96e819e] Parameters v0.12.3
   [69de0a69] Parsers v2.8.1
-  [f517fe37] Polyester v0.7.9
+  [f517fe37] Polyester v0.7.12
   [1d0040c9] PolyesterWeave v0.2.1
   [d236fae5] PreallocationTools v0.4.20
-  [aea7be01] PrecompileTools v1.2.0
-  [21216c6a] Preferences v1.4.2
+  [aea7be01] PrecompileTools v1.2.1
+  [21216c6a] Preferences v1.4.3
   [27ebfcd6] Primes v0.5.6
   [8a4e6c94] QuasiMonteCarlo v0.3.3
   [3cdcf5f2] RecipesBase v1.3.4
@@ -224,7 +225,8 @@ Threads: 1 default, 0 interactive, 1 GC (on 4 virtual cores)</code></pre></detai
   [3783bdb8] TableTraits v1.0.1
   [bd369af6] Tables v1.11.1
   [8290d209] ThreadingUtilities v0.5.2
-  [d5829a12] TriangularSolve v0.1.20
+  [3bb67fe8] TranscodingStreams v0.10.7
+  [d5829a12] TriangularSolve v0.1.21
   [410a4b4d] Tricks v0.1.8
   [781d530d] TruncatedStacktraces v1.4.0
   [3a884ed6] UnPack v1.0.2
@@ -235,7 +237,7 @@ Threads: 1 default, 0 interactive, 1 GC (on 4 virtual cores)</code></pre></detai
   [1d5cc7b8] IntelOpenMP_jll v2024.0.2+0
   [94ce4f54] Libiconv_jll v1.17.0+0
   [856f044c] MKL_jll v2024.0.0+0
-  [458c3c95] OpenSSL_jll v3.0.13+0
+  [458c3c95] OpenSSL_jll v3.0.13+1
   [efe28fd5] OpenSpecFun_jll v0.5.5+0
   [0dad84c5] ArgTools v1.1.1
   [56f22d72] Artifacts
@@ -286,4 +288,4 @@ Threads: 1 default, 0 interactive, 1 GC (on 4 virtual cores)</code></pre></detai
   [8e850ede] nghttp2_jll v1.52.0+1
   [3f19e933] p7zip_jll v17.4.0+2
 Info Packages marked with ⌃ and ⌅ have new versions available. Those with ⌃ may be upgradable, but those with ⌅ are restricted by compatibility constraints from upgrading. To see why use `status --outdated -m`</code></pre></details>You can also download the 
-<a href="<p>You can also download the <a href="https://github.com/SciML/NBodySimulator.jl/tree/gh-pages/v1.10.0/assets/Manifest.toml">manifest</a> file and the <a href="https://github.com/SciML/NBodySimulator.jl/tree/gh-pages/v1.10.0/assets/Project.toml">project</a> file.</p></article><nav class="docs-footer"><a class="docs-footer-nextpage" href="examples/">Examples »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="auto">Automatic (OS)</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.2.1 on <span class="colophon-date" title="Friday 1 March 2024 11:18">Friday 1 March 2024</span>. Using Julia version 1.10.1.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+<a href="<p>You can also download the <a href="https://github.com/SciML/NBodySimulator.jl/tree/gh-pages/v1.10.0/assets/Manifest.toml">manifest</a> file and the <a href="https://github.com/SciML/NBodySimulator.jl/tree/gh-pages/v1.10.0/assets/Project.toml">project</a> file.</p></article><nav class="docs-footer"><a class="docs-footer-nextpage" href="examples/">Examples »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.3.0 on <span class="colophon-date" title="Tuesday 2 April 2024 01:01">Tuesday 2 April 2024</span>. Using Julia version 1.10.2.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
