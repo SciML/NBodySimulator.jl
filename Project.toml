@@ -19,7 +19,7 @@ StaticArrays = "90137ffa-7385-5640-81b9-e52037218182"
 
 [compat]
 DiffEqBase = "6.122"
-DiffEqCallbacks = "2.9"
+DiffEqCallbacks = "2.9, 4"
 DocStringExtensions = "0.8, 0.9"
 FileIO = "1.0"
 OrdinaryDiffEq = "5, 6"
