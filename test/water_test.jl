@@ -24,7 +24,7 @@
 
     jl_parameters = LennardJonesParameters(ϵOO, σOO, R)
     e_parameters = ElectrostaticParameters(k_el, Rel)
-    spc_paramters = SPCFwParameters(rOH, ∠HOH, k_bond, k_angle)
+    spc_parameters = SPCFwParameters(rOH, ∠HOH, k_bond, k_angle)
     pbc = CubicPeriodicBoundaryConditions(L)
 
     @testset "Analyzing simulation result" begin
@@ -43,7 +43,7 @@
 
         bodies = [p1, p2, p3]
         water = WaterSPCFw(bodies, mH, mO, qH, qO, jl_parameters, e_parameters,
-                           spc_paramters)
+                           spc_parameters)
         simulation = NBodySimulation(water, (t1, t2), pbc, kb)
 
         result = run_simulation(simulation, VelocityVerlet(), dt = τ)
@@ -96,7 +96,7 @@
 
         bodies = [p1, p2]
         water = WaterSPCFw(bodies, mH, mO, qH, qO, jl_parameters, e_parameters,
-                           spc_paramters)
+                           spc_parameters)
 
         thermostat = BerendsenThermostat(T0, 200τ)
         simulation = NBodySimulation(water, (t1, t2), pbc, kb)
@@ -123,7 +123,7 @@
         T0 = 275
         bodies = generate_bodies_in_cell_nodes(N, mH2O, v_dev, L)
         water = WaterSPCFw(bodies, mH, mO, qH, qO, jl_parameters, e_parameters,
-                           spc_paramters)
+                           spc_parameters)
         thermostat = LangevinThermostat(T0, 100)
         simulation = NBodySimulation(water, (t1, t2), pbc, thermostat, kb)
         result = run_simulation(simulation, EM(), dt = τ)
@@ -146,18 +146,18 @@
 
         bodies = [p1, p2]
         water = WaterSPCFw(bodies, mH, mO, qH, qO, jl_parameters, e_parameters,
-                           spc_paramters)
+                           spc_parameters)
         simulation = NBodySimulation(water, (t1, t2), pbc, kb)
         result = run_simulation(simulation, VelocityVerlet(), dt = τ)
 
         io = IOBuffer()
         pdb_data = sprint(io -> NBodySimulator.write_pdb_data(io, result))
-        splitted_data = split(pdb_data, '\n')
+        split_data = split(pdb_data, '\n')
 
         hetatm_count = 0
         timestep_count = 0
 
-        for s in splitted_data
+        for s in split_data
             if length(s) >= 10 && s[1:10] == "REMARK 250"
                 timestep_count += 1
             elseif length(s) >= 6 && s[1:6] == "HETATM"
@@ -199,7 +199,7 @@ ENDMDL")
 
         bodies = NBodySimulator.extract_from_pdb(pdb_data)
         water = WaterSPCFw(bodies, mH, mO, qH, qO, jl_parameters, e_parameters,
-                           spc_paramters)
+                           spc_parameters)
         t1 = 0τ
         t2 = 2τ
         simulation = NBodySimulation(water, (t1, t2), pbc, kb)

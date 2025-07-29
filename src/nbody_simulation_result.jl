@@ -265,8 +265,8 @@ function valence_angle_harmonic_potential(rs,
         rba = ra - rb
         rbc = rc - rb
 
-        currenct_angle = acos(dot(rba, rbc) / (norm(rba) * norm(rbc)))
-        e_valence += k * (currenct_angle - valence_angle)^2
+        current_angle = acos(dot(rba, rbc) / (norm(rba) * norm(rbc)))
+        e_valence += k * (current_angle - valence_angle)^2
     end
     return e_valence / 2
 end

@@ -259,8 +259,8 @@ In NBodySImulator the [SPC/Fw water model](http://www.sklogwiki.org/SklogWiki/in
 bodies = generate_bodies_in_cell_nodes(N, mH2O, v, L)
 jl_parameters = LennardJonesParameters(ϵOO, σOO, R)
 e_parameters = ElectrostaticParameters(k, Rel)
-spc_paramters = SPCFwParameters(rOH, ∠HOH, k_bond, k_angle)
-water = WaterSPCFw(bodies, mH, mO, qH, qO, jl_parameters, e_parameters, spc_paramters);
+spc_parameters = SPCFwParameters(rOH, ∠HOH, k_bond, k_angle)
+water = WaterSPCFw(bodies, mH, mO, qH, qO, jl_parameters, e_parameters, spc_parameters);
 ```
 For each water molecule here, `rOH` is the equilibrium distance between a hydrogen atom and the oxygen atom, `∠HOH` denotes the equilibrium angle made of those two bonds, `k_bond` and `k_angle` are the elastic coefficients for the corresponding harmonic potentials.
 Further, one can pass the water system into the `NBodySimulation` constructor as a usual system of N-bodies.

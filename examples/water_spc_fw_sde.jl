@@ -28,9 +28,9 @@ const k = 138.935458 #
 bodies = generate_bodies_in_cell_nodes(N, mH2O, v_dev, L)
 jl_parameters = LennardJonesParameters(ϵOO, σOO, R)
 e_parameters = ElectrostaticParameters(k, Rel)
-spc_paramters = SPCFwParameters(rOH, ∠HOH, k_bond, k_angle)
+spc_parameters = SPCFwParameters(rOH, ∠HOH, k_bond, k_angle)
 pbc = CubicPeriodicBoundaryConditions(L)
-water = WaterSPCFw(bodies, mH, mO, qH, qO, jl_parameters, e_parameters, spc_paramters);
+water = WaterSPCFw(bodies, mH, mO, qH, qO, jl_parameters, e_parameters, spc_parameters);
 thermostat = LangevinThermostat(T0, 0)
 simulation = NBodySimulation(water, (t1, t2), pbc, thermostat, kb);
 result = @time run_simulation(simulation, EM(), dt = τ)

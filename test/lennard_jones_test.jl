@@ -90,12 +90,12 @@
 
         io = IOBuffer()
         pdb_data = sprint(io -> NBodySimulator.write_pdb_data(io, result))
-        splitted_data = split(pdb_data, '\n')
+        split_data = split(pdb_data, '\n')
 
         hetatm_count = 0
         timestep_count = 0
 
-        for s in splitted_data
+        for s in split_data
             if length(s) >= 10 && s[1:10] == "REMARK 250"
                 timestep_count += 1
             elseif length(s) >= 6 && s[1:6] == "HETATM"
