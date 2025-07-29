@@ -35,7 +35,7 @@ using OrdinaryDiffEq
             @test e_kin≈kinetic_energy(sim_result, t1) atol=ε
         end
 
-        @testset "Using convertion into SecondOrderODEProblem" begin
+        @testset "Using conversion into SecondOrderODEProblem" begin
             sim_result = run_simulation(simulation, DPRKN6())
             solution_simo_3_2nd = sim_result.solution
             ε = 0.001

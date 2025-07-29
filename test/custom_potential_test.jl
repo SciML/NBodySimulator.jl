@@ -11,7 +11,7 @@ function get_accelerating_function(p::CustomPotentialParameters,
     end
 end
 
-@testset "A sysem with custom potential" begin
+@testset "A system with custom potential" begin
     m1 = 1.0
     m2 = 1.0
 
