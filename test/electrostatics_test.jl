@@ -20,10 +20,14 @@
         solution = sim_result.solution
         ε = 0.1 * r
         for j in 1:2, i in 1:3
+
             @test solution[1][i, j]≈solution[end][i, j] atol=ε
         end
 
-        (qs_act, ms_act, indxs_act, exclude_act) = NBodySimulator.obtain_data_for_electrostatic_interaction(simulation.system)
+        (qs_act,
+            ms_act,
+            indxs_act,
+            exclude_act) = NBodySimulator.obtain_data_for_electrostatic_interaction(simulation.system)
         @test qs_act[1] == q1 && qs_act[2] == q2
         @test ms_act[1] == m1 && ms_act[2] == m2
         @test length(qs_act) == length(ms_act)

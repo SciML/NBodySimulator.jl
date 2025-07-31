@@ -141,14 +141,15 @@ function potential_energy(coordinates, simulation::NBodySimulation)
         p = system.potentials[:lennard_jones]
         (ms, indxs) = obtain_data_for_lennard_jones_interaction(system)
         e_potential += lennard_jones_potential(p, indxs, coordinates,
-                                               simulation.boundary_conditions)
+            simulation.boundary_conditions)
     end
 
     if :electrostatic ∈ keys(system.potentials)
         p = system.potentials[:electrostatic]
-        (qs, ms, indxs, exclude) = obtain_data_for_electrostatic_interaction(simulation.system)
+        (qs, ms, indxs,
+            exclude) = obtain_data_for_electrostatic_interaction(simulation.system)
         e_potential += electrostatic_potential(p, indxs, exclude, qs, coordinates,
-                                               simulation.boundary_conditions)
+            simulation.boundary_conditions)
     end
     e_potential
 end
@@ -159,12 +160,12 @@ function potential_energy(coordinates, simulation::NBodySimulation{<:WaterSPCFw}
     p = system.lj_parameters
     (ms, indxs) = obtain_data_for_lennard_jones_interaction(system)
     e_potential += lennard_jones_potential(p, indxs, coordinates,
-                                           simulation.boundary_conditions)
+        simulation.boundary_conditions)
 
     p = system.e_parameters
     (qs, ms, indxs, exclude) = obtain_data_for_electrostatic_interaction(simulation.system)
     e_potential += electrostatic_potential(p, indxs, exclude, qs, coordinates,
-                                           simulation.boundary_conditions)
+        simulation.boundary_conditions)
 
     p = system.scpfw_parameters
     (ms, neighbouhoods) = obtain_data_for_harmonic_bond_interaction(simulation.system, p)
@@ -177,7 +178,7 @@ function potential_energy(coordinates, simulation::NBodySimulation{<:WaterSPCFw}
 end
 
 function lennard_jones_potential(p::LennardJonesParameters, indxs::Vector{<:Integer},
-                                 coordinates, pbc::BoundaryConditions)
+        coordinates, pbc::BoundaryConditions)
     e_lj = 0
     n = length(indxs)
     @inbounds for ind_i in 1:n
@@ -203,8 +204,8 @@ function lennard_jones_potential(p::LennardJonesParameters, indxs::Vector{<:Inte
 end
 
 function electrostatic_potential(p::ElectrostaticParameters, indxs::Vector{<:Integer},
-                                 exclude::Dict{Int, Vector{Int}}, qs, rs,
-                                 pbc::BoundaryConditions)
+        exclude::Dict{Int, Vector{Int}}, qs, rs,
+        pbc::BoundaryConditions)
     e_el = 0.0
 
     n = length(indxs)
@@ -233,9 +234,9 @@ function electrostatic_potential(p::ElectrostaticParameters, indxs::Vector{<:Int
 end
 
 function harmonic_bonds_potential(p::SPCFwParameters,
-                                  rs,
-                                  ms::Vector{<:Real},
-                                  neighborhoods::Dict{Int, Vector{Tuple{Int, Float64}}})
+        rs,
+        ms::Vector{<:Real},
+        neighborhoods::Dict{Int, Vector{Tuple{Int, Float64}}})
     e_harmonic = 0
 
     @inbounds for (i, neighborhood) in neighborhoods
@@ -252,9 +253,9 @@ function harmonic_bonds_potential(p::SPCFwParameters,
 end
 
 function valence_angle_harmonic_potential(rs,
-                                          bonds::Vector{
-                                                        Tuple{Int, Int, Int, Float64,
-                                                              Float64}})
+        bonds::Vector{
+            Tuple{Int, Int, Int, Float64,
+            Float64}})
     e_valence = 0
 
     for (a, b, c, valence_angle, k) in bonds
@@ -307,11 +308,11 @@ end
 
 # this should be a method for integrators designed for the SecondOrderODEProblem (It is worth somehow to sort them from other algorithms)
 function calculate_simulation(s::NBodySimulation,
-                              alg_type::Union{VelocityVerlet, DPRKN6, Yoshida6}, args...;
-                              kwargs...)
+        alg_type::Union{VelocityVerlet, DPRKN6, Yoshida6}, args...;
+        kwargs...)
     cb = obtain_callbacks_for_so_ode_problem(s)
     solution = solve(SecondOrderODEProblem(s), alg_type, args...; callback = cb,
-                     save_everystep = isempty(cb), kwargs...)
+        save_everystep = isempty(cb), kwargs...)
     return SimulationResult(solution, s)
 end
 
@@ -349,13 +350,13 @@ function get_andersen_thermostating_callback(s::NBodySimulation)
 end
 
 function apply_andersen_rescaling_velocity(integrator, i, kb, system::PotentialNBodySystem,
-                                           p::AndersenThermostat)
+        p::AndersenThermostat)
     v_dev = sqrt(kb * p.T / system.bodies[1].m)
     @. integrator.u.x[1][:, i] = v_dev * randn()
 end
 
 function apply_andersen_rescaling_velocity(integrator, i, kb, system::WaterSPCFw,
-                                           p::AndersenThermostat)
+        p::AndersenThermostat)
     vO = sqrt(kb * p.T / system.mO)
     vH = sqrt(kb * p.T / system.mH)
     @. integrator.u.x[1][:, 3 * (i - 1) + 1] = vO * randn()
@@ -364,7 +365,7 @@ function apply_andersen_rescaling_velocity(integrator, i, kb, system::WaterSPCFw
 end
 
 @recipe function generate_data_for_scatter(sr::SimulationResult{<:PotentialNBodySystem},
-                                           time::Real = 0.0)
+        time::Real = 0.0)
     solution = sr.solution
     n = length(sr.simulation.system.bodies)
 
@@ -596,20 +597,20 @@ function write_pdb_data(f::IO, sr::SimulationResult{<:WaterSPCFw})
             indO, indH1, indH2 = 3 * (i - 1) + 1, 3 * (i - 1) + 2, 3 * (i - 1) + 3
 
             println(f, "HETATM", lpad(indO, 5), "  ", rpad("O", 4), "HOH", lpad(i, 6),
-                    "    ", lpad(@sprintf("%8.3f", cc[1, indO]), 8),
-                    lpad(@sprintf("%8.3f", cc[2, indO]), 8),
-                    lpad(@sprintf("%8.3f", cc[3, indO]), 8), lpad("1.00", 6),
-                    lpad("0.00", 6), lpad("", 10), lpad("O", 2))
+                "    ", lpad(@sprintf("%8.3f", cc[1, indO]), 8),
+                lpad(@sprintf("%8.3f", cc[2, indO]), 8),
+                lpad(@sprintf("%8.3f", cc[3, indO]), 8), lpad("1.00", 6),
+                lpad("0.00", 6), lpad("", 10), lpad("O", 2))
             println(f, "HETATM", lpad(indH1, 5), "  ", rpad("H1", 4), "HOH", lpad(i, 6),
-                    "    ", lpad(@sprintf("%8.3f", cc[1, indH1]), 8),
-                    lpad(@sprintf("%8.3f", cc[2, indH1]), 8),
-                    lpad(@sprintf("%8.3f", cc[3, indH1]), 8), lpad("1.00", 6),
-                    lpad("0.00", 6), lpad("", 10), lpad("H", 2))
+                "    ", lpad(@sprintf("%8.3f", cc[1, indH1]), 8),
+                lpad(@sprintf("%8.3f", cc[2, indH1]), 8),
+                lpad(@sprintf("%8.3f", cc[3, indH1]), 8), lpad("1.00", 6),
+                lpad("0.00", 6), lpad("", 10), lpad("H", 2))
             println(f, "HETATM", lpad(indH2, 5), "  ", rpad("H2", 4), "HOH", lpad(i, 6),
-                    "    ", lpad(@sprintf("%8.3f", cc[1, indH2]), 8),
-                    lpad(@sprintf("%8.3f", cc[2, indH2]), 8),
-                    lpad(@sprintf("%8.3f", cc[3, indH2]), 8), lpad("1.00", 6),
-                    lpad("0.00", 6), lpad("", 10), lpad("H", 2))
+                "    ", lpad(@sprintf("%8.3f", cc[1, indH2]), 8),
+                lpad(@sprintf("%8.3f", cc[2, indH2]), 8),
+                lpad(@sprintf("%8.3f", cc[3, indH2]), 8), lpad("1.00", 6),
+                lpad("0.00", 6), lpad("", 10), lpad("H", 2))
         end
         println(f, "ENDMDL")
     end
@@ -627,10 +628,10 @@ function write_pdb_data(f::IO, sr::SimulationResult)
         println(f, "REMARK 250 time=$t steps")
         for i in 1:n
             println(f, "HETATM", lpad(i, 5), "  ", rpad("Ar", 4), "Ar", lpad(i, 6), "    ",
-                    lpad(@sprintf("%8.3f", cc[1, i]), 8),
-                    lpad(@sprintf("%8.3f", cc[2, i]), 8),
-                    lpad(@sprintf("%8.3f", cc[3, i]), 8), lpad("1.00", 6), lpad("0.00", 6),
-                    lpad("", 10), lpad("Ar", 2))
+                lpad(@sprintf("%8.3f", cc[1, i]), 8),
+                lpad(@sprintf("%8.3f", cc[2, i]), 8),
+                lpad(@sprintf("%8.3f", cc[3, i]), 8), lpad("1.00", 6), lpad("0.00", 6),
+                lpad("", 10), lpad("Ar", 2))
         end
         println(f, "ENDMDL")
     end
@@ -679,13 +680,13 @@ function extract_from_pdb(file)
         elseif ln_cc[14] == 'O'
             ps_o = split(ln_cc)
             cc_o = SVector(parse(Float64, ps_o[6]), parse(Float64, ps_o[7]),
-                           parse(Float64, ps_o[8])) / den
+                parse(Float64, ps_o[8])) / den
             ps_h1 = split(readline(file))
             cc_h1 = SVector(parse(Float64, ps_h1[6]), parse(Float64, ps_h1[7]),
-                            parse(Float64, ps_h1[8])) / den
+                parse(Float64, ps_h1[8])) / den
             ps_h2 = split(readline(file))
             cc_h2 = SVector(parse(Float64, ps_h2[6]), parse(Float64, ps_h2[7]),
-                            parse(Float64, ps_h2[8])) / den
+                parse(Float64, ps_h2[8])) / den
             push!(cc, cc_o)
             push!(cc, cc_h1)
             push!(cc, cc_h2)
@@ -713,13 +714,13 @@ function extract_from_pdb(file)
             mc += 1
             ps_o = split(ln_cc)
             cc_o = SVector(parse(Float64, ps_o[6]), parse(Float64, ps_o[7]),
-                           parse(Float64, ps_o[8])) / den
+                parse(Float64, ps_o[8])) / den
             ps_h1 = split(readline(file))
             cc_h1 = SVector(parse(Float64, ps_h1[6]), parse(Float64, ps_h1[7]),
-                            parse(Float64, ps_h1[8])) / den
+                parse(Float64, ps_h1[8])) / den
             ps_h2 = split(readline(file))
             cc_h2 = SVector(parse(Float64, ps_h2[6]), parse(Float64, ps_h2[7]),
-                            parse(Float64, ps_h2[8])) / den
+                parse(Float64, ps_h2[8])) / den
 
             o = MassBody(cc[3 * (mc - 1) + 1], (cc_o - cc[3 * (mc - 1) + 1]) / τ, 15.999)
             h1 = MassBody(cc[3 * (mc - 1) + 2], (cc_h1 - cc[3 * (mc - 1) + 2]) / τ, 1.00794)

@@ -81,7 +81,7 @@
         @test e_tot_1≈e_tot_2 atol=ε
 
         simulation = NBodySimulation(lj_system, (t1, t2),
-                                     CubicPeriodicBoundaryConditions(L))
+            CubicPeriodicBoundaryConditions(L))
         result = run_simulation(simulation, VelocityVerlet(), dt = τ)
         e_tot_1 = total_energy(result, t1)
         ε = 0.1 * e_tot_1
@@ -128,7 +128,7 @@
         parameters = LennardJonesParameters(ϵ, σ, R)
         lj_system = PotentialNBodySystem(bodies, Dict(:lennard_jones => parameters))
         simulation = NBodySimulation(lj_system, (t1, t2),
-                                     CubicPeriodicBoundaryConditions(L), kb)
+            CubicPeriodicBoundaryConditions(L), kb)
         result = run_simulation(simulation, VelocityVerlet(), dt = τ)
 
         (ts, mean_square_displacement) = msd(result)

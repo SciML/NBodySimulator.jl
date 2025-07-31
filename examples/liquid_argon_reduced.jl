@@ -27,7 +27,7 @@ bodies = generate_bodies_in_cell_nodes(N, _m, _v, _L)
 parameters = LennardJonesParameters(_ϵ, _σ, _R)
 lj_system = PotentialNBodySystem(bodies, Dict(:lennard_jones => parameters));
 simulation = NBodySimulation(lj_system, (_t1, _t2), CubicPeriodicBoundaryConditions(_L),
-                             _ϵ / T);
+    _ϵ / T);
 #result = run_simulation(simulation, Tsit5())
 result = @time run_simulation(simulation, VelocityVerlet(), dt = _τ)
 

@@ -43,7 +43,7 @@
 
         bodies = [p1, p2, p3]
         water = WaterSPCFw(bodies, mH, mO, qH, qO, jl_parameters, e_parameters,
-                           spc_parameters)
+            spc_parameters)
         simulation = NBodySimulation(water, (t1, t2), pbc, kb)
 
         result = run_simulation(simulation, VelocityVerlet(), dt = τ)
@@ -96,11 +96,12 @@
 
         bodies = [p1, p2]
         water = WaterSPCFw(bodies, mH, mO, qH, qO, jl_parameters, e_parameters,
-                           spc_parameters)
+            spc_parameters)
 
         thermostat = BerendsenThermostat(T0, 200τ)
         simulation = NBodySimulation(water, (t1, t2), pbc, kb)
-        (ms_ber, kb_ber, n_ber, nc_ber, p_ber) = NBodySimulator.obtain_data_for_berendsen_thermostating(simulation)
+        (ms_ber, kb_ber, n_ber, nc_ber,
+            p_ber) = NBodySimulator.obtain_data_for_berendsen_thermostating(simulation)
         @test length(ms_ber) == n_ber
         @test kb_ber == kb
         @test n_ber == 6
@@ -108,7 +109,8 @@
 
         thermostat = NoseHooverThermostat(T0, 200τ)
         simulation = NBodySimulation(water, (t1, t2), pbc, kb)
-        (ms_nh, kb_nh, n_nh, nc_nh, γind, p_nh) = NBodySimulator.obtain_data_for_nosehoover_thermostating(simulation)
+        (ms_nh, kb_nh, n_nh, nc_nh, γind,
+            p_nh) = NBodySimulator.obtain_data_for_nosehoover_thermostating(simulation)
         @test length(ms_nh) == n_nh
         @test kb_nh == kb
         @test n_nh == 6
@@ -123,7 +125,7 @@
         T0 = 275
         bodies = generate_bodies_in_cell_nodes(N, mH2O, v_dev, L)
         water = WaterSPCFw(bodies, mH, mO, qH, qO, jl_parameters, e_parameters,
-                           spc_parameters)
+            spc_parameters)
         thermostat = LangevinThermostat(T0, 100)
         simulation = NBodySimulation(water, (t1, t2), pbc, thermostat, kb)
         result = run_simulation(simulation, EM(), dt = τ)
@@ -146,7 +148,7 @@
 
         bodies = [p1, p2]
         water = WaterSPCFw(bodies, mH, mO, qH, qO, jl_parameters, e_parameters,
-                           spc_parameters)
+            spc_parameters)
         simulation = NBodySimulation(water, (t1, t2), pbc, kb)
         result = run_simulation(simulation, VelocityVerlet(), dt = τ)
 
@@ -199,7 +201,7 @@ ENDMDL")
 
         bodies = NBodySimulator.extract_from_pdb(pdb_data)
         water = WaterSPCFw(bodies, mH, mO, qH, qO, jl_parameters, e_parameters,
-                           spc_parameters)
+            spc_parameters)
         t1 = 0τ
         t2 = 2τ
         simulation = NBodySimulation(water, (t1, t2), pbc, kb)
