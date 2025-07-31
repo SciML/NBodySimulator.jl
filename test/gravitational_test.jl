@@ -15,6 +15,7 @@ using OrdinaryDiffEq
         solution_simo_3 = sim_result.solution
         ε = 0.1
         for j in 1:3, i in 1:3
+
             @test solution_simo_3[1][i, j]≈solution_simo_3[end][i, j] atol=ε
         end
 
@@ -40,6 +41,7 @@ using OrdinaryDiffEq
             solution_simo_3_2nd = sim_result.solution
             ε = 0.001
             for i in 1:3, j in 1:3
+
                 @test solution_simo_3_2nd[1][9 + 3(i - 1) + j]≈solution_simo_3_2nd[end][9 + 3(i - 1) + j] atol=ε
             end
         end
@@ -49,6 +51,7 @@ using OrdinaryDiffEq
             solution_simo_3_2nd = sim_result.solution
             ε = 0.001
             for i in 1:3, j in 1:3
+
                 @test solution_simo_3_2nd[1][9 + 3(i - 1) + j]≈solution_simo_3_2nd[end][9 + 3(i - 1) + j] atol=ε
             end
 
@@ -56,6 +59,7 @@ using OrdinaryDiffEq
             solution_simo_3_2nd = sim_result.solution
             ε = 0.001
             for i in 1:3, j in 1:3
+
                 @test solution_simo_3_2nd[1][9 + 3(i - 1) + j]≈solution_simo_3_2nd[end][9 + 3(i - 1) + j] atol=ε
             end
         end
@@ -64,13 +68,13 @@ using OrdinaryDiffEq
     @testset "5-body choreography" begin
         m1 = MassBody(SVector(1.657666, 0.0, 0.0), SVector(0.0, -0.593786, 0.0), 1.0)
         m2 = MassBody(SVector(0.439775, -0.169717, 0.0), SVector(1.822785, 0.128248, 0.0),
-                      1.0)
+            1.0)
         m3 = MassBody(SVector(-1.268608, -0.267651, 0.0), SVector(1.271564, 0.168645, 0.0),
-                      1.0)
+            1.0)
         m4 = MassBody(SVector(-1.268608, 0.267651, 0.0), SVector(-1.271564, 0.168645, 0.0),
-                      1.0)
+            1.0)
         m5 = MassBody(SVector(0.439775, 0.169717, 0.0), SVector(-1.822785, 0.128248, 0.0),
-                      1.0)
+            1.0)
         tspan = (0.0, 2pi)
         system = GravitationalSystem([m1, m2, m3, m4, m5], G)
         simulation = NBodySimulation(system, tspan)
@@ -79,6 +83,7 @@ using OrdinaryDiffEq
 
         ε = 0.01
         for j in 1:5, i in 1:3
+
             @test solution_simo_5[1][i, j]≈solution_simo_5[end][i, j] atol=ε
         end
     end

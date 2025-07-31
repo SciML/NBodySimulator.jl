@@ -22,7 +22,7 @@ function generate_random_directions(n::Int)
     directions = [@SVector [
                       sin(theta[i]) .* cos(phi[i]),
                       sin(theta[i]) .* sin(phi[i]),
-                      cos(theta[i]),
+                      cos(theta[i])
                   ] for i in 1:n]
 end
 

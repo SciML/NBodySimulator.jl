@@ -95,12 +95,12 @@ struct SPCFwParameters{pType <: Real} <: PotentialParameters
 end
 
 function pairwise_lennard_jones_acceleration!(dv,
-                                              rs,
-                                              i::Integer,
-                                              indxs::Vector{<:Integer},
-                                              ms::Vector{<:Real},
-                                              p::LennardJonesParameters,
-                                              pbc::BoundaryConditions)
+        rs,
+        i::Integer,
+        indxs::Vector{<:Integer},
+        ms::Vector{<:Real},
+        p::LennardJonesParameters,
+        pbc::BoundaryConditions)
     force = @SVector [0.0, 0.0, 0.0]
     ri = @SVector [rs[1, i], rs[2, i], rs[3, i]]
 
@@ -120,14 +120,14 @@ function pairwise_lennard_jones_acceleration!(dv,
 end
 
 function pairwise_electrostatic_acceleration!(dv,
-                                              rs,
-                                              i::Integer,
-                                              n::Integer,
-                                              qs::Vector{<:Real},
-                                              ms::Vector{<:Real},
-                                              exclude::Dict{Int, Vector{Int}},
-                                              p::ElectrostaticParameters,
-                                              pbc::BoundaryConditions)
+        rs,
+        i::Integer,
+        n::Integer,
+        qs::Vector{<:Real},
+        ms::Vector{<:Real},
+        exclude::Dict{Int, Vector{Int}},
+        p::ElectrostaticParameters,
+        pbc::BoundaryConditions)
     force = @SVector [0.0, 0.0, 0.0]
     ri = @SVector [rs[1, i], rs[2, i], rs[3, i]]
     @inbounds for j in 1:n
@@ -143,11 +143,11 @@ function pairwise_electrostatic_acceleration!(dv,
 end
 
 function gravitational_acceleration!(dv,
-                                     rs,
-                                     i::Integer,
-                                     n::Integer,
-                                     bodies::Vector{<:MassBody},
-                                     p::GravitationalParameters)
+        rs,
+        i::Integer,
+        n::Integer,
+        bodies::Vector{<:MassBody},
+        p::GravitationalParameters)
     accel = @SVector [0.0, 0.0, 0.0]
     ri = @SVector [rs[1, i], rs[2, i], rs[3, i]]
     @inbounds for j in 1:n
@@ -162,11 +162,11 @@ function gravitational_acceleration!(dv,
 end
 
 function magnetostatic_dipdip_acceleration!(dv,
-                                            rs,
-                                            i::Integer,
-                                            n::Integer,
-                                            bodies::Vector{<:MagneticParticle},
-                                            p::MagnetostaticParameters)
+        rs,
+        i::Integer,
+        n::Integer,
+        bodies::Vector{<:MagneticParticle},
+        p::MagnetostaticParameters)
     force = @SVector [0.0, 0.0, 0.0]
     mi = bodies[i].mm
     ri = @SVector [rs[1, i], rs[2, i], rs[3, i]]
@@ -187,14 +187,14 @@ function magnetostatic_dipdip_acceleration!(dv,
 end
 
 function harmonic_bond_potential_acceleration!(dv,
-                                               rs,
-                                               i::Integer,
-                                               ms::Vector{<:Real},
-                                               neighbouhoods::Dict{Int,
-                                                                   Vector{
-                                                                          Tuple{Int, Float64
-                                                                                }}},
-                                               p::SPCFwParameters)
+        rs,
+        i::Integer,
+        ms::Vector{<:Real},
+        neighbouhoods::Dict{Int,
+            Vector{
+                Tuple{Int, Float64
+            }}},
+        p::SPCFwParameters)
     force = @SVector [0.0, 0.0, 0.0]
     ri = @SVector [rs[1, i], rs[2, i], rs[3, i]]
     @inbounds for (j, k) in neighbouhoods[i]
@@ -209,12 +209,12 @@ function harmonic_bond_potential_acceleration!(dv,
 end
 
 function valence_angle_potential_acceleration!(dv,
-                                               rs,
-                                               a::Integer,
-                                               b::Integer,
-                                               c::Integer,
-                                               ms::Vector{<:Real},
-                                               p::SPCFwParameters)
+        rs,
+        a::Integer,
+        b::Integer,
+        c::Integer,
+        ms::Vector{<:Real},
+        p::SPCFwParameters)
     ra = @SVector [rs[1, a], rs[2, a], rs[3, a]]
     rb = @SVector [rs[1, b], rs[2, b], rs[3, b]]
     rc = @SVector [rs[1, c], rs[2, c], rs[3, c]]

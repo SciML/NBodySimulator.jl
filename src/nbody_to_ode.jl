@@ -72,16 +72,16 @@ function gather_atom_coordinates(system::WaterSPCFw{<:WaterMolecule}, len)
 end
 
 function gather_accelerations_for_potentials(simulation::NBodySimulation{
-                                                                         CustomAccelerationSystem
-                                                                         })
+        CustomAccelerationSystem
+})
     acceleration_functions = []
     push!(acceleration_functions, simulation.system.acceleration)
     acceleration_functions
 end
 
 function gather_accelerations_for_potentials(simulation::NBodySimulation{
-                                                                         <:PotentialNBodySystem
-                                                                         })
+        <:PotentialNBodySystem
+})
     acceleration_functions = []
 
     for (potential, parameters) in simulation.system.potentials
@@ -94,55 +94,77 @@ end
 function gather_group_accelerations(simulation::NBodySimulation{<:WaterSPCFw})
     acelerations = []
     push!(acelerations,
-          get_group_accelerating_function(simulation.system.scpfw_parameters, simulation))
+        get_group_accelerating_function(simulation.system.scpfw_parameters, simulation))
     acelerations
 end
 
 function get_accelerating_function(parameters::LennardJonesParameters,
-                                   simulation::NBodySimulation)
+        simulation::NBodySimulation)
     (ms, indxs) = obtain_data_for_lennard_jones_interaction(simulation.system)
-    (dv, u, v, t, i) -> pairwise_lennard_jones_acceleration!(dv, u, i, indxs, ms,
-                                                             parameters,
-                                                             simulation.boundary_conditions)
+    (dv,
+        u,
+        v,
+        t,
+        i) -> pairwise_lennard_jones_acceleration!(dv, u, i, indxs, ms,
+        parameters,
+        simulation.boundary_conditions)
 end
 
 function get_accelerating_function(parameters::ElectrostaticParameters,
-                                   simulation::NBodySimulation)
+        simulation::NBodySimulation)
     (qs, ms, indxs, exclude) = obtain_data_for_electrostatic_interaction(simulation.system)
-    (dv, u, v, t, i) -> pairwise_electrostatic_acceleration!(dv, u, i, length(indxs), qs,
-                                                             ms, exclude, parameters,
-                                                             simulation.boundary_conditions)
+    (dv,
+        u,
+        v,
+        t,
+        i) -> pairwise_electrostatic_acceleration!(dv, u, i, length(indxs), qs,
+        ms, exclude, parameters,
+        simulation.boundary_conditions)
 end
 
 function get_accelerating_function(parameters::SPCFwParameters, simulation::NBodySimulation)
-    (ms, neighbouhood) = obtain_data_for_harmonic_bond_interaction(simulation.system,
-                                                                   parameters)
-    (dv, u, v, t, i) -> harmonic_bond_potential_acceleration!(dv, u, i, ms, neighbouhood,
-                                                              parameters)
+    (ms,
+        neighbouhood) = obtain_data_for_harmonic_bond_interaction(simulation.system,
+        parameters)
+    (dv, u, v, t,
+        i) -> harmonic_bond_potential_acceleration!(dv, u, i, ms, neighbouhood,
+        parameters)
 end
 
 function get_accelerating_function(parameters::GravitationalParameters,
-                                   simulation::NBodySimulation)
-    (dv, u, v, t, i) -> gravitational_acceleration!(dv, u, i,
-                                                    length(simulation.system.bodies),
-                                                    simulation.system.bodies, parameters)
+        simulation::NBodySimulation)
+    (dv,
+        u,
+        v,
+        t,
+        i) -> gravitational_acceleration!(dv, u, i,
+        length(simulation.system.bodies),
+        simulation.system.bodies, parameters)
 end
 
 function get_accelerating_function(parameters::MagnetostaticParameters,
-                                   simulation::NBodySimulation)
-    (dv, u, v, t, i) -> magnetostatic_dipdip_acceleration!(dv, u, i,
-                                                           length(simulation.system.bodies),
-                                                           simulation.system.bodies,
-                                                           parameters)
+        simulation::NBodySimulation)
+    (dv,
+        u,
+        v,
+        t,
+        i) -> magnetostatic_dipdip_acceleration!(dv, u, i,
+        length(simulation.system.bodies),
+        simulation.system.bodies,
+        parameters)
 end
 
 function get_group_accelerating_function(parameters::PotentialParameters,
-                                         simulation::NBodySimulation{<:WaterSPCFw})
+        simulation::NBodySimulation{<:WaterSPCFw})
     (ms, indxs) = obtain_data_for_lennard_jones_interaction(simulation.system)
-    (dv, u, v, t, i) -> valence_angle_potential_acceleration!(dv, u, 3 * (i - 1) + 2,
-                                                              3 * (i - 1) + 1,
-                                                              3 * (i - 1) + 3, ms,
-                                                              parameters)
+    (dv,
+        u,
+        v,
+        t,
+        i) -> valence_angle_potential_acceleration!(dv, u, 3 * (i - 1) + 2,
+        3 * (i - 1) + 1,
+        3 * (i - 1) + 3, ms,
+        parameters)
 end
 
 function obtain_data_for_harmonic_bond_interaction(system::WaterSPCFw, p::SPCFwParameters)
@@ -338,7 +360,7 @@ function DiffEqBase.ODEProblem(simulation::NBodySimulation{<:PotentialNBodySyste
 end
 
 function DiffEqBase.SecondOrderODEProblem(simulation::NBodySimulation{<:PotentialNBodySystem
-                                                                      })
+})
     (u0, v0, n) = gather_bodies_initial_coordinates(simulation)
 
     acceleration_functions = gather_accelerations_for_potentials(simulation)
@@ -379,6 +401,7 @@ function DiffEqBase.SecondOrderODEProblem(simulation::NBodySimulation{<:WaterSPC
             dv[:, 3 * (i - 1) + 1] .= a
         end
         @inbounds for i in 1:n, j in (2, 3)
+
             a = MVector(0.0, 0.0, 0.0)
             for acceleration! in h_acelerations
                 acceleration!(a, u, v, t, 3 * (i - 1) + j)
@@ -403,16 +426,16 @@ function gather_accelerations_for_potentials(simulation::NBodySimulation{<:Water
     h_acelerations = []
 
     push!(o_acelerations,
-          get_accelerating_function(simulation.system.e_parameters, simulation))
+        get_accelerating_function(simulation.system.e_parameters, simulation))
     push!(o_acelerations,
-          get_accelerating_function(simulation.system.scpfw_parameters, simulation))
+        get_accelerating_function(simulation.system.scpfw_parameters, simulation))
     push!(o_acelerations,
-          get_accelerating_function(simulation.system.lj_parameters, simulation))
+        get_accelerating_function(simulation.system.lj_parameters, simulation))
 
     push!(h_acelerations,
-          get_accelerating_function(simulation.system.e_parameters, simulation))
+        get_accelerating_function(simulation.system.e_parameters, simulation))
     push!(h_acelerations,
-          get_accelerating_function(simulation.system.scpfw_parameters, simulation))
+        get_accelerating_function(simulation.system.scpfw_parameters, simulation))
 
     (o_acelerations, h_acelerations)
 end
@@ -465,7 +488,7 @@ function DiffEqBase.SDEProblem(simulation::NBodySimulation{<:WaterSPCFw})
             a = MVector(0.0, 0.0, 0.0)
             for acceleration! in o_acelerations
                 acceleration!(a, (@view u[:, 1:(3 * n)]),
-                              (@view u[:, (3 * n + 1):(2 * 3 * n)]), t, 3 * (i - 1) + 1)
+                    (@view u[:, (3 * n + 1):(2 * 3 * n)]), t, 3 * (i - 1) + 1)
             end
             du[:, 3 * n + 3 * (i - 1) + 1] .= a
 
@@ -477,23 +500,24 @@ function DiffEqBase.SDEProblem(simulation::NBodySimulation{<:WaterSPCFw})
                                                  mH
         end
         @inbounds for i in 1:n, j in (2, 3)
+
             a = MVector(0.0, 0.0, 0.0)
             for acceleration! in h_acelerations
                 acceleration!(a, (@view u[:, 1:(3 * n)]),
-                              (@view u[:, (3 * n + 1):(2 * 3 * n)]), t, 3 * (i - 1) + j)
+                    (@view u[:, (3 * n + 1):(2 * 3 * n)]), t, 3 * (i - 1) + j)
             end
             du[:, 3 * n + 3 * (i - 1) + j] .= a
         end
         @inbounds for i in 1:n
             for acceleration! in group_accelerations
                 acceleration!((@view du[:, (3 * n + 1):(2 * 3 * n)]),
-                              (@view u[:, 1:(3 * n)]),
-                              (@view u[:, (3 * n + 1):(2 * 3 * n)]), t, i)
+                    (@view u[:, 1:(3 * n)]),
+                    (@view u[:, (3 * n + 1):(2 * 3 * n)]), t, i)
             end
         end
         for acceleration! in simultaneous_acceleration
             acceleration!((@view du[:, (3 * n + 1):(2 * 3 * n)]), (@view u[:, 1:(3 * n)]),
-                          (@view u[:, (3 * n + 1):(2 * 3 * n)]), t)
+                (@view u[:, (3 * n + 1):(2 * 3 * n)]), t)
         end
         @. du[:, (3 * n + 1):(2 * 3 * n)] -= therm.γ * u[:, (3 * n + 1):(2 * 3 * n)]
     end

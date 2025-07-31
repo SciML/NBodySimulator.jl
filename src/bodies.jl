@@ -33,7 +33,7 @@ end
 Places similar particles in the nodes of a cubic cell with their velocities distributed in accordance with the Maxwell–Boltzmann law
 """
 function generate_bodies_in_cell_nodes(n::Int, m::Real, v_dev::Real, L::Real;
-                                       rng = MersenneTwister(n))
+        rng = MersenneTwister(n))
     velocities = v_dev * randn(rng, Float64, (3, n))
     bodies = MassBody[]
 

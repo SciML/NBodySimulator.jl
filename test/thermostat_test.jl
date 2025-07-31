@@ -21,7 +21,7 @@
         lj_system = PotentialNBodySystem(bodies, Dict(:lennard_jones => parameters))
         thermostat = AndersenThermostat(T0, 0.1 / τ)
         simulation = NBodySimulation(lj_system, (t1, t2), PeriodicBoundaryConditions(L),
-                                     thermostat, kb)
+            thermostat, kb)
         result = run_simulation(simulation, VelocityVerlet(), dt = τ)
 
         T1 = temperature(result, t1)

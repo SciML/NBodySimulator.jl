@@ -44,18 +44,18 @@ e_pot = potential_energy.(result, t) / (kb * T)
 #e_tot = total_energy.(result, t)/(kb*T)
 e_tot = e_kin + e_pot
 plot(t, [signif.(e_tot, 4), signif.(e_kin, 4), signif.(e_pot, 4)],
-     label = ["Total energy", "Kinetic energy", "Potential energy"], legend = :right,
-     ylabel = "E/kT", xlabel = "t, s", formatter = :scientific)
+    label = ["Total energy", "Kinetic energy", "Potential energy"], legend = :right,
+    ylabel = "E/kT", xlabel = "t, s", formatter = :scientific)
 plot(d["t"], [signif.(d["e_tot"], 4), signif.(d["e_kin"], 4), signif.(d["e_pot"], 4)],
-     label = ["Total energy", "Kinetic energy", "Potential energy"], legend = :right,
-     ylabel = "E/kT", xlabel = "t, s", formatter = :scientific)
+    label = ["Total energy", "Kinetic energy", "Potential energy"], legend = :right,
+    ylabel = "E/kT", xlabel = "t, s", formatter = :scientific)
 
 _e_tot = signif.(e_tot, 4)
 _e_pot = signif.(e_pot, 4)
 _e_kin = signif.(e_kin, 4)
 plot(t, [_e_tot, _e_kin, _e_pot],
-     label = ["Total energy", "Kinetic energy", "Potential energy"], legend = :right,
-     ylabel = "Energy, J", xlabel = "t, s", formatter = :scientific)
+    label = ["Total energy", "Kinetic energy", "Potential energy"], legend = :right,
+    ylabel = "Energy, J", xlabel = "t, s", formatter = :scientific)
 
 #----------------------------------------
 using DifferentialEquations
@@ -83,28 +83,29 @@ using Plots
 import GR
 (rs, grf) = rdf(result)
 plot(rs / σ, grf, xlim = [0, 0.4999L / σ], label = ["Radial distribution function"],
-     ylabel = "g(r)", xlabel = "r/σ")
+    ylabel = "g(r)", xlabel = "r/σ")
 plot(d["rs"] / σ, d["grf"], xlim = [0, 0.4999L / σ],
-     label = ["Radial distribution function"], ylabel = "g(r)", xlabel = "r/σ")
+    label = ["Radial distribution function"], ylabel = "g(r)", xlabel = "r/σ")
 
 using Plots
 import GR
 (rs, grf) = rdf(result)
-plot(rs / 1e-10, grf, xlim = [0, 0.4999L / 1e-10], label = ["Radial distribution function"],
-     ylabel = "g(r)", xlabel = "r, Å")
+plot(
+    rs / 1e-10, grf, xlim = [0, 0.4999L / 1e-10], label = ["Radial distribution function"],
+    ylabel = "g(r)", xlabel = "r, Å")
 plot(d["rs"] / 1e-10, d["grf"], xlim = [0, 0.4999L / 1e-10],
-     label = ["Radial distribution function"], ylabel = "g(r)", xlabel = "r, Å")
+    label = ["Radial distribution function"], ylabel = "g(r)", xlabel = "r, Å")
 plot(d["rs"], d["grf"], label = ["Radial distribution function"], ylabel = "g(r)",
-     xlabel = "r, Å")
+    xlabel = "r, Å")
 plot(rs, grf, label = ["Radial distribution function"], ylabel = "g(r)", xlabel = "r, Å")
 
 #-------------msd-------------------
 using Plots
 import GR
 plot(ts, dr2 / 1e-20, label = ["Mean square distance"], ylabel = "MSD, Å^2",
-     xlabel = "t, s")
+    xlabel = "t, s")
 plot(d["ts"], d["dr2"] / 1e-20, label = ["Mean square distance"], ylabel = "MSD, Å^2",
-     xlabel = "t, s")
+    xlabel = "t, s")
 plot(ts, 100 * dr2, label = ["Mean square distance"], ylabel = "MSD, Å^2", xlabel = "t, s")
 #----------aus file-------------
 e_kin = d["e_kin"];
