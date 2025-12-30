@@ -1,4 +1,3 @@
-__precompile__()
 """
 $(DocStringExtensions.README)
 """
@@ -9,6 +8,7 @@ using Reexport
 @reexport using DiffEqBase, OrdinaryDiffEq, RecursiveArrayTools
 using StaticArrays, RecipesBase, FileIO
 using Random, Printf, LinearAlgebra
+using PrecompileTools
 
 include("nbody_simulation.jl")
 
@@ -22,5 +22,7 @@ export AndersenThermostat, BerendsenThermostat, NoseHooverThermostat, LangevinTh
 export run_simulation, get_position, get_velocity, get_masses, temperature,
        initial_energy, kinetic_energy, potential_energy, total_energy, rdf, msd,
        generate_bodies_in_cell_nodes, load_water_molecules_from_pdb
+
+include("precompilation.jl")
 
 end # module
