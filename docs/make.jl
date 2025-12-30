@@ -5,7 +5,7 @@ cp("./docs/Project.toml", "./docs/src/assets/Project.toml", force = true)
 
 include("pages.jl")
 
-makedocs(sitename = "NbodySimulator.jl",
+makedocs(sitename = "NBodySimulator.jl",
     authors = "Chris Rackauckas",
     modules = [NBodySimulator],
     clean = true, doctest = false, linkcheck = true,
