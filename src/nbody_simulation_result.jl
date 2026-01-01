@@ -71,7 +71,7 @@ end
 
 function get_masses(system::NBodySystem)
     n = length(system.bodies)
-    masses = zeros(n)
+    masses = zeros(typeof(first(system.bodies).m), n)
     for i in 1:n
         masses[i] = system.bodies[i].m
     end
@@ -80,7 +80,7 @@ end
 
 function get_masses(system::WaterSPCFw)
     n = length(system.bodies)
-    ms = zeros(Real, 3 * n)
+    ms = zeros(typeof(system.mO), 3 * n)
     for i in 1:n
         ms[3 * (i - 1) + 1] = system.mO
         ms[3 * (i - 1) + 2] = system.mH
