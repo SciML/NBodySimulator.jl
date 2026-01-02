@@ -35,3 +35,4 @@ animate(sim_result, "path_to_animated_particles.gif")
 ```
 
 <img src="https://user-images.githubusercontent.com/16945627/39958539-d2cf779c-561d-11e8-96a8-ffc3a595be8b.gif" alt="Here should appear a gif of rotating bodies" width="350"/>
+
