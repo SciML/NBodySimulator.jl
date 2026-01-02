@@ -4,10 +4,12 @@ version = "1.11.0"
 authors = ["Chris Rackauckas <accounts@chrisrackauckas.com>"]
 
 [deps]
+ArrayInterface = "4fba245c-0d91-5ea0-9b3e-6abc04ee57a9"
 DiffEqBase = "2b5f629d-d688-5b77-993f-72d75c75574e"
 DiffEqCallbacks = "459566f4-90b8-5000-8ac3-15dfb0a30def"
 DocStringExtensions = "ffbed154-4ef7-542d-bbb7-c09d3a79fcae"
 FileIO = "5789e2e9-d7fb-5bc7-8068-2c6fae9b9549"
+JLArrays = "27aeb0d3-9eb9-45fb-866b-73c2ecf80fcb"
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 OrdinaryDiffEq = "1dea7af3-3e70-54e6-95c3-0bf5283fa5ed"
 PrecompileTools = "aea7be01-6a6a-4083-8856-8a6e6704d82a"
@@ -19,10 +21,12 @@ Reexport = "189a3867-3050-52da-a836-e630ba90ab69"
 StaticArrays = "90137ffa-7385-5640-81b9-e52037218182"
 
 [compat]
+ArrayInterface = "7.22.0"
 DiffEqBase = "6.122"
 DiffEqCallbacks = "2.9, 4"
 DocStringExtensions = "0.8, 0.9"
 FileIO = "1.0"
+JLArrays = "0.3.0"
 OrdinaryDiffEq = "5, 6"
 PrecompileTools = "1"
 RecipesBase = "0.7, 0.8, 1.0"

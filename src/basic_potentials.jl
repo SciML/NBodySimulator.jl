@@ -101,7 +101,8 @@ function pairwise_lennard_jones_acceleration!(dv,
         ms::Vector{<:Real},
         p::LennardJonesParameters,
         pbc::BoundaryConditions)
-    force = @SVector [0.0, 0.0, 0.0]
+    T = eltype(rs)
+    force1, force2, force3 = zero(T), zero(T), zero(T)
     ri = @SVector [rs[1, i], rs[2, i], rs[3, i]]
 
     for j in indxs
@@ -112,11 +113,17 @@ function pairwise_lennard_jones_acceleration!(dv,
             if rij_2 < p.R2
                 σ_rij_6 = (p.σ2 / rij_2)^3
                 σ_rij_12 = σ_rij_6^2
-                force += (2 * σ_rij_12 - σ_rij_6) * rij / rij_2
+                factor = (2 * σ_rij_12 - σ_rij_6) / rij_2
+                force1 += factor * rij[1]
+                force2 += factor * rij[2]
+                force3 += factor * rij[3]
             end
         end
     end
-    @. dv += 24 * p.ϵ * force / ms[i]
+    coeff = 24 * p.ϵ / ms[i]
+    dv[1] += coeff * force1
+    dv[2] += coeff * force2
+    dv[3] += coeff * force3
 end
 
 function pairwise_electrostatic_acceleration!(dv,
@@ -128,18 +135,25 @@ function pairwise_electrostatic_acceleration!(dv,
         exclude::Dict{Int, Vector{Int}},
         p::ElectrostaticParameters,
         pbc::BoundaryConditions)
-    force = @SVector [0.0, 0.0, 0.0]
+    T = eltype(rs)
+    force1, force2, force3 = zero(T), zero(T), zero(T)
     ri = @SVector [rs[1, i], rs[2, i], rs[3, i]]
     @inbounds for j in 1:n
         if !in(j, exclude[i])
             rj = @SVector [rs[1, j], rs[2, j], rs[3, j]]
             rij, r, r2 = get_interparticle_distance(ri, rj, pbc)
             if r2 < p.R2
-                force += qs[j] * rij / (r * r2)
+                factor = qs[j] / (r * r2)
+                force1 += factor * rij[1]
+                force2 += factor * rij[2]
+                force3 += factor * rij[3]
             end
         end
     end
-    @. dv += p.k * qs[i] * force / ms[i]
+    coeff = p.k * qs[i] / ms[i]
+    dv[1] += coeff * force1
+    dv[2] += coeff * force2
+    dv[3] += coeff * force3
 end
 
 function gravitational_acceleration!(dv,
@@ -148,17 +162,23 @@ function gravitational_acceleration!(dv,
         n::Integer,
         bodies::Vector{<:MassBody},
         p::GravitationalParameters)
-    accel = @SVector [0.0, 0.0, 0.0]
+    T = eltype(rs)
+    accel1, accel2, accel3 = zero(T), zero(T), zero(T)
     ri = @SVector [rs[1, i], rs[2, i], rs[3, i]]
     @inbounds for j in 1:n
         if j != i
             rj = @SVector [rs[1, j], rs[2, j], rs[3, j]]
             rij = ri - rj
-            accel -= p.G * bodies[j].m * rij / norm(rij)^3
+            factor = -p.G * bodies[j].m / norm(rij)^3
+            accel1 += factor * rij[1]
+            accel2 += factor * rij[2]
+            accel3 += factor * rij[3]
         end
     end
 
-    @. dv += accel
+    dv[1] += accel1
+    dv[2] += accel2
+    dv[3] += accel3
 end
 
 function magnetostatic_dipdip_acceleration!(dv,
@@ -167,7 +187,8 @@ function magnetostatic_dipdip_acceleration!(dv,
         n::Integer,
         bodies::Vector{<:MagneticParticle},
         p::MagnetostaticParameters)
-    force = @SVector [0.0, 0.0, 0.0]
+    T = eltype(rs)
+    force1, force2, force3 = zero(T), zero(T), zero(T)
     mi = bodies[i].mm
     ri = @SVector [rs[1, i], rs[2, i], rs[3, i]]
     @inbounds for j in 1:n
@@ -179,33 +200,43 @@ function magnetostatic_dipdip_acceleration!(dv,
             r = rij / norm(rij)
             mir = dot(mi, r)
             mij = dot(mj, r)
-            force += (mi * mij + mj * mir + r * dot(mi, mj) - 5 * r * mir * mij) / rij4
+            contrib = (mi * mij + mj * mir + r * dot(mi, mj) - 5 * r * mir * mij) / rij4
+            force1 += contrib[1]
+            force2 += contrib[2]
+            force3 += contrib[3]
         end
     end
 
-    @. dv += 3 * p.μ_4π * force / bodies[i].m
+    coeff = 3 * p.μ_4π / bodies[i].m
+    dv[1] += coeff * force1
+    dv[2] += coeff * force2
+    dv[3] += coeff * force3
 end
 
 function harmonic_bond_potential_acceleration!(dv,
         rs,
         i::Integer,
         ms::Vector{<:Real},
-        neighbouhoods::Dict{Int,
-            Vector{
-                Tuple{Int, Float64
-            }}},
+        neighbouhoods,
         p::SPCFwParameters)
-    force = @SVector [0.0, 0.0, 0.0]
+    T = eltype(rs)
+    force1, force2, force3 = zero(T), zero(T), zero(T)
     ri = @SVector [rs[1, i], rs[2, i], rs[3, i]]
     @inbounds for (j, k) in neighbouhoods[i]
         rj = @SVector [rs[1, j], rs[2, j], rs[3, j]]
         rij = ri - rj
         r = norm(rij)
         d = r - p.rOH
-        force -= d * k * rij / r
+        factor = -d * k / r
+        force1 += factor * rij[1]
+        force2 += factor * rij[2]
+        force3 += factor * rij[3]
     end
 
-    @. dv += force / ms[i]
+    coeff = one(T) / ms[i]
+    dv[1] += coeff * force1
+    dv[2] += coeff * force2
+    dv[3] += coeff * force3
 end
 
 function valence_angle_potential_acceleration!(dv,
