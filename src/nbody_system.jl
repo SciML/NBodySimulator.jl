@@ -51,7 +51,7 @@ function PotentialNBodySystem(bodies::Vector{<:Body}; potentials::Vector{Symbol}
         parameters[:magnetostatic] = MagnetostaticParameters()
     end
 
-    PotentialNBodySystem(bodies, parameters)
+    return PotentialNBodySystem(bodies, parameters)
 end
 
 function Base.show(stream::IO, s::PotentialNBodySystem)
@@ -63,6 +63,7 @@ function Base.show(stream::IO, s::PotentialNBodySystem)
             show(stream, s.potentials[potential])
         end
     end
+    return
 end
 
 function PotentialNBodySystem(system::PotentialNBodySystem)
@@ -72,13 +73,13 @@ end
 function PotentialNBodySystem(system::ChargedParticles)
     pp = ElectrostaticParameters(system.k)
     potential = Dict{Symbol, PotentialParameters}(:electrostatic => pp)
-    PotentialNBodySystem(system.bodies, potential)
+    return PotentialNBodySystem(system.bodies, potential)
 end
 
 function PotentialNBodySystem(system::GravitationalSystem)
     pp = GravitationalParameters(system.G)
     potential = Dict{Symbol, PotentialParameters}(:gravitational => pp)
-    PotentialNBodySystem(system.bodies, potential)
+    return PotentialNBodySystem(system.bodies, potential)
 end
 
 struct WaterSPCFw{bType <: Body, pType <: Real} <: NBodySystem

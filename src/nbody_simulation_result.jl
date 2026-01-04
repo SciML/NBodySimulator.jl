@@ -16,7 +16,7 @@ function Base.show(stream::IO, sr::SimulationResult)
     show(stream, sr.solution.stats.naccept)
     println(stream)
     print(stream, "t: ", minimum(sr.solution.t), ", ", maximum(sr.solution.t))
-    println(stream)
+    return println(stream)
 end
 
 (sr::SimulationResult)(args...; kwargs...) = return sr.solution(args...; kwargs...)
@@ -26,13 +26,13 @@ end
 
 function Base.iterate(sr::SimulationResult, state = 1)
     state > length(sr.solution.t) && return nothing
-    (sr, sr.solution.t[state]), state + 1
+    return (sr, sr.solution.t[state]), state + 1
 end
 
 function get_velocity(sr::SimulationResult, time::Real, i::Integer = 0)
     n = get_coordinate_vector_count(sr.simulation.system)
 
-    if sr.solution[1] isa RecursiveArrayTools.ArrayPartition
+    return if sr.solution[1] isa RecursiveArrayTools.ArrayPartition
         velocities = sr(time).x[1]
         if i <= 0
             return velocities[:, 1:n]
@@ -104,14 +104,14 @@ function get_degrees_of_freedom(system::NBodySystem)
     n = length(system.bodies)
     nc = 0
     ndf = 3 * n - nc
-    (n, nc, ndf)
+    return (n, nc, ndf)
 end
 
 function get_degrees_of_freedom(system::WaterSPCFw)
     n = 3 * length(system.bodies)
     nc = 2 * length(system.bodies)
     ndf = 3 * n - nc
-    (n, nc, ndf)
+    return (n, nc, ndf)
 end
 
 function temperature(result::SimulationResult, time::Real)
@@ -140,18 +140,24 @@ function potential_energy(coordinates, simulation::NBodySimulation)
     if :lennard_jones ∈ keys(system.potentials)
         p = system.potentials[:lennard_jones]
         (ms, indxs) = obtain_data_for_lennard_jones_interaction(system)
-        e_potential += lennard_jones_potential(p, indxs, coordinates,
-            simulation.boundary_conditions)
+        e_potential += lennard_jones_potential(
+            p, indxs, coordinates,
+            simulation.boundary_conditions
+        )
     end
 
     if :electrostatic ∈ keys(system.potentials)
         p = system.potentials[:electrostatic]
-        (qs, ms, indxs,
-            exclude) = obtain_data_for_electrostatic_interaction(simulation.system)
-        e_potential += electrostatic_potential(p, indxs, exclude, qs, coordinates,
-            simulation.boundary_conditions)
+        (
+            qs, ms, indxs,
+            exclude,
+        ) = obtain_data_for_electrostatic_interaction(simulation.system)
+        e_potential += electrostatic_potential(
+            p, indxs, exclude, qs, coordinates,
+            simulation.boundary_conditions
+        )
     end
-    e_potential
+    return e_potential
 end
 
 function potential_energy(coordinates, simulation::NBodySimulation{<:WaterSPCFw})
@@ -159,13 +165,17 @@ function potential_energy(coordinates, simulation::NBodySimulation{<:WaterSPCFw}
     system = simulation.system
     p = system.lj_parameters
     (ms, indxs) = obtain_data_for_lennard_jones_interaction(system)
-    e_potential += lennard_jones_potential(p, indxs, coordinates,
-        simulation.boundary_conditions)
+    e_potential += lennard_jones_potential(
+        p, indxs, coordinates,
+        simulation.boundary_conditions
+    )
 
     p = system.e_parameters
     (qs, ms, indxs, exclude) = obtain_data_for_electrostatic_interaction(simulation.system)
-    e_potential += electrostatic_potential(p, indxs, exclude, qs, coordinates,
-        simulation.boundary_conditions)
+    e_potential += electrostatic_potential(
+        p, indxs, exclude, qs, coordinates,
+        simulation.boundary_conditions
+    )
 
     p = system.scpfw_parameters
     (ms, neighbouhoods) = obtain_data_for_harmonic_bond_interaction(simulation.system, p)
@@ -174,11 +184,13 @@ function potential_energy(coordinates, simulation::NBodySimulation{<:WaterSPCFw}
     p = system.scpfw_parameters
     (ms, bonds) = obtain_data_for_valence_angle_harmonic_interaction(simulation.system)
     e_potential += valence_angle_harmonic_potential(coordinates, bonds)
-    e_potential
+    return e_potential
 end
 
-function lennard_jones_potential(p::LennardJonesParameters, indxs::Vector{<:Integer},
-        coordinates, pbc::BoundaryConditions)
+function lennard_jones_potential(
+        p::LennardJonesParameters, indxs::Vector{<:Integer},
+        coordinates, pbc::BoundaryConditions
+    )
     e_lj = 0
     n = length(indxs)
     @inbounds for ind_i in 1:n
@@ -203,9 +215,11 @@ function lennard_jones_potential(p::LennardJonesParameters, indxs::Vector{<:Inte
     return 4 * p.ϵ * e_lj
 end
 
-function electrostatic_potential(p::ElectrostaticParameters, indxs::Vector{<:Integer},
+function electrostatic_potential(
+        p::ElectrostaticParameters, indxs::Vector{<:Integer},
         exclude::Dict{Int, Vector{Int}}, qs, rs,
-        pbc::BoundaryConditions)
+        pbc::BoundaryConditions
+    )
     e_el = 0.0
 
     n = length(indxs)
@@ -233,10 +247,12 @@ function electrostatic_potential(p::ElectrostaticParameters, indxs::Vector{<:Int
     return e_el * p.k
 end
 
-function harmonic_bonds_potential(p::SPCFwParameters,
+function harmonic_bonds_potential(
+        p::SPCFwParameters,
         rs,
         ms::Vector{<:Real},
-        neighborhoods::Dict{Int, Vector{Tuple{Int, Float64}}})
+        neighborhoods::Dict{Int, Vector{Tuple{Int, Float64}}}
+    )
     e_harmonic = 0
 
     @inbounds for (i, neighborhood) in neighborhoods
@@ -252,10 +268,15 @@ function harmonic_bonds_potential(p::SPCFwParameters,
     return e_harmonic / 4
 end
 
-function valence_angle_harmonic_potential(rs,
+function valence_angle_harmonic_potential(
+        rs,
         bonds::Vector{
-            Tuple{Int, Int, Int, Float64,
-            Float64}})
+            Tuple{
+                Int, Int, Int, Float64,
+                Float64,
+            },
+        }
+    )
     e_valence = 0
 
     for (a, b, c, valence_angle, k) in bonds
@@ -281,7 +302,7 @@ end
 function total_energy(sr::SimulationResult, time::Real)
     e_kin = kinetic_energy(sr, time)
     e_pot = potential_energy(sr, time)
-    e_kin + e_pot
+    return e_kin + e_pot
 end
 
 function initial_energy(simulation::NBodySimulation)
@@ -294,7 +315,7 @@ end
 Run the N-body simulation.
 """
 function run_simulation(s::NBodySimulation, args...; kwargs...)
-    if s.thermostat isa LangevinThermostat
+    return if s.thermostat isa LangevinThermostat
         calculate_simulation_sde(s, args...; kwargs...)
     else
         calculate_simulation(s, args...; kwargs...)
@@ -307,12 +328,16 @@ function calculate_simulation(s::NBodySimulation, alg_type = Tsit5(), args...; k
 end
 
 # this should be a method for integrators designed for the SecondOrderODEProblem (It is worth somehow to sort them from other algorithms)
-function calculate_simulation(s::NBodySimulation,
+function calculate_simulation(
+        s::NBodySimulation,
         alg_type::Union{VelocityVerlet, DPRKN6, Yoshida6}, args...;
-        kwargs...)
+        kwargs...
+    )
     cb = obtain_callbacks_for_so_ode_problem(s)
-    solution = solve(SecondOrderODEProblem(s), alg_type, args...; callback = cb,
-        save_everystep = isempty(cb), kwargs...)
+    solution = solve(
+        SecondOrderODEProblem(s), alg_type, args...; callback = cb,
+        save_everystep = isempty(cb), kwargs...
+    )
     return SimulationResult(solution, s)
 end
 
@@ -336,7 +361,7 @@ function get_andersen_thermostating_callback(s::NBodySimulation)
     n = length(s.system.bodies)
 
     condition = function (u, t, integrator)
-        true
+        return true
     end
     affect! = function (integrator)
         collision_prob = p.ν * (integrator.t - integrator.tprev)
@@ -345,27 +370,34 @@ function get_andersen_thermostating_callback(s::NBodySimulation)
                 apply_andersen_rescaling_velocity(integrator, i, s.kb, s.system, p)
             end
         end
+        return
     end
-    cb = DiscreteCallback(condition, affect!, save_positions = (false, true))
+    return cb = DiscreteCallback(condition, affect!, save_positions = (false, true))
 end
 
-function apply_andersen_rescaling_velocity(integrator, i, kb, system::PotentialNBodySystem,
-        p::AndersenThermostat)
+function apply_andersen_rescaling_velocity(
+        integrator, i, kb, system::PotentialNBodySystem,
+        p::AndersenThermostat
+    )
     v_dev = sqrt(kb * p.T / system.bodies[1].m)
-    @. integrator.u.x[1][:, i] = v_dev * randn()
+    return @. integrator.u.x[1][:, i] = v_dev * randn()
 end
 
-function apply_andersen_rescaling_velocity(integrator, i, kb, system::WaterSPCFw,
-        p::AndersenThermostat)
+function apply_andersen_rescaling_velocity(
+        integrator, i, kb, system::WaterSPCFw,
+        p::AndersenThermostat
+    )
     vO = sqrt(kb * p.T / system.mO)
     vH = sqrt(kb * p.T / system.mH)
     @. integrator.u.x[1][:, 3 * (i - 1) + 1] = vO * randn()
     @. integrator.u.x[1][:, 3 * (i - 1) + 2] = vH * randn()
-    @. integrator.u.x[1][:, 3 * (i - 1) + 3] = vH * randn()
+    return @. integrator.u.x[1][:, 3 * (i - 1) + 3] = vH * randn()
 end
 
-@recipe function generate_data_for_scatter(sr::SimulationResult{<:PotentialNBodySystem},
-        time::Real = 0.0)
+@recipe function generate_data_for_scatter(
+        sr::SimulationResult{<:PotentialNBodySystem},
+        time::Real = 0.0
+    )
     solution = sr.solution
     n = length(sr.simulation.system.bodies)
 
@@ -403,7 +435,7 @@ end
         @series begin
             label --> "Body no. $i"
 
-            if all(positions[3, :] .- positions[3, 1] .< 1e-15)
+            if all(positions[3, :] .- positions[3, 1] .< 1.0e-15)
                 ([positions[1, i]], [positions[2, i]])
             else
                 (positions[1, :], positions[2, :], positions[3, :])
@@ -535,7 +567,7 @@ function msd(sr::SimulationResult{<:PotentialNBodySystem})
         dr2[t] /= indlen
     end
 
-    (ts, dr2)
+    return (ts, dr2)
 end
 
 function msd(sr::SimulationResult{<:WaterSPCFw})
@@ -554,20 +586,22 @@ function msd(sr::SimulationResult{<:WaterSPCFw})
         cc = get_position(sr, ts[t])
         for i in 1:n
             indO, indH1, indH2 = 3 * (i - 1) + 1, 3 * (i - 1) + 2, 3 * (i - 1) + 3
-            dr = ((cc[:, indO] - cc0[:, indO]) * mO + (cc[:, indH1] - cc0[:, indH1]) * mH +
-                  (cc[:, indH2] - cc0[:, indH2]) * mH) / (2 * mH + mO)
+            dr = (
+                (cc[:, indO] - cc0[:, indO]) * mO + (cc[:, indH1] - cc0[:, indH1]) * mH +
+                    (cc[:, indH2] - cc0[:, indH2]) * mH
+            ) / (2 * mH + mO)
 
             dr2[t] += dot(dr, dr)
         end
         dr2[t] /= n
     end
 
-    (ts, dr2)
+    return (ts, dr2)
 end
 
 # coordinates should be in angstroms
 function save(f::File{format"ProteinDataBank"}, sr::SimulationResult)
-    open(f, "w") do s
+    return open(f, "w") do s
         write_pdb_data(s, sr)
     end
 end
@@ -596,24 +630,31 @@ function write_pdb_data(f::IO, sr::SimulationResult{<:WaterSPCFw})
         for i in 1:n
             indO, indH1, indH2 = 3 * (i - 1) + 1, 3 * (i - 1) + 2, 3 * (i - 1) + 3
 
-            println(f, "HETATM", lpad(indO, 5), "  ", rpad("O", 4), "HOH", lpad(i, 6),
+            println(
+                f, "HETATM", lpad(indO, 5), "  ", rpad("O", 4), "HOH", lpad(i, 6),
                 "    ", lpad(@sprintf("%8.3f", cc[1, indO]), 8),
                 lpad(@sprintf("%8.3f", cc[2, indO]), 8),
                 lpad(@sprintf("%8.3f", cc[3, indO]), 8), lpad("1.00", 6),
-                lpad("0.00", 6), lpad("", 10), lpad("O", 2))
-            println(f, "HETATM", lpad(indH1, 5), "  ", rpad("H1", 4), "HOH", lpad(i, 6),
+                lpad("0.00", 6), lpad("", 10), lpad("O", 2)
+            )
+            println(
+                f, "HETATM", lpad(indH1, 5), "  ", rpad("H1", 4), "HOH", lpad(i, 6),
                 "    ", lpad(@sprintf("%8.3f", cc[1, indH1]), 8),
                 lpad(@sprintf("%8.3f", cc[2, indH1]), 8),
                 lpad(@sprintf("%8.3f", cc[3, indH1]), 8), lpad("1.00", 6),
-                lpad("0.00", 6), lpad("", 10), lpad("H", 2))
-            println(f, "HETATM", lpad(indH2, 5), "  ", rpad("H2", 4), "HOH", lpad(i, 6),
+                lpad("0.00", 6), lpad("", 10), lpad("H", 2)
+            )
+            println(
+                f, "HETATM", lpad(indH2, 5), "  ", rpad("H2", 4), "HOH", lpad(i, 6),
                 "    ", lpad(@sprintf("%8.3f", cc[1, indH2]), 8),
                 lpad(@sprintf("%8.3f", cc[2, indH2]), 8),
                 lpad(@sprintf("%8.3f", cc[3, indH2]), 8), lpad("1.00", 6),
-                lpad("0.00", 6), lpad("", 10), lpad("H", 2))
+                lpad("0.00", 6), lpad("", 10), lpad("H", 2)
+            )
         end
         println(f, "ENDMDL")
     end
+    return
 end
 
 function write_pdb_data(f::IO, sr::SimulationResult)
@@ -627,24 +668,27 @@ function write_pdb_data(f::IO, sr::SimulationResult)
         println(f, rpad("MODEL", 10), count)
         println(f, "REMARK 250 time=$t steps")
         for i in 1:n
-            println(f, "HETATM", lpad(i, 5), "  ", rpad("Ar", 4), "Ar", lpad(i, 6), "    ",
+            println(
+                f, "HETATM", lpad(i, 5), "  ", rpad("Ar", 4), "Ar", lpad(i, 6), "    ",
                 lpad(@sprintf("%8.3f", cc[1, i]), 8),
                 lpad(@sprintf("%8.3f", cc[2, i]), 8),
                 lpad(@sprintf("%8.3f", cc[3, i]), 8), lpad("1.00", 6), lpad("0.00", 6),
-                lpad("", 10), lpad("Ar", 2))
+                lpad("", 10), lpad("Ar", 2)
+            )
         end
         println(f, "ENDMDL")
     end
+    return
 end
 
 function save_to_pdb(sr::SimulationResult, f)
-    open(f, "w") do s
+    return open(f, "w") do s
         write_pdb_data(s, sr)
     end
 end
 
 function load(f::File{format"ProteinDataBank"})
-    open(f) do s
+    return open(f) do s
         skipmagic(s)  # skip over the magic bytes
         extract_from_pdb(s)
     end
@@ -653,7 +697,7 @@ end
 Molecules for the SPC/Fw water model can be imported from a PDB file.
 """
 function load_water_molecules_from_pdb(path_str)
-    open(path_str) do file
+    return open(path_str) do file
         extract_from_pdb(file)
     end
 end
@@ -679,14 +723,20 @@ function extract_from_pdb(file)
             break
         elseif ln_cc[14] == 'O'
             ps_o = split(ln_cc)
-            cc_o = SVector(parse(Float64, ps_o[6]), parse(Float64, ps_o[7]),
-                parse(Float64, ps_o[8])) / den
+            cc_o = SVector(
+                parse(Float64, ps_o[6]), parse(Float64, ps_o[7]),
+                parse(Float64, ps_o[8])
+            ) / den
             ps_h1 = split(readline(file))
-            cc_h1 = SVector(parse(Float64, ps_h1[6]), parse(Float64, ps_h1[7]),
-                parse(Float64, ps_h1[8])) / den
+            cc_h1 = SVector(
+                parse(Float64, ps_h1[6]), parse(Float64, ps_h1[7]),
+                parse(Float64, ps_h1[8])
+            ) / den
             ps_h2 = split(readline(file))
-            cc_h2 = SVector(parse(Float64, ps_h2[6]), parse(Float64, ps_h2[7]),
-                parse(Float64, ps_h2[8])) / den
+            cc_h2 = SVector(
+                parse(Float64, ps_h2[6]), parse(Float64, ps_h2[7]),
+                parse(Float64, ps_h2[8])
+            ) / den
             push!(cc, cc_o)
             push!(cc, cc_h1)
             push!(cc, cc_h2)
@@ -713,14 +763,20 @@ function extract_from_pdb(file)
         elseif ln_cc[14] == 'O'
             mc += 1
             ps_o = split(ln_cc)
-            cc_o = SVector(parse(Float64, ps_o[6]), parse(Float64, ps_o[7]),
-                parse(Float64, ps_o[8])) / den
+            cc_o = SVector(
+                parse(Float64, ps_o[6]), parse(Float64, ps_o[7]),
+                parse(Float64, ps_o[8])
+            ) / den
             ps_h1 = split(readline(file))
-            cc_h1 = SVector(parse(Float64, ps_h1[6]), parse(Float64, ps_h1[7]),
-                parse(Float64, ps_h1[8])) / den
+            cc_h1 = SVector(
+                parse(Float64, ps_h1[6]), parse(Float64, ps_h1[7]),
+                parse(Float64, ps_h1[8])
+            ) / den
             ps_h2 = split(readline(file))
-            cc_h2 = SVector(parse(Float64, ps_h2[6]), parse(Float64, ps_h2[7]),
-                parse(Float64, ps_h2[8])) / den
+            cc_h2 = SVector(
+                parse(Float64, ps_h2[6]), parse(Float64, ps_h2[7]),
+                parse(Float64, ps_h2[8])
+            ) / den
 
             o = MassBody(cc[3 * (mc - 1) + 1], (cc_o - cc[3 * (mc - 1) + 1]) / τ, 15.999)
             h1 = MassBody(cc[3 * (mc - 1) + 2], (cc_h1 - cc[3 * (mc - 1) + 2]) / τ, 1.00794)
@@ -734,5 +790,5 @@ function extract_from_pdb(file)
         end
     end
 
-    wms
+    return wms
 end

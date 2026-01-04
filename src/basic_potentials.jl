@@ -12,11 +12,11 @@ struct LennardJonesParameters{pType <: Real} <: PotentialParameters
 end
 
 function LennardJonesParameters(ϵ::Real, σ::Real, R::Real)
-    LennardJonesParameters(ϵ, σ, R, σ^2, R^2)
+    return LennardJonesParameters(ϵ, σ, R, σ^2, R^2)
 end
 
 function LennardJonesParameters()
-    LennardJonesParameters(1.0, 1.0, 2.5)
+    return LennardJonesParameters(1.0, 1.0, 2.5)
 end
 
 function Base.show(stream::IO, pp::LennardJonesParameters)
@@ -29,7 +29,7 @@ function Base.show(stream::IO, pp::LennardJonesParameters)
     println(stream)
     print(stream, "\tR:")
     show(stream, pp.R)
-    println(stream)
+    return println(stream)
 end
 
 struct GravitationalParameters{gType <: Real} <: PotentialParameters
@@ -37,14 +37,14 @@ struct GravitationalParameters{gType <: Real} <: PotentialParameters
 end
 
 function GravitationalParameters()
-    GravitationalParameters(6.67408e-11)
+    return GravitationalParameters(6.67408e-11)
 end
 
 function Base.show(stream::IO, pp::GravitationalParameters)
     println(stream, "Gravitational:")
     print(stream, "\tG:")
     show(stream, pp.G)
-    println(stream)
+    return println(stream)
 end
 
 struct ElectrostaticParameters{pType <: Real} <: PotentialParameters
@@ -54,22 +54,22 @@ struct ElectrostaticParameters{pType <: Real} <: PotentialParameters
 end
 
 function ElectrostaticParameters()
-    ElectrostaticParameters(9e9, Inf, Inf)
+    return ElectrostaticParameters(9.0e9, Inf, Inf)
 end
 
 function ElectrostaticParameters(k::Real)
-    ElectrostaticParameters(k, Inf, Inf)
+    return ElectrostaticParameters(k, Inf, Inf)
 end
 
 function ElectrostaticParameters(k::Real, R::Real)
-    ElectrostaticParameters(k, R, R^2)
+    return ElectrostaticParameters(k, R, R^2)
 end
 
 function Base.show(stream::IO, pp::ElectrostaticParameters)
     println(stream, "Electrostatic:")
     print(stream, "\tk:")
     show(stream, pp.k)
-    println(stream)
+    return println(stream)
 end
 
 struct MagnetostaticParameters{mType <: Real} <: PotentialParameters
@@ -77,14 +77,14 @@ struct MagnetostaticParameters{mType <: Real} <: PotentialParameters
 end
 
 function MagnetostaticParameters()
-    MagnetostaticParameters(1e-7)
+    return MagnetostaticParameters(1.0e-7)
 end
 
 function Base.show(stream::IO, pp::MagnetostaticParameters)
     println(stream, "Magnetostatic:")
     print(stream, "\tμ/4π:")
     show(stream, pp.μ_4π)
-    println(stream)
+    return println(stream)
 end
 
 struct SPCFwParameters{pType <: Real} <: PotentialParameters
@@ -94,13 +94,15 @@ struct SPCFwParameters{pType <: Real} <: PotentialParameters
     ka::pType
 end
 
-function pairwise_lennard_jones_acceleration!(dv,
+function pairwise_lennard_jones_acceleration!(
+        dv,
         rs,
         i::Integer,
         indxs::Vector{<:Integer},
         ms::Vector{<:Real},
         p::LennardJonesParameters,
-        pbc::BoundaryConditions)
+        pbc::BoundaryConditions
+    )
     T = eltype(rs)
     force1, force2, force3 = zero(T), zero(T), zero(T)
     ri = @SVector [rs[1, i], rs[2, i], rs[3, i]]
@@ -123,10 +125,11 @@ function pairwise_lennard_jones_acceleration!(dv,
     coeff = 24 * p.ϵ / ms[i]
     dv[1] += coeff * force1
     dv[2] += coeff * force2
-    dv[3] += coeff * force3
+    return dv[3] += coeff * force3
 end
 
-function pairwise_electrostatic_acceleration!(dv,
+function pairwise_electrostatic_acceleration!(
+        dv,
         rs,
         i::Integer,
         n::Integer,
@@ -134,7 +137,8 @@ function pairwise_electrostatic_acceleration!(dv,
         ms::Vector{<:Real},
         exclude::Dict{Int, Vector{Int}},
         p::ElectrostaticParameters,
-        pbc::BoundaryConditions)
+        pbc::BoundaryConditions
+    )
     T = eltype(rs)
     force1, force2, force3 = zero(T), zero(T), zero(T)
     ri = @SVector [rs[1, i], rs[2, i], rs[3, i]]
@@ -153,15 +157,17 @@ function pairwise_electrostatic_acceleration!(dv,
     coeff = p.k * qs[i] / ms[i]
     dv[1] += coeff * force1
     dv[2] += coeff * force2
-    dv[3] += coeff * force3
+    return dv[3] += coeff * force3
 end
 
-function gravitational_acceleration!(dv,
+function gravitational_acceleration!(
+        dv,
         rs,
         i::Integer,
         n::Integer,
         bodies::Vector{<:MassBody},
-        p::GravitationalParameters)
+        p::GravitationalParameters
+    )
     T = eltype(rs)
     accel1, accel2, accel3 = zero(T), zero(T), zero(T)
     ri = @SVector [rs[1, i], rs[2, i], rs[3, i]]
@@ -178,15 +184,17 @@ function gravitational_acceleration!(dv,
 
     dv[1] += accel1
     dv[2] += accel2
-    dv[3] += accel3
+    return dv[3] += accel3
 end
 
-function magnetostatic_dipdip_acceleration!(dv,
+function magnetostatic_dipdip_acceleration!(
+        dv,
         rs,
         i::Integer,
         n::Integer,
         bodies::Vector{<:MagneticParticle},
-        p::MagnetostaticParameters)
+        p::MagnetostaticParameters
+    )
     T = eltype(rs)
     force1, force2, force3 = zero(T), zero(T), zero(T)
     mi = bodies[i].mm
@@ -210,15 +218,17 @@ function magnetostatic_dipdip_acceleration!(dv,
     coeff = 3 * p.μ_4π / bodies[i].m
     dv[1] += coeff * force1
     dv[2] += coeff * force2
-    dv[3] += coeff * force3
+    return dv[3] += coeff * force3
 end
 
-function harmonic_bond_potential_acceleration!(dv,
+function harmonic_bond_potential_acceleration!(
+        dv,
         rs,
         i::Integer,
         ms::Vector{<:Real},
         neighbouhoods,
-        p::SPCFwParameters)
+        p::SPCFwParameters
+    )
     T = eltype(rs)
     force1, force2, force3 = zero(T), zero(T), zero(T)
     ri = @SVector [rs[1, i], rs[2, i], rs[3, i]]
@@ -236,16 +246,18 @@ function harmonic_bond_potential_acceleration!(dv,
     coeff = one(T) / ms[i]
     dv[1] += coeff * force1
     dv[2] += coeff * force2
-    dv[3] += coeff * force3
+    return dv[3] += coeff * force3
 end
 
-function valence_angle_potential_acceleration!(dv,
+function valence_angle_potential_acceleration!(
+        dv,
         rs,
         a::Integer,
         b::Integer,
         c::Integer,
         ms::Vector{<:Real},
-        p::SPCFwParameters)
+        p::SPCFwParameters
+    )
     ra = @SVector [rs[1, a], rs[2, a], rs[3, a]]
     rb = @SVector [rs[1, b], rs[2, b], rs[3, b]]
     rc = @SVector [rs[1, c], rs[2, c], rs[3, c]]
@@ -274,5 +286,5 @@ function valence_angle_potential_acceleration!(dv,
 
     @. dv[:, a] += force_a / ms[a]
     @. dv[:, b] += force_b / ms[b]
-    @. dv[:, c] += force_c / ms[c]
+    return @. dv[:, c] += force_c / ms[c]
 end

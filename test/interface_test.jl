@@ -3,10 +3,14 @@ using Test, NBodySimulator, StaticArrays, OrdinaryDiffEq
 @testset "Interface Compatibility" begin
     @testset "BigFloat support" begin
         # Create bodies with BigFloat coordinates
-        body1 = MassBody(SVector(big"1.0", big"0.0", big"0.0"),
-            SVector(big"0.0", big"0.5", big"0.0"), big"1.0")
-        body2 = MassBody(SVector(big"-1.0", big"0.0", big"0.0"),
-            SVector(big"0.0", big"-0.5", big"0.0"), big"1.0")
+        body1 = MassBody(
+            SVector(big"1.0", big"0.0", big"0.0"),
+            SVector(big"0.0", big"0.5", big"0.0"), big"1.0"
+        )
+        body2 = MassBody(
+            SVector(big"-1.0", big"0.0", big"0.0"),
+            SVector(big"0.0", big"-0.5", big"0.0"), big"1.0"
+        )
 
         @test eltype(body1.r) == BigFloat
         @test eltype(body1.v) == BigFloat
@@ -17,8 +21,10 @@ using Test, NBodySimulator, StaticArrays, OrdinaryDiffEq
         @test typeof(system.G) == BigFloat
 
         # Create simulation with BigFloat time span and kb
-        simulation = NBodySimulation(system, (big"0.0", big"1.0"), InfiniteBox(),
-            big"1.38e-23")
+        simulation = NBodySimulation(
+            system, (big"0.0", big"1.0"), InfiniteBox(),
+            big"1.38e-23"
+        )
         @test typeof(simulation.tspan[1]) == BigFloat
 
         # Create ODE problem and verify element types are preserved
@@ -32,10 +38,14 @@ using Test, NBodySimulator, StaticArrays, OrdinaryDiffEq
 
     @testset "Float32 support" begin
         # Create bodies with Float32 coordinates
-        body1 = MassBody(SVector(1.0f0, 0.0f0, 0.0f0),
-            SVector(0.0f0, 0.5f0, 0.0f0), 1.0f0)
-        body2 = MassBody(SVector(-1.0f0, 0.0f0, 0.0f0),
-            SVector(0.0f0, -0.5f0, 0.0f0), 1.0f0)
+        body1 = MassBody(
+            SVector(1.0f0, 0.0f0, 0.0f0),
+            SVector(0.0f0, 0.5f0, 0.0f0), 1.0f0
+        )
+        body2 = MassBody(
+            SVector(-1.0f0, 0.0f0, 0.0f0),
+            SVector(0.0f0, -0.5f0, 0.0f0), 1.0f0
+        )
 
         @test eltype(body1.r) == Float32
         @test eltype(body1.v) == Float32
@@ -59,17 +69,23 @@ using Test, NBodySimulator, StaticArrays, OrdinaryDiffEq
 
     @testset "Lennard-Jones BigFloat support" begin
         # Test that Lennard-Jones potential also works with BigFloat
-        body1 = MassBody(SVector(big"0.0", big"0.0", big"0.0"),
-            SVector(big"0.0", big"0.0", big"0.0"), big"1.0")
-        body2 = MassBody(SVector(big"2.0", big"0.0", big"0.0"),
-            SVector(big"0.0", big"0.0", big"0.0"), big"1.0")
+        body1 = MassBody(
+            SVector(big"0.0", big"0.0", big"0.0"),
+            SVector(big"0.0", big"0.0", big"0.0"), big"1.0"
+        )
+        body2 = MassBody(
+            SVector(big"2.0", big"0.0", big"0.0"),
+            SVector(big"0.0", big"0.0", big"0.0"), big"1.0"
+        )
 
         lj = LennardJonesParameters(big"1.0", big"1.0", big"2.5")
         potentials = Dict{Symbol, PotentialParameters}(:lennard_jones => lj)
         system = PotentialNBodySystem([body1, body2], potentials)
 
-        simulation = NBodySimulation(system, (big"0.0", big"0.1"), InfiniteBox(),
-            big"1.38e-23")
+        simulation = NBodySimulation(
+            system, (big"0.0", big"0.1"), InfiniteBox(),
+            big"1.38e-23"
+        )
         prob = SecondOrderODEProblem(simulation)
 
         @test eltype(prob.u0) == BigFloat

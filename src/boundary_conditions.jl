@@ -8,12 +8,12 @@ PeriodicBoundaryConditions(L::Real) = PeriodicBoundaryConditions(SVector(0, L, 0
 
 function Base.iterate(pbc::PeriodicBoundaryConditions, state = 1)
     state > length(pbc.boundary) && return nothing
-    pbc.boundary[state], state + 1
+    return pbc.boundary[state], state + 1
 end
 
 function Base.getindex(pbc::PeriodicBoundaryConditions, i::Integer)
     1 <= i <= length(pbc.boundary) || throw(BoundsError(pbc, i))
-    pbc.boundary[i]
+    return pbc.boundary[i]
 end
 
 struct InfiniteBox{cType <: Real} <: BoundaryConditions
@@ -86,5 +86,5 @@ function get_interparticle_distance(ri, rj, ::BoundaryConditions)
     rij = ri - rj
     r2 = rij[1]^2 + rij[2]^2 + rij[3]^2
     r = sqrt(r2)
-    (rij, r, r2)
+    return (rij, r, r2)
 end

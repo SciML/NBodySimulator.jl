@@ -1,12 +1,12 @@
 @testset "Electrostatics Functional Tests" begin
-    k = 9e9
+    k = 9.0e9
 
     @testset "One particle rotates around another" begin
         # small mass with negative charge rotating around more massive object with positive charge
 
         r = 100.0
-        q1 = 1e-3
-        q2 = -1e-3
+        q1 = 1.0e-3
+        q2 = -1.0e-3
         m1 = 100.0
         m2 = 0.1
         v2 = sqrt(abs(k * q1 * q2 / m2 / r))
@@ -21,13 +21,15 @@
         ε = 0.1 * r
         for j in 1:2, i in 1:3
 
-            @test solution[1][i, j]≈solution[end][i, j] atol=ε
+            @test solution[1][i, j] ≈ solution[end][i, j] atol = ε
         end
 
-        (qs_act,
+        (
+            qs_act,
             ms_act,
             indxs_act,
-            exclude_act) = NBodySimulator.obtain_data_for_electrostatic_interaction(simulation.system)
+            exclude_act,
+        ) = NBodySimulator.obtain_data_for_electrostatic_interaction(simulation.system)
         @test qs_act[1] == q1 && qs_act[2] == q2
         @test ms_act[1] == m1 && ms_act[2] == m2
         @test length(qs_act) == length(ms_act)
@@ -36,8 +38,8 @@
     @testset "Two positive charges repelling from each other" begin
         #   ("               <---⊕-----r1-----⊕--->                ")
 
-        q1 = 1e-3 # C
-        q2 = 1e-3 # C
+        q1 = 1.0e-3 # C
+        q2 = 1.0e-3 # C
         m1 = 1.0 # kg
         m2 = 1.0 # kg
         r1 = 1 # m
@@ -58,12 +60,12 @@
         v_actual = norm(get_velocity(sim_result, t2, 2))
 
         ε = 0.001 * v_expected
-        @test v_expected≈v_actual atol=ε
+        @test v_expected ≈ v_actual atol = ε
     end
 
     @testset "Constructing electorstatic potential parameters entity" begin
         default_potential_1 = ElectrostaticParameters()
-        @test 9e9 == default_potential_1.k
+        @test 9.0e9 == default_potential_1.k
 
         default_potential_2 = ElectrostaticParameters(k, 8.0)
         @test 64.0 == default_potential_2.R2
@@ -94,7 +96,7 @@
             count += 1
         end
 
-        k = 9e9
+        k = 9.0e9
         τ = 0.01 * dL / sqrt(2 * k * q * q / (dL * m))
         t1 = 0.0
         t2 = 1000 * τ
@@ -109,6 +111,6 @@
         e_tot_2 = total_energy(result, t2)
 
         ε = 0.001
-        @test (e_tot_2 - e_tot_1) / e_tot_1≈0.0 atol=ε
+        @test (e_tot_2 - e_tot_1) / e_tot_1 ≈ 0.0 atol = ε
     end
 end
