@@ -3,5 +3,5 @@
 pages = [
     "Home" => "index.md",
     "examples.md",
-    "nbodysimulator.md"
+    "nbodysimulator.md",
 ]
