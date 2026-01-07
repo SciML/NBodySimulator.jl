@@ -18,10 +18,11 @@
         sim_result = run_simulation(simulation)
 
         solution = sim_result.solution
+        # Test that positions return to initial values after one orbit
+        # SecondOrderODEProblem stores positions in .x[2] of the ArrayPartition
         ε = 0.1 * r
         for j in 1:2, i in 1:3
-
-            @test solution[1][i, j] ≈ solution[end][i, j] atol = ε
+            @test solution.u[1].x[2][i, j] ≈ solution.u[end].x[2][i, j] atol = ε
         end
 
         (
