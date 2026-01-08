@@ -32,7 +32,7 @@ end
 function get_velocity(sr::SimulationResult, time::Real, i::Integer = 0)
     n = get_coordinate_vector_count(sr.simulation.system)
 
-    return if sr.solution[1] isa RecursiveArrayTools.ArrayPartition
+    return if sr.solution.u[1] isa RecursiveArrayTools.ArrayPartition
         velocities = sr(time).x[1]
         if i <= 0
             return velocities[:, 1:n]
@@ -54,7 +54,7 @@ function get_velocity(sr::SimulationResult, time::Real, i::Integer = 0)
 end
 
 function get_position(sr::SimulationResult, time::Real, i::Integer = 0)
-    if sr.solution[1] isa RecursiveArrayTools.ArrayPartition
+    if sr.solution.u[1] isa RecursiveArrayTools.ArrayPartition
         positions = sr(time).x[2]
     else
         positions = sr(time)
@@ -322,17 +322,11 @@ function run_simulation(s::NBodySimulation, args...; kwargs...)
     end
 end
 
+# Use SecondOrderODEProblem for all algorithms since N-body simulations are
+# second-order ODEs. This allows any algorithm compatible with SecondOrderODEProblem
+# (including Tsit5, DPRKN6, VelocityVerlet, Yoshida6, etc.) to be used.
+# See https://github.com/SciML/NBodySimulator.jl/issues/26
 function calculate_simulation(s::NBodySimulation, alg_type = Tsit5(), args...; kwargs...)
-    solution = solve(ODEProblem(s), alg_type, args...; kwargs...)
-    return SimulationResult(solution, s)
-end
-
-# this should be a method for integrators designed for the SecondOrderODEProblem (It is worth somehow to sort them from other algorithms)
-function calculate_simulation(
-        s::NBodySimulation,
-        alg_type::Union{VelocityVerlet, DPRKN6, Yoshida6}, args...;
-        kwargs...
-    )
     cb = obtain_callbacks_for_so_ode_problem(s)
     solution = solve(
         SecondOrderODEProblem(s), alg_type, args...; callback = cb,

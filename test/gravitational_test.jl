@@ -13,10 +13,11 @@ using OrdinaryDiffEq
         simulation = NBodySimulation(system, tspan)
         sim_result = run_simulation(simulation)
         solution_simo_3 = sim_result.solution
+        # Test that positions return to initial values after one period (choreography)
+        # SecondOrderODEProblem stores positions in .x[2] of the ArrayPartition
         ε = 0.1
         for j in 1:3, i in 1:3
-
-            @test solution_simo_3[1][i, j] ≈ solution_simo_3[end][i, j] atol = ε
+            @test solution_simo_3.u[1].x[2][i, j] ≈ solution_simo_3.u[end].x[2][i, j] atol = ε
         end
 
         @testset "Analyzing simulation result" begin
@@ -36,31 +37,31 @@ using OrdinaryDiffEq
             @test e_kin ≈ kinetic_energy(sim_result, t1) atol = ε
         end
 
-        @testset "Using conversion into SecondOrderODEProblem" begin
+        @testset "Using DPRKN6 integrator" begin
             sim_result = run_simulation(simulation, DPRKN6())
             solution_simo_3_2nd = sim_result.solution
+            # Test that positions return to initial values after one period
             ε = 0.001
             for i in 1:3, j in 1:3
-
-                @test solution_simo_3_2nd[1][9 + 3(i - 1) + j] ≈ solution_simo_3_2nd[end][9 + 3(i - 1) + j] atol = ε
+                @test solution_simo_3_2nd.u[1].x[2][i, j] ≈ solution_simo_3_2nd.u[end].x[2][i, j] atol = ε
             end
         end
 
         @testset "Using symplectic integrators" begin
             sim_result = run_simulation(simulation, VelocityVerlet(), dt = pi / 130)
             solution_simo_3_2nd = sim_result.solution
+            # Test that positions return to initial values after one period
             ε = 0.001
             for i in 1:3, j in 1:3
-
-                @test solution_simo_3_2nd[1][9 + 3(i - 1) + j] ≈ solution_simo_3_2nd[end][9 + 3(i - 1) + j] atol = ε
+                @test solution_simo_3_2nd.u[1].x[2][i, j] ≈ solution_simo_3_2nd.u[end].x[2][i, j] atol = ε
             end
 
             sim_result = run_simulation(simulation, Yoshida6(), dt = pi / 12)
             solution_simo_3_2nd = sim_result.solution
+            # Test that positions return to initial values after one period
             ε = 0.001
             for i in 1:3, j in 1:3
-
-                @test solution_simo_3_2nd[1][9 + 3(i - 1) + j] ≈ solution_simo_3_2nd[end][9 + 3(i - 1) + j] atol = ε
+                @test solution_simo_3_2nd.u[1].x[2][i, j] ≈ solution_simo_3_2nd.u[end].x[2][i, j] atol = ε
             end
         end
     end
@@ -89,10 +90,10 @@ using OrdinaryDiffEq
         sim_result = run_simulation(simulation, Tsit5(), abstol = 1.0e-10, reltol = 1.0e-10)
         solution_simo_5 = sim_result.solution
 
+        # Test that positions return to initial values after one period (choreography)
         ε = 0.01
         for j in 1:5, i in 1:3
-
-            @test solution_simo_5[1][i, j] ≈ solution_simo_5[end][i, j] atol = ε
+            @test solution_simo_5.u[1].x[2][i, j] ≈ solution_simo_5.u[end].x[2][i, j] atol = ε
         end
     end
 
