@@ -5,7 +5,7 @@ module NBodySimulator
 
 using DocStringExtensions
 using Reexport
-@reexport using DiffEqBase, OrdinaryDiffEq, RecursiveArrayTools
+@reexport using DiffEqBase, OrdinaryDiffEq, OrdinaryDiffEqSymplecticRK, RecursiveArrayTools
 using StaticArrays, RecipesBase, FileIO
 using Random, Printf, LinearAlgebra
 using PrecompileTools
