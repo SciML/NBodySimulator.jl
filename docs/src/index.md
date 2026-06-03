@@ -76,7 +76,7 @@ g_parameters = GravitationalParameters(G)
 m_parameters = MagnetostaticParameters(μ_4π)
 el_potential = ElectrostaticParameters(k, cutoff_radius)
 jl_parameters = LennardJonesParameters(ϵ, σ, cutoff_radius)
-spc_water_paramters = SPCFwParameters(rOH, ∠HOH, k_bond, k_angle)
+spc_water_parameters = SPCFwParameters(rOH, ∠HOH, k_bond, k_angle)
 ```
 
 The Lennard-Jones potential is used in molecular dynamics simulations to approximate interactions between neutral atoms or molecules. The [SPC/Fw water model](http://www.sklogwiki.org/SklogWiki/index.php/SPC/Fw_model_of_water) is used in water simulations. The meaning of arguments for `SPCFwParameters` constructor will be clarified further in this documentation.

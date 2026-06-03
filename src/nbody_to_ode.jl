@@ -99,12 +99,12 @@ function gather_accelerations_for_potentials(
 end
 
 function gather_group_accelerations(simulation::NBodySimulation{<:WaterSPCFw})
-    acelerations = []
+    accelerations = []
     push!(
-        acelerations,
+        accelerations,
         get_group_accelerating_function(simulation.system.scpfw_parameters, simulation)
     )
-    return acelerations
+    return accelerations
 end
 
 function get_accelerating_function(
@@ -329,13 +329,13 @@ function obtain_data_for_valence_angle_harmonic_interaction(system::WaterSPCFw)
 end
 
 function gather_simultaneous_acceleration(s::NBodySimulation)
-    acelerations = []
+    accelerations = []
     if s.thermostat isa BerendsenThermostat
-        push!(acelerations, get_berendsen_thermostating_acceleration(s))
+        push!(accelerations, get_berendsen_thermostating_acceleration(s))
     elseif s.thermostat isa NoseHooverThermostat
-        push!(acelerations, get_nosehoover_thermostating_acceleration(s))
+        push!(accelerations, get_nosehoover_thermostating_acceleration(s))
     end
-    return acelerations
+    return accelerations
 end
 
 function get_berendsen_thermostating_acceleration(simulation::NBodySimulation)
@@ -448,7 +448,7 @@ function DiffEqBase.SecondOrderODEProblem(simulation::NBodySimulation{<:WaterSPC
     (u0, v0, n) = gather_bodies_initial_coordinates(simulation)
     T = eltype(u0)
 
-    (o_acelerations, h_acelerations) = gather_accelerations_for_potentials(simulation)
+    (o_accelerations, h_accelerations) = gather_accelerations_for_potentials(simulation)
     group_accelerations = gather_group_accelerations(simulation)
     simultaneous_acceleration = gather_simultaneous_acceleration(simulation)
 
@@ -460,7 +460,7 @@ function DiffEqBase.SecondOrderODEProblem(simulation::NBodySimulation{<:WaterSPC
                 dv[2, idx] = zero(T)
                 dv[3, idx] = zero(T)
                 a = @view dv[:, idx]
-                for acceleration! in o_acelerations
+                for acceleration! in o_accelerations
                     acceleration!(a, u, v, t, idx)
                 end
             end
@@ -470,7 +470,7 @@ function DiffEqBase.SecondOrderODEProblem(simulation::NBodySimulation{<:WaterSPC
                 dv[2, idx] = zero(T)
                 dv[3, idx] = zero(T)
                 a = @view dv[:, idx]
-                for acceleration! in h_acelerations
+                for acceleration! in h_accelerations
                     acceleration!(a, u, v, t, idx)
                 end
             end
@@ -490,32 +490,32 @@ function DiffEqBase.SecondOrderODEProblem(simulation::NBodySimulation{<:WaterSPC
 end
 
 function gather_accelerations_for_potentials(simulation::NBodySimulation{<:WaterSPCFw})
-    o_acelerations = []
-    h_acelerations = []
+    o_accelerations = []
+    h_accelerations = []
 
     push!(
-        o_acelerations,
+        o_accelerations,
         get_accelerating_function(simulation.system.e_parameters, simulation)
     )
     push!(
-        o_acelerations,
+        o_accelerations,
         get_accelerating_function(simulation.system.scpfw_parameters, simulation)
     )
     push!(
-        o_acelerations,
+        o_accelerations,
         get_accelerating_function(simulation.system.lj_parameters, simulation)
     )
 
     push!(
-        h_acelerations,
+        h_accelerations,
         get_accelerating_function(simulation.system.e_parameters, simulation)
     )
     push!(
-        h_acelerations,
+        h_accelerations,
         get_accelerating_function(simulation.system.scpfw_parameters, simulation)
     )
 
-    return (o_acelerations, h_acelerations)
+    return (o_accelerations, h_accelerations)
 end
 
 function DiffEqBase.SDEProblem(simulation::NBodySimulation{<:PotentialNBodySystem})
@@ -555,7 +555,7 @@ function DiffEqBase.SDEProblem(simulation::NBodySimulation{<:WaterSPCFw})
     (u0, v0, n) = gather_bodies_initial_coordinates(simulation)
     T = eltype(u0)
 
-    (o_acelerations, h_acelerations) = gather_accelerations_for_potentials(simulation)
+    (o_accelerations, h_accelerations) = gather_accelerations_for_potentials(simulation)
     group_accelerations = gather_group_accelerations(simulation)
     simultaneous_acceleration = gather_simultaneous_acceleration(simulation)
 
@@ -573,7 +573,7 @@ function DiffEqBase.SDEProblem(simulation::NBodySimulation{<:WaterSPCFw})
                 du[2, idx] = zero(T)
                 du[3, idx] = zero(T)
                 a = @view du[:, idx]
-                for acceleration! in o_acelerations
+                for acceleration! in o_accelerations
                     acceleration!(
                         a, (@view u[:, 1:(3 * n)]),
                         (@view u[:, (3 * n + 1):(2 * 3 * n)]), t, 3 * (i - 1) + 1
@@ -593,7 +593,7 @@ function DiffEqBase.SDEProblem(simulation::NBodySimulation{<:WaterSPCFw})
                 du[2, idx] = zero(T)
                 du[3, idx] = zero(T)
                 a = @view du[:, idx]
-                for acceleration! in h_acelerations
+                for acceleration! in h_accelerations
                     acceleration!(
                         a, (@view u[:, 1:(3 * n)]),
                         (@view u[:, (3 * n + 1):(2 * 3 * n)]), t, 3 * (i - 1) + j
