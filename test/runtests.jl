@@ -1,11 +1,20 @@
-using NBodySimulator, StaticArrays, LinearAlgebra, StochasticDiffEq
 using Test
 
-include("lennard_jones_test.jl")
-include("electrostatics_test.jl")
-include("gravitational_test.jl")
-include("custom_potential_test.jl")
-include("magnetostaic_test.jl")
-include("thermostat_test.jl")
-include("water_test.jl")
-include("interface_test.jl")
+const GROUP = get(ENV, "GROUP", "All")
+
+if GROUP == "All" || GROUP == "Core"
+    using NBodySimulator, StaticArrays, LinearAlgebra, StochasticDiffEq
+
+    include("lennard_jones_test.jl")
+    include("electrostatics_test.jl")
+    include("gravitational_test.jl")
+    include("custom_potential_test.jl")
+    include("magnetostaic_test.jl")
+    include("thermostat_test.jl")
+    include("water_test.jl")
+    include("interface_test.jl")
+end
+
+if GROUP == "QA"
+    include("qa/qa.jl")
+end
