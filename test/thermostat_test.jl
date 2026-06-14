@@ -1,4 +1,6 @@
-@testset "Testing thermostats on liquid argon " begin
+@safetestset "Testing thermostats on liquid argon " begin
+    using NBodySimulator, StochasticDiffEq
+
     T = 120.0 # °K
     T0 = 90 # °K
     kb = 8.3144598e-3 # kJ/(K*mol)

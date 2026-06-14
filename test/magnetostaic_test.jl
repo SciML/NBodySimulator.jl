@@ -1,4 +1,6 @@
-@testset "Magnetostatics Functional Tests" begin
+@safetestset "Magnetostatics Functional Tests" begin
+    using NBodySimulator, StaticArrays, LinearAlgebra
+
     @testset "Repelling magnetic dipoles" begin
         d1 = 0.01 # m
         m1 = 5.0e-6 # kg

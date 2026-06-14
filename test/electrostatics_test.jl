@@ -1,4 +1,6 @@
-@testset "Electrostatics Functional Tests" begin
+@safetestset "Electrostatics Functional Tests" begin
+    using NBodySimulator, StaticArrays, LinearAlgebra
+
     k = 9.0e9
 
     @testset "One particle rotates around another" begin

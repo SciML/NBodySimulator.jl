@@ -1,7 +1,3 @@
-using Pkg
-Pkg.activate(@__DIR__)
-Pkg.instantiate()
-
 using NBodySimulator, Aqua, JET, Test
 
 @testset "Aqua" begin

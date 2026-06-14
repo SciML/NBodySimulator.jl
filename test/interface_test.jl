@@ -1,6 +1,6 @@
-using Test, NBodySimulator, StaticArrays, OrdinaryDiffEq
+@safetestset "Interface Compatibility" begin
+    using NBodySimulator, StaticArrays, OrdinaryDiffEq
 
-@testset "Interface Compatibility" begin
     @testset "BigFloat support" begin
         # Create bodies with BigFloat coordinates
         body1 = MassBody(

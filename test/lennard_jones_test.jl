@@ -1,4 +1,5 @@
-@testset "Lennard-Jones potential" begin
+@safetestset "Lennard-Jones potential" begin
+    using NBodySimulator, StaticArrays, LinearAlgebra
     @testset "Two interacting particles" begin
         m1 = 1.0
         m2 = 1.0

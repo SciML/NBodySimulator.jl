@@ -1,6 +1,6 @@
-using OrdinaryDiffEq
+@safetestset "Gravitational Functional Test" begin
+    using NBodySimulator, StaticArrays, OrdinaryDiffEq
 
-@testset "Gravitational Functional Test" begin
     G = 1
     @testset "The well-known figure Eight choreography" begin
         m1 = MassBody(SVector(-0.995492, 0.0, 0.0), SVector(-0.347902, -0.53393, 0.0), 1.0)
