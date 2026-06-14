@@ -1,4 +1,6 @@
-@testset "Water SPC/Fw test" begin
+@safetestset "Water SPC/Fw test" begin
+    using NBodySimulator, StaticArrays, LinearAlgebra, StochasticDiffEq
+
     qp = 1 # charge of a proton
     T = 298.16 # °K
     kb = 8.3144598e-3 # kJ/(K*mol)
