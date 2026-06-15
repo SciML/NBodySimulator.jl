@@ -6,6 +6,16 @@ end
 
 PeriodicBoundaryConditions(L::Real) = PeriodicBoundaryConditions(SVector(0, L, 0, L, 0, L))
 
+# Explicit `show` so the printed representation is independent of the module the
+# IO context resolves to (the default struct printer qualifies the type name with
+# `NBodySimulator.` when the binding is not visible from the printing module, e.g.
+# inside an isolated `@safetestset` module).
+function Base.show(io::IO, bc::PeriodicBoundaryConditions{cType}) where {cType}
+    print(io, "PeriodicBoundaryConditions{", cType, "}(")
+    show(io, bc.boundary)
+    return print(io, ")")
+end
+
 function Base.iterate(pbc::PeriodicBoundaryConditions, state = 1)
     state > length(pbc.boundary) && return nothing
     return pbc.boundary[state], state + 1
@@ -22,8 +32,20 @@ end
 
 InfiniteBox() = InfiniteBox(SVector(-Inf, Inf, -Inf, Inf, -Inf, Inf))
 
+function Base.show(io::IO, bc::InfiniteBox{cType}) where {cType}
+    print(io, "InfiniteBox{", cType, "}(")
+    show(io, bc.boundary)
+    return print(io, ")")
+end
+
 struct CubicPeriodicBoundaryConditions{cType <: Real} <: BoundaryConditions
     L::cType
+end
+
+function Base.show(io::IO, bc::CubicPeriodicBoundaryConditions{cType}) where {cType}
+    print(io, "CubicPeriodicBoundaryConditions{", cType, "}(")
+    show(io, bc.L)
+    return print(io, ")")
 end
 
 function get_interparticle_distance(ri, rj, pbc::PeriodicBoundaryConditions)
