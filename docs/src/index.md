@@ -28,7 +28,7 @@ mass = 1.25
 body = MassBody(r, v, mass)
 ```
 
-For simulation speed, it is advised to use [static arrays](https://juliaarrays.github.io/StaticArrays.jl/stable/pages/quickstart/).
+For simulation speed, it is advised to use [static arrays](https://juliaarrays.github.io/StaticArrays.jl/stable/quickstart/).
 
 A **System** covers the bodies and the necessary parameters for the correct simulation of interaction between particles. For example, to create an entity for a system of gravitationally interacting particles, one needs to use `GravitationalSystem` constructor:
 
@@ -311,7 +311,7 @@ thermostat = AndersenThermostat(90, ν)
 
 ![andersen thermostating](https://user-images.githubusercontent.com/16945627/44002487-cd99653a-9e5c-11e8-8481-78945a930d94.png)
 
-### [Berendsen Thermostat](https://www2.mpip-mainz.mpg.de/%7Eandrienk/journal_club/thermostats.pdf)
+### [Berendsen Thermostat](http://www.sklogwiki.org/SklogWiki/index.php/Berendsen_thermostat)
 
 ```julia
 τB = 2000τ
