@@ -1,12 +1,25 @@
-using NBodySimulator, Aqua, JET, Test
+using SciMLTesting, NBodySimulator, JET, Test
 
-@testset "Aqua" begin
-    Aqua.test_all(NBodySimulator; stale_deps = false, deps_compat = false)
-    @test_broken false  # Aqua stale_deps: JLArrays declared but unused — see https://github.com/SciML/NBodySimulator.jl/issues/117
-    @test_broken false  # Aqua deps_compat (deps): Printf, Random lack compat — see https://github.com/SciML/NBodySimulator.jl/issues/117
-    @test_broken false  # Aqua deps_compat (extras): Pkg lacks compat — see https://github.com/SciML/NBodySimulator.jl/issues/117
-end
-
-@testset "JET" begin
-    @test_broken false  # JET: PotentialNBodySystem default potentials=[] is Vector{Any}, not Vector{Symbol} (src/nbody_system.jl:35) — see https://github.com/SciML/NBodySimulator.jl/issues/117
-end
+run_qa(
+    NBodySimulator;
+    explicit_imports = true,
+    # Aqua sub-checks tracked-broken in https://github.com/SciML/NBodySimulator.jl/issues/117:
+    #   stale_deps:   JLArrays declared in [deps] but unused in src/
+    #   deps_compat:  Printf, Random (used in src/) lack [compat] bounds
+    aqua_broken = (:stale_deps, :deps_compat),
+    # `@def`, `AbstractTimeseriesSolution`, `DECallback` are SciMLBase names accessed
+    # via DiffEqBase (which re-exports them); ExplicitImports attributes them to their
+    # SciMLBase owner. They go public/owner-clean as those base libs release.
+    ei_kwargs = (;
+        all_qualified_accesses_via_owners = (;
+            ignore = (Symbol("@def"), :AbstractTimeseriesSolution, :DECallback),
+        ),
+        all_qualified_accesses_are_public = (;
+            ignore = (Symbol("@def"), :AbstractTimeseriesSolution, :DECallback),
+        ),
+    ),
+    # 39 implicit imports via heavy `@reexport using DiffEqBase, OrdinaryDiffEq, ...`;
+    # a mass `using X: a, b` refactor is risky alongside @reexport — tracked in
+    # https://github.com/SciML/NBodySimulator.jl/issues/121
+    ei_broken = (:no_implicit_imports,),
+)
