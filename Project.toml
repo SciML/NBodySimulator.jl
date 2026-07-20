@@ -25,7 +25,7 @@ StaticArrays = "90137ffa-7385-5640-81b9-e52037218182"
 [compat]
 ArrayInterface = "7.22.0"
 DiffEqBase = "6.176.0, 7"
-DiffEqCallbacks = "2.35.0, 4"
+DiffEqCallbacks = "4"
 DocStringExtensions = "0.9.3"
 LinearAlgebra = "1"
 FileIO = "1.19.0"
