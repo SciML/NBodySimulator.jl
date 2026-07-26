@@ -1,5 +1,3 @@
-using StaticArrays, DiffEqBase, OrdinaryDiffEq, RecipesBase, DiffEqCallbacks
-
 include("./bodies.jl")
 include("./boundary_conditions.jl")
 include("./thermostats.jl")
@@ -9,9 +7,37 @@ include("./nbody_system.jl")
 const kb_SI = 1.38e-23 # J/K
 
 """
-Simulation is an entity determining the parameters of the experiment:
-time span of simulation, global physical constants, borders of the simulation cell, external magnetic or electric fields, etc.
-The required arguments for the NBodySImulation constructor are the system to be tested and the time span of the simulation.
+    NBodySimulation(
+        system, tspan, boundary_conditions = InfiniteBox(),
+        thermostat = NullThermostat(), kb = 1.38e-23
+    )
+
+Configuration for an N-body simulation.
+
+# Arguments
+
+- `system`: An `NBodySystem` describing the bodies and interactions.
+- `tspan`: Tuple with the simulation start and end times.
+- `boundary_conditions`: Boundary-condition model.
+- `thermostat`: Thermostat model.
+- `kb`: Boltzmann constant in the selected unit system.
+
+# Fields
+
+- `system`, `tspan`: Physical system and integration interval.
+- `boundary_conditions`, `thermostat`: Simulation constraints and temperature model.
+- `kb`: Boltzmann constant.
+- `external_electric_field`, `external_magnetic_field`, `external_gravitational_field`:
+  External-field callables.
+
+# Examples
+
+```julia
+using NBodySimulator, StaticArrays
+
+body = MassBody(SVector(0.0, 0.0, 0.0), SVector(0.0, 0.0, 0.0), 1.0)
+simulation = NBodySimulation(GravitationalSystem([body], 1.0), (0.0, 1.0))
+```
 """
 struct NBodySimulation{
         sType <: NBodySystem, bcType <: BoundaryConditions, tType <: Real,

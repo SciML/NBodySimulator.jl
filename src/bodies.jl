@@ -1,12 +1,11 @@
-# This is an attempt to include the required for n-body simulations fields into structures
-# Indeed, tools of ConcreteAbstractions.jl seem to be more suitable for the fields inheriting
-DiffEqBase.@def position_velocity_mass begin
-    r::SVector{3, cType}
-    v::SVector{3, cType}
-    m::mType
-end
 """
-Bodies or Particles are the objects that will interact with each other and for which the equations of Newton's 2nd law are solved during the simulation process.
+    Body
+
+Abstract supertype for particle definitions used by N-body systems.
+
+`Body` implementations provide an initial position, velocity, and mass. The built-in
+[`MassBody`](@ref), [`ChargedParticle`](@ref), and [`MagneticParticle`](@ref) types
+cover the standard interaction models.
 """
 abstract type Body end
 
@@ -14,18 +13,62 @@ abstract type Body end
     MassBody(r, v, m)
 
 Particle with position `r`, velocity `v`, and mass `m`.
+
+# Arguments
+
+- `r`: Three-dimensional initial position.
+- `v`: Three-dimensional initial velocity.
+- `m`: Particle mass.
+
+# Fields
+
+- `r`: Initial position.
+- `v`: Initial velocity.
+- `m`: Mass.
+
+# Examples
+
+```julia
+using NBodySimulator, StaticArrays
+
+body = MassBody(SVector(0.0, 0.0, 0.0), SVector(0.0, 1.0, 0.0), 1.0)
+```
 """
 struct MassBody{cType <: Real, mType <: Real} <: Body
-    @position_velocity_mass
+    r::SVector{3, cType}
+    v::SVector{3, cType}
+    m::mType
 end
 
 """
     ChargedParticle(r, v, m, q)
 
 Particle with position `r`, velocity `v`, mass `m`, and charge `q`.
+
+# Arguments
+
+- `r`: Three-dimensional initial position.
+- `v`: Three-dimensional initial velocity.
+- `m`: Particle mass.
+- `q`: Electric charge.
+
+# Fields
+
+- `r`, `v`, `m`: Position, velocity, and mass.
+- `q`: Electric charge.
+
+# Examples
+
+```julia
+using NBodySimulator, StaticArrays
+
+particle = ChargedParticle(SVector(0.0, 0.0, 0.0), SVector(0.0, 0.0, 0.0), 1.0, 1.0)
+```
 """
 struct ChargedParticle{cType <: Real, mType <: Real, qType <: Real} <: Body
-    @position_velocity_mass
+    r::SVector{3, cType}
+    v::SVector{3, cType}
+    m::mType
     q::qType
 end
 
@@ -33,9 +76,33 @@ end
     MagneticParticle(r, v, m, mm)
 
 Particle with position `r`, velocity `v`, mass `m`, and magnetic moment `mm`.
+
+# Arguments
+
+- `r`: Three-dimensional initial position.
+- `v`: Three-dimensional initial velocity.
+- `m`: Particle mass.
+- `mm`: Three-dimensional magnetic moment.
+
+# Fields
+
+- `r`, `v`, `m`: Position, velocity, and mass.
+- `mm`: Magnetic moment.
+
+# Examples
+
+```julia
+using NBodySimulator, StaticArrays
+
+particle = MagneticParticle(
+    SVector(0.0, 0.0, 0.0), SVector(0.0, 0.0, 0.0), 1.0, SVector(0.0, 0.0, 1.0)
+)
+```
 """
 struct MagneticParticle{cType <: Real, mType <: Real, mmType <: Real} <: Body
-    @position_velocity_mass
+    r::SVector{3, cType}
+    v::SVector{3, cType}
+    m::mType
     mm::SVector{3, mmType}
 end
 
@@ -45,7 +112,29 @@ struct WaterMolecule <: Body
     H2::MassBody
 end
 """
-Places similar particles in the nodes of a cubic cell with their velocities distributed in accordance with the Maxwell–Boltzmann law
+    generate_bodies_in_cell_nodes(n, m, v_dev, L; rng = MersenneTwister(n))
+
+Generate `n` equal-mass bodies on a cubic-cell grid with normally distributed
+velocities.
+
+# Arguments
+
+- `n`: Number of bodies to generate.
+- `m`: Mass assigned to every body.
+- `v_dev`: Standard deviation of each velocity component.
+- `L`: Side length of the cubic cell.
+
+# Keyword Arguments
+
+- `rng`: Random-number generator used for velocities.
+
+# Examples
+
+```julia
+using NBodySimulator
+
+bodies = generate_bodies_in_cell_nodes(8, 1.0, 0.1, 4.0)
+```
 """
 function generate_bodies_in_cell_nodes(
         n::Int, m::Real, v_dev::Real, L::Real;

@@ -1,5 +1,8 @@
 @safetestset "Interface Compatibility" begin
-    using NBodySimulator, StaticArrays, OrdinaryDiffEq
+    using CommonSolve: solve
+    using NBodySimulator, StaticArrays
+    using OrdinaryDiffEqTsit5: Tsit5
+    using SciMLBase: SecondOrderODEProblem
 
     @testset "BigFloat support" begin
         # Create bodies with BigFloat coordinates

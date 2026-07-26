@@ -1,5 +1,8 @@
 """
-Usually, during the simulation, a system is required to be at a particular temperature. NBodySimulator contains several thermostats for that purpose.
+Abstract supertype for thermostat configurations.
+
+Thermostats control a simulation's temperature. Use one of the concrete exported
+thermostat types when constructing an [`NBodySimulation`](@ref).
 """
 abstract type Thermostat end
 """
@@ -12,6 +15,24 @@ end
     AndersenThermostat(T, ν)
 
 Andersen thermostat targeting temperature `T` with collision frequency `ν`.
+
+# Arguments
+
+- `T`: Target temperature.
+- `ν`: Collision frequency.
+
+# Fields
+
+- `T`: Target temperature.
+- `ν`: Collision frequency.
+
+# Examples
+
+```julia
+using NBodySimulator
+
+thermostat = AndersenThermostat(300.0, 1.0)
+```
 """
 struct AndersenThermostat{tType <: Real, νType <: Real} <: Thermostat
     T::tType
@@ -22,6 +43,25 @@ end
     BerendsenThermostat(T, τ)
 
 Berendsen thermostat targeting temperature `T` with coupling time `τ`.
+
+# Arguments
+
+- `T`: Target temperature.
+- `τ`: Temperature-coupling time.
+
+# Fields
+
+- `T`: Target temperature.
+- `τ`: Temperature-coupling time.
+- `γ`: Rescaling coefficient derived from `τ`.
+
+# Examples
+
+```julia
+using NBodySimulator
+
+thermostat = BerendsenThermostat(300.0, 0.1)
+```
 """
 struct BerendsenThermostat{τType <: Real, tType <: Real} <: Thermostat
     T::tType
@@ -54,6 +94,24 @@ end
     NoseHooverThermostat(T, τ)
 
 Nose-Hoover thermostat targeting temperature `T` with relaxation time `τ`.
+
+# Arguments
+
+- `T`: Target temperature.
+- `τ`: Relaxation time.
+
+# Fields
+
+- `T`: Target temperature.
+- `τ`: Relaxation time.
+
+# Examples
+
+```julia
+using NBodySimulator
+
+thermostat = NoseHooverThermostat(300.0, 0.1)
+```
 """
 struct NoseHooverThermostat{tType <: Real, τType <: Real} <: Thermostat
     T::tType
@@ -73,6 +131,24 @@ end
     LangevinThermostat(T, γ)
 
 Langevin thermostat targeting temperature `T` with friction coefficient `γ`.
+
+# Arguments
+
+- `T`: Target temperature.
+- `γ`: Friction coefficient.
+
+# Fields
+
+- `T`: Target temperature.
+- `γ`: Friction coefficient.
+
+# Examples
+
+```julia
+using NBodySimulator
+
+thermostat = LangevinThermostat(300.0, 1.0)
+```
 """
 struct LangevinThermostat{tType <: Real, gType <: Real} <: Thermostat
     T::tType

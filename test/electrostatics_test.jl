@@ -1,5 +1,6 @@
 @safetestset "Electrostatics Functional Tests" begin
     using NBodySimulator, StaticArrays, LinearAlgebra
+    using OrdinaryDiffEqSymplecticRK: VelocityVerlet
 
     k = 9.0e9
 

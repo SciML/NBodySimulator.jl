@@ -36,6 +36,25 @@ abstract type PotentialParameters end
     LennardJonesParameters(ϵ, σ, R)
 
 Lennard-Jones potential parameters with energy scale `ϵ`, length scale `σ`, and cutoff `R`.
+
+# Arguments
+
+- `ϵ`: Potential-well depth.
+- `σ`: Particle diameter.
+- `R`: Interaction cutoff radius.
+
+# Fields
+
+- `ϵ`, `σ`, `R`: User-supplied potential parameters.
+- `σ2`, `R2`: Cached squared length scales.
+
+# Examples
+
+```julia
+using NBodySimulator
+
+parameters = LennardJonesParameters(1.0, 1.0, 2.5)
+```
 """
 struct LennardJonesParameters{pType <: Real} <: PotentialParameters
     ϵ::pType
@@ -70,6 +89,22 @@ end
     GravitationalParameters(G)
 
 Gravitational interaction parameters with gravitational constant `G`.
+
+# Arguments
+
+- `G`: Gravitational constant.
+
+# Fields
+
+- `G`: Gravitational constant.
+
+# Examples
+
+```julia
+using NBodySimulator
+
+parameters = GravitationalParameters(6.67408e-11)
+```
 """
 struct GravitationalParameters{gType <: Real} <: PotentialParameters
     G::gType
@@ -90,6 +125,24 @@ end
     ElectrostaticParameters(k, R)
 
 Electrostatic interaction parameters with Coulomb constant `k` and cutoff `R`.
+
+# Arguments
+
+- `k`: Coulomb constant.
+- `R`: Interaction cutoff radius. Omit it for no cutoff.
+
+# Fields
+
+- `k`, `R`: User-supplied electrostatic parameters.
+- `R2`: Cached squared cutoff radius.
+
+# Examples
+
+```julia
+using NBodySimulator
+
+parameters = ElectrostaticParameters(8.9875517923e9, 5.0)
+```
 """
 struct ElectrostaticParameters{pType <: Real} <: PotentialParameters
     k::pType
@@ -120,6 +173,22 @@ end
     MagnetostaticParameters(μ_4π)
 
 Magnetostatic interaction parameters storing `μ / 4π`.
+
+# Arguments
+
+- `μ_4π`: Magnetic interaction constant `μ / 4π`.
+
+# Fields
+
+- `μ_4π`: Magnetic interaction constant.
+
+# Examples
+
+```julia
+using NBodySimulator
+
+parameters = MagnetostaticParameters(1.0e-7)
+```
 """
 struct MagnetostaticParameters{mType <: Real} <: PotentialParameters
     μ_4π::mType
@@ -140,6 +209,26 @@ end
     SPCFwParameters(rOH, aHOH, kb, ka)
 
 SPC/Fw water-model parameters for bond length, bond angle, bond stiffness, and angle stiffness.
+
+# Arguments
+
+- `rOH`: Equilibrium oxygen-hydrogen bond length.
+- `aHOH`: Equilibrium hydrogen-oxygen-hydrogen angle in radians.
+- `kb`: Harmonic-bond stiffness.
+- `ka`: Harmonic-angle stiffness.
+
+# Fields
+
+- `rOH`, `aHOH`: Equilibrium molecular geometry.
+- `kb`, `ka`: Bond and angle stiffnesses.
+
+# Examples
+
+```julia
+using NBodySimulator
+
+parameters = SPCFwParameters(0.1012, 1.9764, 44315.0, 317.6)
+```
 """
 struct SPCFwParameters{pType <: Real} <: PotentialParameters
     rOH::pType

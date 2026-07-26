@@ -432,7 +432,7 @@ function obtain_data_for_nosehoover_thermostating(simulation::NBodySimulation{<:
     return (ms, kb, n, nc, γind, p)
 end
 
-function DiffEqBase.ODEProblem(simulation::NBodySimulation{<:PotentialNBodySystem})
+function SciMLBase.ODEProblem(simulation::NBodySimulation{<:PotentialNBodySystem})
     (u0, v0, n) = gather_bodies_initial_coordinates(simulation)
     T = eltype(u0)
 
@@ -457,7 +457,7 @@ function DiffEqBase.ODEProblem(simulation::NBodySimulation{<:PotentialNBodySyste
     return ODEProblem(ode_system!, hcat(u0, v0), simulation.tspan)
 end
 
-function DiffEqBase.SecondOrderODEProblem(
+function SciMLBase.SecondOrderODEProblem(
         simulation::NBodySimulation{
             <:PotentialNBodySystem,
         }
@@ -490,7 +490,7 @@ function DiffEqBase.SecondOrderODEProblem(
     return SecondOrderODEProblem(soode_system!, v0, u0, simulation.tspan)
 end
 
-function DiffEqBase.SecondOrderODEProblem(simulation::NBodySimulation{<:WaterSPCFw})
+function SciMLBase.SecondOrderODEProblem(simulation::NBodySimulation{<:WaterSPCFw})
     (u0, v0, n) = gather_bodies_initial_coordinates(simulation)
     T = eltype(u0)
 
@@ -564,7 +564,7 @@ function gather_accelerations_for_potentials(simulation::NBodySimulation{<:Water
     return (o_accelerations, h_accelerations)
 end
 
-function DiffEqBase.SDEProblem(simulation::NBodySimulation{<:PotentialNBodySystem})
+function SciMLBase.SDEProblem(simulation::NBodySimulation{<:PotentialNBodySystem})
     (u0, v0, n) = gather_bodies_initial_coordinates(simulation)
     T = eltype(u0)
 
@@ -597,7 +597,7 @@ function DiffEqBase.SDEProblem(simulation::NBodySimulation{<:PotentialNBodySyste
     return SDEProblem(deterministic_acceleration!, noise!, hcat(u0, v0), simulation.tspan)
 end
 
-function DiffEqBase.SDEProblem(simulation::NBodySimulation{<:WaterSPCFw})
+function SciMLBase.SDEProblem(simulation::NBodySimulation{<:WaterSPCFw})
     (u0, v0, n) = gather_bodies_initial_coordinates(simulation)
     T = eltype(u0)
 

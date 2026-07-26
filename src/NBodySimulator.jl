@@ -3,12 +3,23 @@ $(DocStringExtensions.README)
 """
 module NBodySimulator
 
-using DocStringExtensions
-using Reexport
-@reexport using DiffEqBase, OrdinaryDiffEq, OrdinaryDiffEqRKN, OrdinaryDiffEqSymplecticRK, RecursiveArrayTools
-using StaticArrays, RecipesBase, FileIO
-using Random, Printf, LinearAlgebra
-using PrecompileTools
+import DocStringExtensions
+using CommonSolve: solve
+using FileIO: @format_str, File, skipmagic
+using LinearAlgebra: cross, dot, norm, normalize
+using OrdinaryDiffEqSymplecticRK: VelocityVerlet
+using OrdinaryDiffEqTsit5: Tsit5
+using PrecompileTools: @compile_workload, @setup_workload
+using Printf: @sprintf
+using Base: rand, randn
+using Random: MersenneTwister
+using RecipesBase: @recipe, @series
+import RecursiveArrayTools
+import SciMLBase
+using SciMLBase: AbstractTimeseriesSolution, CallbackSet, DECallback, DiscreteCallback,
+    ODEProblem, SDEProblem, SecondOrderODEProblem
+using StaticArrays: @SVector
+using StaticArraysCore: SVector
 
 include("nbody_simulation.jl")
 
