@@ -1,5 +1,6 @@
 @safetestset "Magnetostatics Functional Tests" begin
     using NBodySimulator, StaticArrays, LinearAlgebra
+    using OrdinaryDiffEqSymplecticRK: VelocityVerlet
 
     @testset "Repelling magnetic dipoles" begin
         d1 = 0.01 # m

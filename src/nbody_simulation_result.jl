@@ -3,7 +3,7 @@ SimulationResult should provide an interface for working with the properties of 
 and with the physical properties of the whole system.
 """
 struct SimulationResult{sType <: NBodySystem}
-    solution::DiffEqBase.AbstractTimeseriesSolution
+    solution::AbstractTimeseriesSolution
     simulation::NBodySimulation{sType}
 end
 
@@ -33,6 +33,18 @@ end
     get_velocity(result::SimulationResult, time, i = 0)
 
 Return all particle velocities at `time`, or the velocity of particle `i` when `i > 0`.
+
+# Arguments
+
+- `result`: Result returned by [`run_simulation`](@ref).
+- `time`: Time at which to interpolate the solution.
+- `i`: Particle index; use `0` to return all velocities.
+
+# Examples
+
+```julia
+velocity = get_velocity(result, 0.5, 1)
+```
 """
 function get_velocity(sr::SimulationResult, time::Real, i::Integer = 0)
     n = get_coordinate_vector_count(sr.simulation.system)
@@ -62,6 +74,18 @@ end
     get_position(result::SimulationResult, time, i = 0)
 
 Return all particle positions at `time`, or the position of particle `i` when `i > 0`.
+
+# Arguments
+
+- `result`: Result returned by [`run_simulation`](@ref).
+- `time`: Time at which to interpolate the solution.
+- `i`: Particle index; use `0` to return all positions.
+
+# Examples
+
+```julia
+position = get_position(result, 0.5, 1)
+```
 """
 function get_position(sr::SimulationResult, time::Real, i::Integer = 0)
     if sr.solution.u[1] isa RecursiveArrayTools.ArrayPartition
@@ -83,6 +107,16 @@ end
     get_masses(system::NBodySystem)
 
 Return the particle masses for `system` in simulation-coordinate order.
+
+# Arguments
+
+- `system`: N-body system whose masses are requested.
+
+# Examples
+
+```julia
+masses = get_masses(simulation.system)
+```
 """
 function get_masses(system::NBodySystem)
     n = length(system.bodies)
@@ -133,6 +167,17 @@ end
     temperature(result::SimulationResult, time)
 
 Compute the system temperature at `time`.
+
+# Arguments
+
+- `result`: Result returned by [`run_simulation`](@ref).
+- `time`: Time at which to interpolate the solution.
+
+# Examples
+
+```julia
+T = temperature(result, 0.5)
+```
 """
 function temperature(result::SimulationResult, time::Real)
     kb = result.simulation.kb
@@ -147,6 +192,19 @@ end
     kinetic_energy(result::SimulationResult, time)
 
 Compute kinetic energy from velocity and mass arrays or from a simulation result at `time`.
+
+# Arguments
+
+- `velocities`: Matrix with one velocity column per particle.
+- `masses`: Particle masses corresponding to the velocity columns.
+- `result`: Result returned by [`run_simulation`](@ref).
+- `time`: Time at which to interpolate a result.
+
+# Examples
+
+```julia
+energy = kinetic_energy(result, 0.5)
+```
 """
 function kinetic_energy(velocities, masses)
     ke = sum(dot(vec(sum(velocities .^ 2, dims = 1)), masses / 2))
@@ -164,6 +222,19 @@ end
     potential_energy(result::SimulationResult, time)
 
 Compute potential energy from coordinates and simulation parameters or from a result at `time`.
+
+# Arguments
+
+- `coordinates`: Position matrix with one column per particle.
+- `simulation`: Simulation providing potentials and boundary conditions.
+- `result`: Result returned by [`run_simulation`](@ref).
+- `time`: Time at which to interpolate a result.
+
+# Examples
+
+```julia
+energy = potential_energy(result, 0.5)
+```
 """
 function potential_energy(coordinates, simulation::NBodySimulation)
     e_potential = 0
@@ -335,6 +406,17 @@ end
     total_energy(result::SimulationResult, time)
 
 Compute kinetic plus potential energy at `time`.
+
+# Arguments
+
+- `result`: Result returned by [`run_simulation`](@ref).
+- `time`: Time at which to interpolate the solution.
+
+# Examples
+
+```julia
+energy = total_energy(result, 0.5)
+```
 """
 function total_energy(sr::SimulationResult, time::Real)
     e_kin = kinetic_energy(sr, time)
@@ -346,6 +428,16 @@ end
     initial_energy(simulation::NBodySimulation)
 
 Compute the total energy of the simulation initial condition.
+
+# Arguments
+
+- `simulation`: Simulation whose initial state is evaluated.
+
+# Examples
+
+```julia
+energy = initial_energy(simulation)
+```
 """
 function initial_energy(simulation::NBodySimulation)
     (u0, v0, n) = gather_bodies_initial_coordinates(simulation)
@@ -354,7 +446,24 @@ function initial_energy(simulation::NBodySimulation)
 end
 
 """
-Run the N-body simulation.
+    run_simulation(simulation, algorithm = Tsit5(); kwargs...)
+
+Solve `simulation` and return an interpolating simulation result.
+
+# Arguments
+
+- `simulation`: Simulation configuration to solve.
+- `algorithm`: Optional compatible OrdinaryDiffEq algorithm.
+
+# Keyword Arguments
+
+- `kwargs...`: Keyword arguments forwarded to `solve`.
+
+# Examples
+
+```julia
+result = run_simulation(simulation)
+```
 """
 function run_simulation(s::NBodySimulation, args...; kwargs...)
     return if s.thermostat isa LangevinThermostat
@@ -383,7 +492,7 @@ function calculate_simulation_sde(s::NBodySimulation, args...; kwargs...)
 end
 
 function obtain_callbacks_for_so_ode_problem(s::NBodySimulation)
-    callback_array = Vector{DiffEqBase.DECallback}()
+    callback_array = Vector{DECallback}()
 
     if s.thermostat isa AndersenThermostat
         push!(callback_array, get_andersen_thermostating_callback(s))
@@ -537,6 +646,20 @@ end
     rdf(result::SimulationResult)
 
 Compute the radial distribution function from a simulation result.
+
+# Arguments
+
+- `result`: Result for a system with cubic periodic boundary conditions.
+
+# Returns
+
+- `(r, g)`: Radial-bin centers and radial-distribution values.
+
+# Examples
+
+```julia
+r, g = rdf(result)
+```
 """
 function rdf(sr::SimulationResult)
     n = length(sr.simulation.system.bodies)
@@ -589,6 +712,20 @@ end
     msd(result::SimulationResult)
 
 Compute the mean squared displacement over the saved solution times.
+
+# Arguments
+
+- `result`: Result returned by [`run_simulation`](@ref).
+
+# Returns
+
+- `(t, displacement)`: Saved times and mean squared displacements.
+
+# Examples
+
+```julia
+t, displacement = msd(result)
+```
 """
 function msd(sr::SimulationResult{<:PotentialNBodySystem})
     n = length(sr.simulation.system.bodies)
@@ -755,6 +892,16 @@ function load(f::File{format"ProteinDataBank"})
 end
 """
 Molecules for the SPC/Fw water model can be imported from a PDB file.
+
+# Arguments
+
+- `path_str`: Path to a PDB trajectory written by [`save_to_pdb`](@ref).
+
+# Examples
+
+```julia
+molecules = load_water_molecules_from_pdb("water.pdb")
+```
 """
 function load_water_molecules_from_pdb(path_str)
     return open(path_str) do file

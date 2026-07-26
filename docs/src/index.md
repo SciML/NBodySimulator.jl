@@ -399,12 +399,12 @@ plot(result)
 animate(result, "path_to_file.gif")
 ```
 
-Makie.jl also has a recipe for plotting the results of N-body simulations. The [example](https://github.com/MakieOrg/Makie.jl/blob/master/ReferenceTests/src/tests/recipes.jl) is presented in the documentation.
+Makie.jl also has a recipe for plotting the results of N-body simulations.
 
 ## Contributing
 
   - Please refer to the
-    [SciML ColPrac: Contributor's Guide on Collaborative Practices for Community Packages](https://github.com/SciML/ColPrac/blob/master/README.md)
+    SciML ColPrac: Contributor's Guide on Collaborative Practices for Community Packages
     for guidance on PRs, issues, and other matters relating to contributing to SciML.
 
   - See the [SciML Style Guide](https://github.com/SciML/SciMLStyle) for common coding practices and other style decisions.

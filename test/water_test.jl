@@ -1,5 +1,6 @@
 @safetestset "Water SPC/Fw test" begin
     using NBodySimulator, StaticArrays, LinearAlgebra, StochasticDiffEq
+    using OrdinaryDiffEqSymplecticRK: VelocityVerlet
 
     qp = 1 # charge of a proton
     T = 298.16 # °K

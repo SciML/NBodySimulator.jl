@@ -1,5 +1,9 @@
 # API
 
+```@docs
+NBodySimulator
+```
+
 ## Simulation
 
 ```@docs

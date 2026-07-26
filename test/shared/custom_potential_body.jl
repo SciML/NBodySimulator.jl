@@ -1,4 +1,5 @@
 using NBodySimulator, StaticArrays, Test
+using OrdinaryDiffEqSymplecticRK: VelocityVerlet
 
 struct CustomPotentialParameters <: PotentialParameters
     a::AbstractFloat

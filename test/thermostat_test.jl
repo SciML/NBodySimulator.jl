@@ -1,5 +1,6 @@
 @safetestset "Testing thermostats on liquid argon " begin
     using NBodySimulator, StochasticDiffEq
+    using OrdinaryDiffEqSymplecticRK: VelocityVerlet
 
     T = 120.0 # °K
     T0 = 90 # °K

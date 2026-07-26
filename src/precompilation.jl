@@ -1,8 +1,4 @@
-using PrecompileTools
-
 @setup_workload begin
-    using StaticArrays
-
     @compile_workload begin
         # Precompile gravitational system workflow
         bodies_grav = [

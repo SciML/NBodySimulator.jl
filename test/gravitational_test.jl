@@ -1,5 +1,8 @@
 @safetestset "Gravitational Functional Test" begin
-    using NBodySimulator, StaticArrays, OrdinaryDiffEq
+    using NBodySimulator, StaticArrays
+    using OrdinaryDiffEqRKN: DPRKN6
+    using OrdinaryDiffEqSymplecticRK: VelocityVerlet, Yoshida6
+    using OrdinaryDiffEqTsit5: Tsit5
 
     G = 1
     @testset "The well-known figure Eight choreography" begin

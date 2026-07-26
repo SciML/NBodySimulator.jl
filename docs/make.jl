@@ -9,8 +9,7 @@ makedocs(
     sitename = "NBodySimulator.jl",
     authors = "Chris Rackauckas",
     modules = [NBodySimulator],
-    clean = true, doctest = false, linkcheck = true,
-    warnonly = [:docs_block, :missing_docs],
+    clean = true, doctest = true, linkcheck = true, checkdocs = :exports,
     format = Documenter.HTML(
         assets = ["assets/favicon.ico"],
         canonical = "https://docs.sciml.ai/NBodySimulator/stable/"
