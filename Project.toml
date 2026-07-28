@@ -1,7 +1,7 @@
 name = "NBodySimulator"
 uuid = "0e6f8da7-a7fc-5c8b-a220-74e902c310f9"
 authors = ["Chris Rackauckas <accounts@chrisrackauckas.com>"]
-version = "2.0.0"
+version = "1.15.0"
 
 [deps]
 CommonSolve = "38540f10-b2f7-11e9-35d8-d573e4eb0ff2"
