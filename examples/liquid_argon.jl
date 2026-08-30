@@ -21,10 +21,10 @@ function generate_random_directions(n::Int)
     phi = 2 * pi * rand(n)
     return directions = [
         @SVector [
-                sin(theta[i]) .* cos(phi[i]),
-                sin(theta[i]) .* sin(phi[i]),
-                cos(theta[i]),
-            ] for i in 1:n
+            sin(theta[i]) .* cos(phi[i]),
+            sin(theta[i]) .* sin(phi[i]),
+            cos(theta[i]),
+        ] for i in 1:n
     ]
 end
 
