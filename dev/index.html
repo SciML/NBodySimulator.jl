@@ -88,19 +88,22 @@ e_kin = kinetic_energy(result, t)
 e_pot = potential_energy(result, t)
 e_tot = total_energy(result, t)</code></pre><h2 id="Plotting-Images"><a class="docs-heading-anchor" href="#Plotting-Images">Plotting Images</a><a id="Plotting-Images-1"></a><a class="docs-heading-anchor-permalink" href="#Plotting-Images" title="Permalink"></a></h2><p>Using the tools of NBodySimulator, one can export the results of a simulation into a <a href="https://en.wikipedia.org/wiki/Protein_Data_Bank_(file_format)">Protein Database File</a>. <a href="http://www.ks.uiuc.edu/Research/vmd/">VMD</a> is a well-known tool for visualizing molecular dynamics, which can read data from PDB files.</p><pre><code class="language-julia hljs">save_to_pdb(result, &quot;path_to_a_new_pdb_file.pdb&quot;)</code></pre><p>In the future, it will be possible to export results via the FileIO interface and its <code>save</code> function. Using Plots.jl, one can draw the positions of particles at any time of simulation or create an animation of moving particles, molecules of water:</p><pre><code class="language-julia hljs">using Plots
 plot(result)
-animate(result, &quot;path_to_file.gif&quot;)</code></pre><p>Makie.jl also has a recipe for plotting the results of N-body simulations.</p><h2 id="Contributing"><a class="docs-heading-anchor" href="#Contributing">Contributing</a><a id="Contributing-1"></a><a class="docs-heading-anchor-permalink" href="#Contributing" title="Permalink"></a></h2><ul><li><p>Please refer to the SciML ColPrac: Contributor&#39;s Guide on Collaborative Practices for Community Packages for guidance on PRs, issues, and other matters relating to contributing to SciML.</p></li><li><p>See the <a href="https://github.com/SciML/SciMLStyle">SciML Style Guide</a> for common coding practices and other style decisions.</p></li><li><p>There are a few community forums:</p><ul><li>The #diffeq-bridged and #sciml-bridged channels in the <a href="https://julialang.org/slack/">Julia Slack</a></li><li>The #diffeq-bridged and #sciml-bridged channels in the <a href="https://julialang.zulipchat.com/#narrow/stream/279055-sciml-bridged">Julia Zulip</a></li><li>On the <a href="https://discourse.julialang.org">Julia Discourse forums</a></li><li>See also <a href="https://sciml.ai/community/">SciML Community page</a></li></ul></li></ul><h2 id="Reproducibility"><a class="docs-heading-anchor" href="#Reproducibility">Reproducibility</a><a id="Reproducibility-1"></a><a class="docs-heading-anchor-permalink" href="#Reproducibility" title="Permalink"></a></h2><details><summary>The documentation of this SciML package was built using these direct dependencies,</summary><pre class="documenter-example-output"><code class="nohighlight hljs ansi"><span class="sgr32"><span class="sgr1">Status</span></span> `~/work/NBodySimulator.jl/NBodySimulator.jl/docs/Project.toml`
+animate(result, &quot;path_to_file.gif&quot;)</code></pre><p>Makie.jl also has a recipe for plotting the results of N-body simulations.</p><h2 id="Contributing"><a class="docs-heading-anchor" href="#Contributing">Contributing</a><a id="Contributing-1"></a><a class="docs-heading-anchor-permalink" href="#Contributing" title="Permalink"></a></h2><ul><li><p>Please refer to the SciML ColPrac: Contributor&#39;s Guide on Collaborative Practices for Community Packages for guidance on PRs, issues, and other matters relating to contributing to SciML.</p></li><li><p>See the <a href="https://github.com/SciML/SciMLStyle">SciML Style Guide</a> for common coding practices and other style decisions.</p></li><li><p>There are a few community forums:</p><ul><li>The #diffeq-bridged and #sciml-bridged channels in the <a href="https://julialang.org/slack/">Julia Slack</a></li><li>The #diffeq-bridged and #sciml-bridged channels in the <a href="https://julialang.zulipchat.com/#narrow/stream/279055-sciml-bridged">Julia Zulip</a></li><li>On the <a href="https://discourse.julialang.org">Julia Discourse forums</a></li><li>See also <a href="https://sciml.ai/community/">SciML Community page</a></li></ul></li></ul><h2 id="Reproducibility"><a class="docs-heading-anchor" href="#Reproducibility">Reproducibility</a><a id="Reproducibility-1"></a><a class="docs-heading-anchor-permalink" href="#Reproducibility" title="Permalink"></a></h2><details><summary>The documentation of this SciML package was built using these direct dependencies,</summary><pre class="documenter-example-output"><code class="nohighlight hljs ansi"><span class="sgr32"><span class="sgr1">Status</span></span> `~/_work/NBodySimulator.jl/NBodySimulator.jl/docs/Project.toml`
   <span class="sgr90">[e30172f5] </span>Documenter v1.19.0
-  <span class="sgr90">[0e6f8da7] </span>NBodySimulator v1.16.0 `~/work/NBodySimulator.jl/NBodySimulator.jl`</code></pre></details><details><summary>and using this machine and Julia version.</summary><pre class="documenter-example-output"><code class="nohighlight hljs ansi">Julia Version 1.13.2
+  <span class="sgr90">[0e6f8da7] </span>NBodySimulator v1.16.0 `~/_work/NBodySimulator.jl/NBodySimulator.jl`</code></pre></details><details><summary>and using this machine and Julia version.</summary><pre class="documenter-example-output"><code class="nohighlight hljs ansi">Julia Version 1.13.2
 Commit 45b6d15e34b (2026-10-14 20:33 UTC)
 Build Info:
   Official https://julialang.org release
 Platform Info:
   OS: Linux (x86_64-linux-gnu)
-  CPU: 4 × AMD EPYC 7763 64-Core Processor
+  CPU: 112 × AMD EPYC 7663 56-Core Processor
   WORD_SIZE: 64
   LLVM: libLLVM-20.1.8 (ORCJIT, znver3)
   GC: Built with stock GC
-Threads: 1 default, 1 interactive, 1 GC (on 4 virtual cores)</code></pre></details><details><summary>A more complete overview of all dependencies and their versions is also provided.</summary><pre class="documenter-example-output"><code class="nohighlight hljs ansi"><span class="sgr32"><span class="sgr1">Status</span></span> `~/work/NBodySimulator.jl/NBodySimulator.jl/docs/Manifest.toml`
+Threads: 1 default, 1 interactive, 1 GC (on 4 virtual cores)
+Environment:
+  JULIA_CPU_THREADS = 4
+  JULIA_NUM_PRECOMPILE_TASKS = 4</code></pre></details><details><summary>A more complete overview of all dependencies and their versions is also provided.</summary><pre class="documenter-example-output"><code class="nohighlight hljs ansi"><span class="sgr32"><span class="sgr1">Status</span></span> `~/_work/NBodySimulator.jl/NBodySimulator.jl/docs/Manifest.toml`
   <span class="sgr90">[47edcb42] </span>ADTypes v1.24.0
   <span class="sgr90">[a4c015fc] </span>ANSIColoredPrinters v0.0.1
   <span class="sgr90">[1520ce14] </span>AbstractTrees v0.4.5
@@ -127,7 +130,7 @@ Threads: 1 default, 1 interactive, 1 GC (on 4 virtual cores)</code></pre></detai
   <span class="sgr90">[e2ba6199] </span>ExprTools v0.1.11
   <span class="sgr90">[7034ab61] </span>FastBroadcast v1.4.0
   <span class="sgr90">[9aa1b823] </span>FastClosures v0.3.2
-  <span class="sgr90">[a4df4552] </span>FastPower v1.5.0
+  <span class="sgr90">[a4df4552] </span>FastPower v1.5.1
   <span class="sgr90">[5789e2e9] </span>FileIO v1.20.0
   <span class="sgr90">[64ca27bc] </span>FindFirstFunctions v3.4.1
   <span class="sgr90">[069b7b12] </span>FunctionWrappers v1.1.3
@@ -139,16 +142,16 @@ Threads: 1 default, 1 interactive, 1 GC (on 4 virtual cores)</code></pre></detai
   <span class="sgr90">[92d709cd] </span>IrrationalConstants v0.2.6
   <span class="sgr90">[82899510] </span>IteratorInterfaceExtensions v1.0.0
   <span class="sgr90">[692b3bcd] </span>JLLWrappers v1.8.0
-  <span class="sgr90">[682c06a0] </span>JSON v1.10.0
+  <span class="sgr90">[682c06a0] </span>JSON v1.11.0
   <span class="sgr90">[b964fa9f] </span>LaTeXStrings v1.4.1
   <span class="sgr90">[0e77f7df] </span>LazilyInitializedFields v1.3.0
-  <span class="sgr90">[2ab3a3ac] </span>LogExpFunctions v1.0.2
+  <span class="sgr90">[2ab3a3ac] </span>LogExpFunctions v1.0.3
   <span class="sgr90">[e6f89c97] </span>LoggingExtras v1.2.0
   <span class="sgr90">[1914dd2f] </span>MacroTools v0.5.16
   <span class="sgr90">[d0879d2d] </span>MarkdownAST v0.1.3
   <span class="sgr90">[bb5d69b7] </span>MaybeInplace v0.1.8
   <span class="sgr90">[46d2c3a1] </span>MuladdMacro v0.2.7
-  <span class="sgr90">[0e6f8da7] </span>NBodySimulator v1.16.0 `~/work/NBodySimulator.jl/NBodySimulator.jl`
+  <span class="sgr90">[0e6f8da7] </span>NBodySimulator v1.16.0 `~/_work/NBodySimulator.jl/NBodySimulator.jl`
   <span class="sgr90">[be0214bd] </span>NonlinearSolveBase v2.55.0
   <span class="sgr90">[bac558e1] </span>OrderedCollections v2.0.3
   <span class="sgr90">[bbf590c4] </span>OrdinaryDiffEqCore v4.19.0
@@ -158,10 +161,10 @@ Threads: 1 default, 1 interactive, 1 GC (on 4 virtual cores)</code></pre></detai
   <span class="sgr90">[69de0a69] </span>Parsers v3.0.0
   <span class="sgr90">[d236fae5] </span>PreallocationTools v1.7.1
   <span class="sgr90">[aea7be01] </span>PrecompileTools v1.3.4
-  <span class="sgr90">[21216c6a] </span>Preferences v1.6.0
+  <span class="sgr90">[21216c6a] </span>Preferences v1.6.1
   <span class="sgr90">[08abe8d2] </span>PrettyTables v3.5.0
   <span class="sgr90">[3cdcf5f2] </span>RecipesBase v1.4.0
-  <span class="sgr90">[731186ca] </span>RecursiveArrayTools v4.5.4
+  <span class="sgr90">[731186ca] </span>RecursiveArrayTools v4.5.5
   <span class="sgr90">[189a3867] </span>Reexport v1.2.2
   <span class="sgr90">[2792f1a3] </span>RegistryInstances v0.1.0
   <span class="sgr90">[ae029012] </span>Requires v1.3.1
@@ -178,7 +181,7 @@ Threads: 1 default, 1 interactive, 1 GC (on 4 virtual cores)</code></pre></detai
   <span class="sgr90">[1e83bf80] </span>StaticArraysCore v1.4.4
   <span class="sgr90">[10745b16] </span>Statistics v1.11.5
   <span class="sgr90">[892a3eda] </span>StringManipulation v0.6.1
-  <span class="sgr90">[ec057cc2] </span>StructUtils v2.9.2
+  <span class="sgr90">[ec057cc2] </span>StructUtils v2.10.0
   <span class="sgr90">[2efcf032] </span>SymbolicIndexingInterface v0.3.55
   <span class="sgr90">[3783bdb8] </span>TableTraits v1.0.1
   <span class="sgr90">[bd369af6] </span>Tables v1.14.0
@@ -234,4 +237,4 @@ Threads: 1 default, 1 interactive, 1 GC (on 4 virtual cores)</code></pre></detai
   <span class="sgr90">[8e850ede] </span>nghttp2_jll v1.70.0+0
   <span class="sgr90">[3f19e933] </span>p7zip_jll v17.8.3+0
 <span class="sgr36"><span class="sgr1">Info</span></span> Packages marked with <span class="sgr33">⌅</span> have new versions available but compatibility constraints restrict them from upgrading. To see why use `status --outdated -m`</code></pre></details>You can also download the 
-<a href="<p>You can also download the <a href="https://github.com/SciML/NBodySimulator.jl/tree/gh-pages/v1.16.0/assets/Manifest.toml">manifest</a> file and the <a href="https://github.com/SciML/NBodySimulator.jl/tree/gh-pages/v1.16.0/assets/Project.toml">project</a> file.</p></article><nav class="docs-footer"><a class="docs-footer-nextpage" href="examples/">Examples »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.19.0 on <span class="colophon-date" title="Thursday 15 October 2026 22:47">Thursday 15 October 2026</span>. Using Julia version 1.13.2.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+<a href="<p>You can also download the <a href="https://github.com/SciML/NBodySimulator.jl/tree/gh-pages/v1.16.0/assets/Manifest.toml">manifest</a> file and the <a href="https://github.com/SciML/NBodySimulator.jl/tree/gh-pages/v1.16.0/assets/Project.toml">project</a> file.</p></article><nav class="docs-footer"><a class="docs-footer-nextpage" href="examples/">Examples »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.19.0 on <span class="colophon-date" title="Saturday 17 October 2026 18:30">Saturday 17 October 2026</span>. Using Julia version 1.13.2.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
