@@ -22,7 +22,7 @@ StaticArraysCore = "1e83bf80-4336-4d27-bf5d-d5a4f845583c"
 
 [compat]
 CommonSolve = "0.2"
-DocStringExtensions = "0.9.3"
+DocStringExtensions = "0.9.3, 0.10"
 LinearAlgebra = "1"
 FileIO = "1.19.0"
 OrdinaryDiffEqRKN = "2"
